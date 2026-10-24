@@ -518,12 +518,12 @@
           </div>
         </section>
 
-        <!-- DASH TAB: CAMPAIGN & KALENDER PROGRAM (WITH EXCEL IMPORT) -->
+        <!-- DASH TAB: CAMPAIGN & KALENDER INTERAKTIF -->
         <section id="dashTab-campaign" class="dash-tab">
           <div class="dash-header">
             <div>
-              <h2>Kalender Program &amp; Campaign Otomatis</h2>
-              <p>Jadwalkan pesan otomatis (seperti Sapa Subuh 04:30 WIB) atau impor puluhan jadwal sekaligus dari file Excel.</p>
+              <h2>Campaign &amp; Kalender Konten</h2>
+              <p>Buat campaign, tentukan target sasaran, dan atur isian pesan di setiap kotak tanggal kalender.</p>
             </div>
             <div class="dash-header-actions">
               <button class="btn btn-outline btn-sm" onclick="downloadExcelTemplate()">
@@ -531,75 +531,68 @@
                 <span>Unduh Template Excel</span>
               </button>
               <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleExcelUpload(event)">
-              <button class="btn btn-primary btn-sm" onclick="document.getElementById('excelFileInput').click()">
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('excelFileInput').click()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <span>Import dari Excel (.xlsx)</span>
+                <span>Import Excel ke Kalender</span>
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="openCreateCampaignModal()">
+                <span>+ Buat Campaign Baru</span>
               </button>
             </div>
           </div>
 
-          <!-- Campaign Metrics -->
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-top">
-                <span class="metric-label">Jadwal Subuh Otomatis</span>
-                <span class="badge-tag green">● AKTIF</span>
-              </div>
-              <h3>04:30 WIB</h3>
-              <small class="metric-foot">Program: <strong>Sapa Subuh &amp; Doa Berkah</strong></small>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-top">
-                <span class="metric-label">Total Jadwal Bulan Ini</span>
-                <span class="badge-icon">📅</span>
-              </div>
-              <h3 id="statTotalSchedules">31 Hari Terjadwal</h3>
-              <small class="metric-foot">Otomasi 24 jam non-stop</small>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-top">
-                <span class="metric-label">Mode Proteksi Akun</span>
-                <span class="badge-icon">🛡️</span>
-              </div>
-              <h3>Anti-Banned Jitter</h3>
-              <small class="metric-foot">Jeda acak 3–7 detik antar nomor</small>
-            </div>
-
-            <div class="metric-card">
-              <div class="metric-top">
-                <span class="metric-label">Eksekutor Pesan</span>
-                <span class="badge-icon">🤖</span>
-              </div>
-              <h3>Bot RAYI (IKP)</h3>
-              <small class="metric-foot">Karakter ramah &amp; santun</small>
+          <!-- Active Campaigns Pill Filter -->
+          <div class="campaign-selector-bar">
+            <span class="label">Pilih Campaign:</span>
+            <div class="campaign-pill-list" id="activeCampaignList">
+              <button class="campaign-chip active" onclick="selectCalendarCampaign('all')">Semua Campaign (3)</button>
+              <button class="campaign-chip amber" onclick="selectCalendarCampaign('subuh')">🌅 Sapa Subuh Anak &amp; Keluarga</button>
+              <button class="campaign-chip green" onclick="selectCalendarCampaign('dinas')">📋 Agenda Kedinasan IKP</button>
+              <button class="campaign-chip blue" onclick="selectCalendarCampaign('sppd')">💼 Pengingat SPPD TANDANG</button>
             </div>
           </div>
 
-          <!-- Excel Drag & Drop Upload Zone -->
-          <div class="panel-card mb-4" id="excelDropZone" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleFileDrop(event)">
-            <div class="dropzone-content text-center">
-              <div class="dropzone-icon">📊</div>
-              <h4>Import File Jadwal &amp; Kontak dari Excel</h4>
-              <p class="text-sm text-muted">Tarik dan jatuhkan (*drag &amp; drop*) file <code>.xlsx</code> atau <code>.csv</code> Anda ke sini, atau klik tombol di bawah.</p>
-              <div class="mt-2">
-                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('excelFileInput').click()">Pilih Berkas Excel...</button>
-                <button class="btn btn-outline btn-sm" onclick="downloadExcelTemplate()">Download Format Contoh (.xlsx)</button>
+          <!-- True Visual Month Calendar Grid -->
+          <div class="calendar-wrapper-card panel-card">
+            <div class="calendar-top-bar">
+              <div class="calendar-nav-controls">
+                <button class="cal-nav-btn" onclick="prevMonth()">&larr; Bulan Sebelumnya</button>
+                <h3 id="currentMonthYearText">Oktober 2026</h3>
+                <button class="cal-nav-btn" onclick="nextMonth()">Bulan Berikutnya &rarr;</button>
               </div>
-              <small class="text-dim mt-2 d-block">Format kolom yang didukung: <code>Tanggal</code>, <code>Jam</code>, <code>Program</code>, <code>Target_Nomor</code>, <code>Pesan</code>, <code>Media_URL</code></small>
+              <div class="calendar-legend">
+                <span class="legend-item"><span class="dot-amber"></span> Subuh (04:30)</span>
+                <span class="legend-item"><span class="dot-green"></span> Agenda Dinas</span>
+                <span class="legend-item"><span class="dot-blue"></span> SPPD / TANDANG</span>
+              </div>
+            </div>
+
+            <!-- Calendar Days Header -->
+            <div class="calendar-grid-header">
+              <div>Min</div>
+              <div>Sen</div>
+              <div>Sel</div>
+              <div>Rab</div>
+              <div>Kam</div>
+              <div>Jum</div>
+              <div>Sab</div>
+            </div>
+
+            <!-- 35-Cell Month Grid (Populated via JS) -->
+            <div class="calendar-month-grid" id="calendarMonthGrid">
+              <!-- Injected by app.js renderCalendar() -->
             </div>
           </div>
 
-          <!-- Excel Preview Modal / Card (Dynamic when file imported) -->
-          <div id="excelPreviewBox" class="panel-card hidden">
+          <!-- Excel Preview Modal (When imported) -->
+          <div id="excelPreviewBox" class="panel-card hidden mb-4">
             <div class="panel-header">
               <div>
                 <h3 id="excelPreviewTitle">Pratinjau Data Impor Excel</h3>
                 <span class="text-muted text-sm" id="excelPreviewCount">0 baris data terdeteksi</span>
               </div>
               <div>
-                <button class="btn btn-primary btn-sm" onclick="confirmImportSchedule()">Kunci &amp; Jadwalkan Semua</button>
+                <button class="btn btn-primary btn-sm" onclick="confirmImportSchedule()">Terapkan ke Kalender</button>
                 <button class="btn btn-outline btn-sm" onclick="cancelImportSchedule()">Batal</button>
               </div>
             </div>
@@ -615,72 +608,124 @@
                     <th>Aksi</th>
                   </tr>
                 </thead>
-                <tbody id="excelPreviewTbody">
-                  <!-- Injected via JavaScript -->
-                </tbody>
+                <tbody id="excelPreviewTbody"></tbody>
               </table>
             </div>
           </div>
 
-          <!-- Active Campaign & Calendar Schedule List -->
-          <div class="panel-card">
-            <div class="panel-header">
-              <h3>Daftar Agenda &amp; Broadcast Terjadwal</h3>
-              <div class="schedule-filters">
-                <button class="btn btn-outline btn-sm active" onclick="filterSchedule('all')">Semua Program</button>
-                <button class="btn btn-outline btn-sm" onclick="filterSchedule('subuh')">🌅 Sapa Subuh</button>
-                <button class="btn btn-outline btn-sm" onclick="filterSchedule('dinas')">📋 Agenda Dinas</button>
+        </section>
+
+        <!-- MODAL: BUAT CAMPAIGN BARU (STEP BY STEP) -->
+        <div id="modalCreateCampaign" class="modal-overlay">
+          <div class="modal-box glass-card max-w-xl">
+            <button class="modal-close" onclick="closeCreateCampaignModal()">&times;</button>
+            <div class="panel-header mb-3">
+              <div>
+                <h3>Buat Campaign Baru</h3>
+                <p class="text-sm text-muted">Tentukan payung program, target penerima, dan jam siar otomatis.</p>
               </div>
             </div>
 
-            <div class="table-responsive">
-              <table class="dash-table">
-                <thead>
-                  <tr>
-                    <th>Waktu Kirim</th>
-                    <th>Nama Program</th>
-                    <th>Target Penerima</th>
-                    <th>Isi Pesan / Template</th>
-                    <th>Status</th>
-                    <th>Tindakan Langsung</th>
-                  </tr>
-                </thead>
-                <tbody id="campaignScheduleTable">
-                  <tr>
-                    <td><strong>Besok, 04:30 WIB</strong></td>
-                    <td><span class="badge-tag amber">🌅 Sapa Subuh</span></td>
-                    <td>Anak &amp; Rekan Kerja (+62 851-2104-2025)</td>
-                    <td><em>"Sampurasun! Selamat subuh, bangun nak, mari sambut pagi dengan penuh syukur..."</em></td>
-                    <td><span class="badge-status open">SCHEDULED</span></td>
-                    <td>
-                      <button class="btn btn-outline btn-sm" onclick="triggerImmediateBroadcast(1)">Tes Kirim Sekarang</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>Setiap Hari, 04:30 WIB</strong></td>
-                    <td><span class="badge-tag amber">🌅 Sapa Subuh</span></td>
-                    <td>Daftar Kontak Subuh (Recurring)</td>
-                    <td><em>"Doa pagi dan motivasi harian dari bot RAYI - IKP..."</em></td>
-                    <td><span class="badge-status open">ACTIVE RECURRING</span></td>
-                    <td>
-                      <button class="btn btn-outline btn-sm" onclick="triggerImmediateBroadcast(2)">Tes Kirim Sekarang</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td><strong>Senin, 07:00 WIB</strong></td>
-                    <td><span class="badge-tag green">📋 Agenda Dinas</span></td>
-                    <td>Grup ASN TANDANG</td>
-                    <td><em>"Pengingat Apel Pagi dan rekap disposisi Surat Tugas minggu ini..."</em></td>
-                    <td><span class="badge-status open">SCHEDULED</span></td>
-                    <td>
-                      <button class="btn btn-outline btn-sm" onclick="triggerImmediateBroadcast(3)">Tes Kirim Sekarang</button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <form onsubmit="handleSaveNewCampaign(event)">
+              <div class="form-group">
+                <label>1. Nama Campaign / Program</label>
+                <input type="text" id="campName" placeholder="Contoh: Sapa Subuh Anak Tercinta / Pengingat Apel Pagi" required>
+              </div>
+
+              <div class="form-group">
+                <label>2. Ke Siapa? (Target Audience / Grup)</label>
+                <select id="campTargetGroup" class="form-select">
+                  <option value="keluarga">👨‍👩‍👧 Grup Keluarga &amp; Anak (+62 851-2104-2025)</option>
+                  <option value="pimpinan">🏛️ Grup Pimpinan &amp; Eselon IKP</option>
+                  <option value="tandang">📋 Grup ASN &amp; Staf TANDANG</option>
+                  <option value="manual">Ketik Nomor HP Manual...</option>
+                </select>
+              </div>
+
+              <div class="form-group hidden" id="boxCampManualPhone">
+                <label>Nomor WhatsApp Tujuan</label>
+                <input type="text" id="campManualPhone" placeholder="Contoh: 6285121042025">
+              </div>
+
+              <div class="card-grid-2">
+                <div class="form-group">
+                  <label>3. Jam Kirim Rutin</label>
+                  <input type="time" id="campTime" value="04:30" required>
+                  <small class="hint-text">Contoh: 04:30 WIB untuk waktu subuh.</small>
+                </div>
+                <div class="form-group">
+                  <label>4. Saluran Pengiriman</label>
+                  <select id="campChannel" class="form-select">
+                    <option value="whatsapp" selected>📱 WhatsApp (via bot RAYI)</option>
+                    <option value="telegram">✈️ Telegram Official Bot</option>
+                    <option value="both">📱 WhatsApp + ✈️ Telegram</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>5. Template / Default Isi Pesan (Bisa Diedit per Tanggal di Kalender)</label>
+                <textarea id="campDefaultText" rows="3" placeholder="Ketik draf pesan default...">Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur.</textarea>
+              </div>
+
+              <div class="form-actions mt-3">
+                <button type="submit" class="btn btn-primary btn-block">Simpan Campaign &amp; Buka Kalender &rarr;</button>
+              </div>
+            </form>
           </div>
-        </section>
+        </div>
+
+        <!-- MODAL: ISI / EDIT PESAN PADA TANGGAL TERTENTU DI KALENDER -->
+        <div id="modalDateEntry" class="modal-overlay">
+          <div class="modal-box glass-card max-w-xl">
+            <button class="modal-close" onclick="closeDateEntryModal()">&times;</button>
+            <div class="panel-header mb-3">
+              <div>
+                <h3 id="dateEntryTitle">Isian Pesan: 25 Oktober 2026</h3>
+                <p class="text-sm text-muted">Atur pesan khusus yang akan dikirim bot RAYI pada tanggal ini.</p>
+              </div>
+            </div>
+
+            <form onsubmit="handleSaveDateEntry(event)">
+              <input type="hidden" id="entryDateKey">
+              
+              <div class="card-grid-2">
+                <div class="form-group">
+                  <label>Pilih Campaign</label>
+                  <select id="entryCampSelect" class="form-select" onchange="applyCampaignTemplateToEntry()">
+                    <option value="subuh">🌅 Sapa Subuh Anak &amp; Keluarga</option>
+                    <option value="dinas">📋 Agenda Kedinasan IKP</option>
+                    <option value="sppd">💼 Pengingat SPPD TANDANG</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Jam Kirim</label>
+                  <input type="time" id="entryTime" value="04:30" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Target Penerima</label>
+                <input type="text" id="entryTargetRecipient" value="👨‍👩‍👧 Anak Tercinta (+62 851-2104-2025)" class="input-readonly" readonly>
+              </div>
+
+              <div class="form-group">
+                <label>Apa Isinya? (Pesan Khusus Hari Ini)</label>
+                <textarea id="entryMessageText" rows="4" placeholder="Ketik pesan yang akan dikirim di tanggal ini..." required>Sampurasun! Selamat subuh anakku tercinta, mari sambut pagi dengan sholat subuh, doa, dan sarapan yang cukup. Semangat belajar hari ini!</textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Lampiran Dokumen PDF / Gambar (Opsional)</label>
+                <input type="text" id="entryMediaUrl" placeholder="URL file PDF / Gambar">
+              </div>
+
+              <div class="form-actions" style="display:flex; gap:10px;">
+                <button type="submit" class="btn btn-primary" style="flex:1;">Simpan ke Tanggal Ini</button>
+                <button type="button" class="btn btn-secondary" onclick="testSendDateEntry()">Tes Kirim ke WA Sekarang</button>
+              </div>
+            </form>
+          </div>
+        </div>
 
         <!-- DASH TAB: GRUP & BUKU KONTAK -->
         <section id="dashTab-contacts" class="dash-tab">

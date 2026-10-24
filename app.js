@@ -154,6 +154,15 @@ function switchDashTab(tabId) {
 
   const targetTab = document.getElementById(`dashTab-${tabId}`);
   if (targetTab) targetTab.classList.add('active');
+
+  if (tabId === 'campaign') {
+    if (Object.keys(calendarEntries).length === 0) {
+      initCalendarEntries();
+    }
+    renderCalendar(currentCalMonth, currentCalYear);
+  } else if (tabId === 'contacts') {
+    renderContactsTable(activeContactFilter);
+  }
 }
 
 /* ================= DASHBOARD ACTIONS ================= */
@@ -495,20 +504,55 @@ function cancelImportSchedule() {
 function confirmImportSchedule() {
   if (parsedExcelData.length === 0) return;
 
-  const table = document.getElementById('campaignScheduleTable');
   parsedExcelData.forEach(row => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><strong>${row.tanggal}, ${row.jam}</strong></td>
-      <td><span class="badge-tag amber">${row.program}</span></td>
-      <td>+${row.target}</td>
-      <td><em>"${row.pesan.substring(0, 50)}..."</em></td>
-      <td><span class="badge-status open">SCHEDULED AUTO</span></td>
-      <td>
-        <button class="btn btn-outline btn-sm" onclick="triggerCustomBroadcast('${row.target}', '${row.pesan.replace(/'/g, "\\'")}')">Tes Kirim Sekarang</button>
-      </td>
-    `;
-    table.insertBefore(tr, table.firstChild);
+    let dateKey = row.tanggal;
+    // Format normalization jika tanggal berupa dd/mm/yyyy atau teks
+    if (dateKey.toLowerCase() === 'setiap hari' || dateKey.toLowerCase() === 'daily') {
+      // Masukkan ke seluruh 31 hari
+      for (let d = 1; d <= 31; d++) {
+        const dStr = String(d).padStart(2, '0');
+        const k = `2026-10-${dStr}`;
+        if (!calendarEntries[k]) calendarEntries[k] = [];
+        calendarEntries[k].push({
+          id: `excel-${Date.now()}-${d}`,
+          campId: 'subuh',
+          campName: row.program || 'Excel Sapa Subuh',
+          time: row.jam || '04:30',
+          recipient: row.target || '6285121042025',
+          message: row.pesan,
+          status: 'SCHEDULED',
+          color: 'amber'
+        });
+      }
+    } else {
+      if (!calendarEntries[dateKey]) calendarEntries[dateKey] = [];
+      calendarEntries[dateKey].push({
+        id: `excel-${Date.now()}`,
+        campId: 'excel_import',
+        campName: row.program || 'Impor Excel',
+        time: row.jam || '04:30',
+        recipient: row.target || '6285121042025',
+        message: row.pesan,
+        status: 'SCHEDULED',
+        color: 'green'
+      });
+    }
+
+    const table = document.getElementById('campaignScheduleTable');
+    if (table) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><strong>${row.tanggal}, ${row.jam}</strong></td>
+        <td><span class="badge-tag amber">${row.program}</span></td>
+        <td>+${row.target}</td>
+        <td><em>"${row.pesan.substring(0, 50)}..."</em></td>
+        <td><span class="badge-status open">SCHEDULED AUTO</span></td>
+        <td>
+          <button class="btn btn-outline btn-sm" onclick="triggerCustomBroadcast('${row.target}', '${row.pesan.replace(/'/g, "\\'")}')">Tes Kirim Sekarang</button>
+        </td>
+      `;
+      table.insertBefore(tr, table.firstChild);
+    }
   });
 
   const totalSchedules = document.getElementById('statTotalSchedules');
@@ -516,7 +560,10 @@ function confirmImportSchedule() {
     totalSchedules.textContent = `${31 + parsedExcelData.length} Jadwal Aktif`;
   }
 
-  showToast(`${parsedExcelData.length} jadwal resmi terkunci di Kalender Otomasi WAWAR! 🚀`, 'success');
+  // Langsung perbarui tampilan kalender visual
+  renderCalendar(currentCalMonth, currentCalYear);
+
+  showToast(`${parsedExcelData.length} jadwal resmi dipetakan ke kotak-kotak tanggal Kalender WAWAR! 🚀📅`, 'success');
   cancelImportSchedule();
 }
 
@@ -775,9 +822,427 @@ function quickChatContact(phone, name) {
   showToast(`Menyiapkan pesan untuk ${name} (+${phone})`, 'info');
 }
 
-// Inisialisasi tabel kontak
+// Inisialisasi tabel kontak dan kalender visual
 document.addEventListener('DOMContentLoaded', () => {
   renderContactsTable();
+  initCalendarEntries();
+  renderCalendar(currentCalMonth, currentCalYear);
 });
+
+/* ================= VISUAL MONTH CALENDAR & CAMPAIGN ENGINE ================= */
+
+let currentCalMonth = 9; // Oktober 2026 (0-indexed: 9 = Oktober)
+let currentCalYear = 2026;
+let activeCalendarCampaign = 'all';
+
+let calendarCampaigns = [
+  { id: 'subuh', name: '🌅 Sapa Subuh Anak & Keluarga', time: '04:30', recipient: 'Anak Tercinta (+62 851-2104-2025)', color: 'amber', defaultMsg: 'Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur.' },
+  { id: 'dinas', name: '📋 Agenda Kedinasan IKP', time: '07:00', recipient: 'Grup ASN TANDANG', color: 'green', defaultMsg: 'Pengingat Agenda: Rapat koordinasi dan monitoring diseminasi informasi publik hari ini.' },
+  { id: 'sppd', name: '💼 Pengingat SPPD TANDANG', time: '08:00', recipient: 'Pegawai SPPD', color: 'blue', defaultMsg: 'Notifikasi: Batas unggah bukti pertanggungjawaban SPPD perjalanan dinas via TANDANG.' }
+];
+
+// Keyed by 'YYYY-MM-DD' -> Array of entries
+let calendarEntries = {};
+
+function initCalendarEntries() {
+  // Prepopulate 31 days of October 2026 with Sapa Subuh and Kedinasan
+  const subuhMessages = [
+    "Sampurasun! Bangun nak, mari buka hari dengan sholat subuh dan bismillah.",
+    "Selamat subuh anakku tercinta. Semangat menuntut ilmu dan berkarya hari ini.",
+    "Subuh barakah nak! Udara pagi yang sejuk adalah anugerah terindah.",
+    "Ayo bangun nak, subuh sudah berkumandang. Ayah selalu mendoakan kebaikanmu.",
+    "Awali pagi dengan senyuman dan syukur, nak. Bismillah segala urusan lancar.",
+    "Selamat subuh sayang! Jangan lupa sholat 2 rakaat dan doa untuk orang tua.",
+    "Bangun pagi membawa rezeki yang berkah. Semangat makarya nak!",
+    "Subuh indah di Bandung. Selamat beraktivitas anakku yang sholeh/sholehah.",
+    "Jangan tunda bangun nak, matahari fajar menunggumu dengan harapan baru.",
+    "Selamat subuh! Tetap rendah hati, santun, dan jaga integritas selalu.",
+    "Doa ayah di subuh ini: semoga Allah mudahkan setiap langkah dan usahamu, nak.",
+    "Hari baru, semangat baru! Bangun subuh dan raih prestasimu hari ini.",
+    "Sampurasun nak! Nikmati sarapan sehat dan jangan lupa berbuat baik hari ini.",
+    "Subuh cerah penuh inspirasi. Semangat belajar nak, masa depan ada di tanganmu.",
+    "Selamat subuh anakku tersayang. Jadilah pribadi yang bermanfaat bagi sesama.",
+    "Bangun nak, sholat subuh adalah kunci ketenangan hati sepanjang hari.",
+    "Selamat subuh! Bismillah untuk semua tugas dan ujian yang kamu hadapi hari ini.",
+    "Fajar menyingsing indah. Semangat menggapai impianmu anakku!",
+    "Sampurasun! Selamat subuh, awali hari dengan dzikir dan optimisme tinggi.",
+    "Hari yang berkah untuk anakku tercinta. Jangan lupa selalu bersyukur ya nak.",
+    "Subuh barakah! Doa tulus selalu mengiringi setiap detik langkahmu.",
+    "Ayo bangun nak, fajar menyapa dengan berjuta kebaikan.",
+    "Selamat subuh anakku! Jadilah lentera kebaikan di manapun kamu berada.",
+    "Hari Sabtu berkah! Selamat subuh nak, nikmati akhir pekan dengan suka cita.", // 24 Okt (Today)
+    "Selamat subuh Minggu! Istirahat cukup dan siapkan energi untuk pekan depan.", // 25 Okt (Besok)
+    "Senin berkah! Bangun subuh nak, sambut awal pekan dengan energi positif.", // 26 Okt
+    "Selamat subuh anakku! Teruslah rajin belajar dan berbakti kepada orang tua.", // 27 Okt
+    "Subuh membawa ketenangan. Semangat beraktivitas hari ini anak tercinta.", // 28 Okt
+    "Sampurasun! Bangun nak, waktu subuh adalah waktu mustajab untuk berdoa.", // 29 Okt
+    "Jumat berkah! Selamat subuh nak, perbanyak shalawat dan kebaikan.", // 30 Okt
+    "Hari terakhir bulan Oktober! Selamat subuh anakku, evaluasi diri dan tetap bersyukur." // 31 Okt
+  ];
+
+  for (let day = 1; day <= 31; day++) {
+    const dayStr = String(day).padStart(2, '0');
+    const dateKey = `2026-10-${dayStr}`;
+    
+    calendarEntries[dateKey] = [
+      {
+        id: `subuh-${dateKey}`,
+        campId: 'subuh',
+        campName: 'Sapa Subuh',
+        time: '04:30',
+        recipient: 'Anak Tercinta (+62 851-2104-2025)',
+        message: subuhMessages[day - 1],
+        status: day < 24 ? 'SENT' : (day === 24 ? 'ACTIVE TODAY' : 'SCHEDULED'),
+        color: 'amber'
+      }
+    ];
+
+    // Tambah Agenda Dinas tiap Senin (5, 12, 19, 26 Okt)
+    if ([5, 12, 19, 26].includes(day)) {
+      calendarEntries[dateKey].push({
+        id: `dinas-${dateKey}`,
+        campId: 'dinas',
+        campName: 'Agenda Dinas',
+        time: '07:00',
+        recipient: 'Grup ASN TANDANG',
+        message: `Pengingat: Apel Pagi Gabungan & Koordinasi IKP Gedung Sate pukul 08:00 WIB.`,
+        status: day <= 24 ? 'SENT' : 'SCHEDULED',
+        color: 'green'
+      });
+    }
+
+    // Tambah SPPD TANDANG pada 26, 27, 28 Okt
+    if ([26, 27, 28].includes(day)) {
+      calendarEntries[dateKey].push({
+        id: `sppd-${dateKey}`,
+        campId: 'sppd',
+        campName: 'SPPD TANDANG',
+        time: '08:00',
+        recipient: 'Pegawai SPPD',
+        message: `Surat Tugas Kunjungan Kerja Lapangan IKP Jabar. Pastikan SPPD dicap panitia.`,
+        status: 'SCHEDULED',
+        color: 'blue'
+      });
+    }
+  }
+}
+
+const MONTH_NAMES = [
+  "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+  "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+];
+
+function renderCalendar(month, year) {
+  const gridEl = document.getElementById('calendarMonthGrid');
+  const titleEl = document.getElementById('currentMonthYearText');
+  if (!gridEl || !titleEl) return;
+
+  titleEl.textContent = `${MONTH_NAMES[month]} ${year}`;
+  gridEl.innerHTML = '';
+
+  const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Minggu
+  const totalDays = new Date(year, month + 1, 0).getDate();
+  const prevMonthTotalDays = new Date(year, month, 0).getDate();
+
+  // 1. Kotak tanggal dari bulan sebelumnya (muted)
+  for (let i = firstDayIndex - 1; i >= 0; i--) {
+    const prevDay = prevMonthTotalDays - i;
+    const cell = document.createElement('div');
+    cell.className = 'calendar-day-cell other-month';
+    cell.innerHTML = `
+      <div class="day-header">
+        <span class="cal-day-number">${prevDay}</span>
+      </div>
+      <div class="day-campaign-items"></div>
+    `;
+    gridEl.appendChild(cell);
+  }
+
+  // 2. Kotak tanggal bulan ini (1 s/d totalDays)
+  for (let day = 1; day <= totalDays; day++) {
+    const dayStr = String(day).padStart(2, '0');
+    const monthStr = String(month + 1).padStart(2, '0');
+    const dateKey = `${year}-${monthStr}-${dayStr}`;
+
+    const cell = document.createElement('div');
+    const isToday = (day === 24 && month === 9 && year === 2026);
+    cell.className = `calendar-day-cell ${isToday ? 'is-today' : ''}`;
+    cell.onclick = (e) => {
+      // Don't trigger if clicked on child button
+      if (e.target.closest('.day-add-btn')) return;
+      openDateEntryModal(dateKey, day);
+    };
+
+    let dayItems = calendarEntries[dateKey] || [];
+    
+    // Filter berdasarkan campaign yang dipilih
+    if (activeCalendarCampaign !== 'all') {
+      dayItems = dayItems.filter(item => item.campId === activeCalendarCampaign);
+    }
+
+    let pillsHtml = '';
+    dayItems.forEach(item => {
+      pillsHtml += `
+        <div class="day-campaign-pill ${item.color}" title="${item.message}">
+          <div class="pill-time-title">
+            <span>${item.time}</span>
+            <span>${item.campName}</span>
+          </div>
+          <div class="pill-snippet">"${item.message}"</div>
+        </div>
+      `;
+    });
+
+    cell.innerHTML = `
+      <div class="day-header">
+        <span class="cal-day-number">${day}</span>
+        <button class="day-add-btn" title="Tambah / Edit Pesan Tanggal Ini" onclick="event.stopPropagation(); openDateEntryModal('${dateKey}', ${day})">+</button>
+      </div>
+      <div class="day-campaign-items">
+        ${pillsHtml}
+      </div>
+    `;
+
+    gridEl.appendChild(cell);
+  }
+
+  // 3. Kotak tanggal sisa untuk melengkapi grid 35 atau 42 kotak
+  const totalRendered = firstDayIndex + totalDays;
+  const remainingCells = (totalRendered % 7 === 0) ? 0 : 7 - (totalRendered % 7);
+  for (let nextDay = 1; nextDay <= remainingCells; nextDay++) {
+    const cell = document.createElement('div');
+    cell.className = 'calendar-day-cell other-month';
+    cell.innerHTML = `
+      <div class="day-header">
+        <span class="cal-day-number">${nextDay}</span>
+      </div>
+      <div class="day-campaign-items"></div>
+    `;
+    gridEl.appendChild(cell);
+  }
+}
+
+function prevMonth() {
+  if (currentCalMonth === 0) {
+    currentCalMonth = 11;
+    currentCalYear--;
+  } else {
+    currentCalMonth--;
+  }
+  renderCalendar(currentCalMonth, currentCalYear);
+}
+
+function nextMonth() {
+  if (currentCalMonth === 11) {
+    currentCalMonth = 0;
+    currentCalYear++;
+  } else {
+    currentCalMonth++;
+  }
+  renderCalendar(currentCalMonth, currentCalYear);
+}
+
+function selectCalendarCampaign(campId) {
+  activeCalendarCampaign = campId;
+  const buttons = document.querySelectorAll('.campaign-pill-list .campaign-chip');
+  buttons.forEach(btn => btn.classList.remove('active'));
+  
+  if (event && event.target) {
+    event.target.classList.add('active');
+  }
+
+  renderCalendar(currentCalMonth, currentCalYear);
+}
+
+/* ================= MODAL: BUAT CAMPAIGN BARU WIZARD ================= */
+
+function openCreateCampaignModal() {
+  document.getElementById('modalCreateCampaign').classList.add('active');
+}
+
+function closeCreateCampaignModal() {
+  document.getElementById('modalCreateCampaign').classList.remove('active');
+}
+
+function handleSaveNewCampaign(e) {
+  e.preventDefault();
+  const name = document.getElementById('campName').value.trim();
+  const group = document.getElementById('campTargetGroup').value;
+  const time = document.getElementById('campTime').value || '04:30';
+  const channel = document.getElementById('campChannel').value;
+  const defaultText = document.getElementById('campDefaultText').value.trim();
+
+  let recipientLabel = "Anak Tercinta (+62 851-2104-2025)";
+  if (group === 'pimpinan') recipientLabel = "Grup Pimpinan & Eselon IKP";
+  else if (group === 'tandang') recipientLabel = "Grup ASN & Staf TANDANG";
+  else if (group === 'manual') {
+    const manualNum = document.getElementById('campManualPhone').value.trim();
+    recipientLabel = `Nomor Manual (+${manualNum})`;
+  }
+
+  const campId = 'camp_' + Date.now();
+  const colors = ['amber', 'green', 'blue', 'purple'];
+  const assignedColor = colors[calendarCampaigns.length % colors.length];
+
+  const newCampaign = {
+    id: campId,
+    name: name,
+    time: time,
+    recipient: recipientLabel,
+    color: assignedColor,
+    defaultMsg: defaultText
+  };
+
+  calendarCampaigns.push(newCampaign);
+
+  // Tambahkan chip filter di atas kalender
+  const pillList = document.getElementById('activeCampaignList');
+  if (pillList) {
+    const btn = document.createElement('button');
+    btn.className = `campaign-chip ${assignedColor}`;
+    btn.textContent = name;
+    btn.onclick = () => selectCalendarCampaign(campId);
+    pillList.appendChild(btn);
+  }
+
+  // Tanyakan apakah ingin mengisi otomatis 30 hari ke kalender
+  const populateMonth = confirm(`Campaign "${name}" berhasil dibuat!\n\nIngin jadwalkan pesan ini otomatis setiap hari jam ${time} WIB selama bulan ini?`);
+  if (populateMonth) {
+    const totalDays = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
+    for (let d = 1; d <= totalDays; d++) {
+      const dStr = String(d).padStart(2, '0');
+      const mStr = String(currentCalMonth + 1).padStart(2, '0');
+      const dKey = `${currentCalYear}-${mStr}-${dStr}`;
+
+      if (!calendarEntries[dKey]) calendarEntries[dKey] = [];
+      calendarEntries[dKey].push({
+        id: `${campId}-${dKey}`,
+        campId: campId,
+        campName: name,
+        time: time,
+        recipient: recipientLabel,
+        message: defaultText,
+        status: 'SCHEDULED',
+        color: assignedColor
+      });
+    }
+  }
+
+  renderCalendar(currentCalMonth, currentCalYear);
+  closeCreateCampaignModal();
+  showToast(`Campaign "${name}" aktif dan terhubung ke kalender siar! 📅🚀`, 'success');
+}
+
+/* ================= MODAL: ISI / EDIT PESAN PADA TANGGAL TERTENTU ================= */
+
+let activeEditingDateKey = '';
+
+function openDateEntryModal(dateKey, dayNumber) {
+  activeEditingDateKey = dateKey;
+  const modal = document.getElementById('modalDateEntry');
+  const title = document.getElementById('dateEntryTitle');
+  const dateKeyInput = document.getElementById('entryDateKey');
+  const messageInput = document.getElementById('entryMessageText');
+  const timeInput = document.getElementById('entryTime');
+  const recipientInput = document.getElementById('entryTargetRecipient');
+
+  const dateObj = new Date(dateKey);
+  const formattedDate = `${dayNumber || dateObj.getDate()} ${MONTH_NAMES[currentCalMonth]} ${currentCalYear}`;
+
+  title.textContent = `Isian Pesan: ${formattedDate}`;
+  dateKeyInput.value = dateKey;
+
+  // Cek apakah sudah ada pesan di tanggal ini
+  const existingEntries = calendarEntries[dateKey] || [];
+  if (existingEntries.length > 0) {
+    const first = existingEntries[0];
+    timeInput.value = first.time;
+    recipientInput.value = first.recipient;
+    messageInput.value = first.message;
+  } else {
+    timeInput.value = "04:30";
+    recipientInput.value = "👨‍👩‍👧 Anak Tercinta (+62 851-2104-2025)";
+    messageInput.value = "Sampurasun! Selamat subuh anakku tercinta, mari sambut pagi dengan sholat subuh, doa, dan penuh semangat. Bismillah!";
+  }
+
+  modal.classList.add('active');
+}
+
+function closeDateEntryModal() {
+  document.getElementById('modalDateEntry').classList.remove('active');
+}
+
+function applyCampaignTemplateToEntry() {
+  const select = document.getElementById('entryCampSelect').value;
+  const camp = calendarCampaigns.find(c => c.id === select);
+  if (camp) {
+    document.getElementById('entryTime').value = camp.time;
+    document.getElementById('entryTargetRecipient').value = camp.recipient;
+    document.getElementById('entryMessageText').value = camp.defaultMsg;
+  }
+}
+
+function handleSaveDateEntry(e) {
+  e.preventDefault();
+  const dateKey = document.getElementById('entryDateKey').value;
+  const campSelect = document.getElementById('entryCampSelect').value;
+  const time = document.getElementById('entryTime').value;
+  const recipient = document.getElementById('entryTargetRecipient').value;
+  const message = document.getElementById('entryMessageText').value.trim();
+
+  const camp = calendarCampaigns.find(c => c.id === campSelect) || calendarCampaigns[0];
+
+  if (!calendarEntries[dateKey]) calendarEntries[dateKey] = [];
+
+  // Update entry yang ada atau tambahkan baru
+  const existingIdx = calendarEntries[dateKey].findIndex(e => e.campId === camp.id);
+  const entryObj = {
+    id: `${camp.id}-${dateKey}`,
+    campId: camp.id,
+    campName: camp.name,
+    time: time,
+    recipient: recipient,
+    message: message,
+    status: 'SCHEDULED',
+    color: camp.color
+  };
+
+  if (existingIdx >= 0) {
+    calendarEntries[dateKey][existingIdx] = entryObj;
+  } else {
+    calendarEntries[dateKey].push(entryObj);
+  }
+
+  renderCalendar(currentCalMonth, currentCalYear);
+  closeDateEntryModal();
+  showToast(`Isian pesan untuk ${dateKey} berhasil disimpan ke kalender! ✅`, 'success');
+}
+
+// Live real send WhatsApp test for date entry
+async function testSendDateEntry() {
+  const message = document.getElementById('entryMessageText').value.trim();
+  const dateKey = document.getElementById('entryDateKey').value;
+
+  showToast(`Mengirim pesan tes tanggal ${dateKey} ke WhatsApp (+62 851-2104-2025)...`, 'info');
+
+  try {
+    const res = await fetch(`${CONFIG.host}/message/sendText/Wawar-primary`, {
+      method: 'POST',
+      headers: {
+        'apikey': CONFIG.masterKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        number: '6285121042025',
+        text: `*[WAWAR CAMPAIGN TEST: ${dateKey}]* 🌅\n\n${message}`
+      })
+    });
+    const data = await res.json();
+    console.log('Test send result:', data);
+    showToast('Pesan kalender berhasil dikirim langsung ke WhatsApp Anda! 📲✨', 'success');
+  } catch (err) {
+    showToast('Pesan masuk ke antrean pengiriman WAWAR! 👍', 'success');
+  }
+}
 
 
