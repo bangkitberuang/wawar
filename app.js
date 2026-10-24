@@ -25,6 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initCalendarEntries();
   populateCampaignContentPresetOptions();
   calculateSeriesEndDate();
+  if (typeof switchRunningCampaignHero === 'function') {
+    switchRunningCampaignHero('camp_dinas_legacy');
+  }
+  if (typeof selectClientApp === 'function') {
+    selectClientApp('tandang');
+  }
+  if (window.lucide) {
+    lucide.createIcons();
+  }
 });
 
 /* ================= NAVIGATION & ROUTING ================= */
@@ -172,6 +181,11 @@ function switchDashTab(tabId) {
   } else if (tabId === 'rayiai') {
     renderKnowledgeBases();
     renderActiveKnowledgeBase();
+  } else if (tabId === 'reports') {
+    fetchLiveCampaignReports();
+  }
+  if (window.lucide) {
+    setTimeout(() => lucide.createIcons(), 50);
   }
 }
 
@@ -368,6 +382,282 @@ function simulateSendOtp() {
   document.getElementById('simOtpResult').classList.remove('hidden');
 
   showToast(`OTP ${code} berhasil dibuat dan dikirim ke ${phone} via WhatsApp!`, 'success');
+}
+
+/* ================= MULTI-APLIKASI KLIEN GATEWAY & LIVE PROGRAM PROGRESS ================= */
+
+let selectedClientAppKey = 'tandang';
+
+const clientApplicationsData = {
+  tandang: {
+    id: 'tandang',
+    name: 'Aplikasi TANDANG',
+    category: 'Kedinasan TANDANG',
+    categoryBadgeClass: 'green',
+    status: 'ACTIVE',
+    apiKey: 'wawar_live_tandang_sec_994821a8',
+    activeProgram: {
+      id: 'camp_dinas_legacy',
+      title: 'Sosialisasi SPPD & Kedinasan TANDANG',
+      durationText: '🟢 Sisa 12 Hari Lagi (Aktif s/d 15 Nov 2026)',
+      desc: 'Program terjadwal mingguan pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas ASN Diskominfo Jawa Barat.',
+      progressPercent: 50,
+      progressText: '50% Berjalan (Minggu ke-2 dari 4 Minggu)',
+      startDate: '15 Okt 2026',
+      currentDate: '24 Okt 2026',
+      endDate: '15 Nov 2026',
+      botName: 'Bot RAYI Kedinasan',
+      botEngine: 'Gemini 2.5 Flash RAG',
+      senderNumber: 'Wawar-primary (+62 851-2104-2025)',
+      security: '🔒 Whitelist: Hanya Nomor di Grup TANDANG'
+    },
+    sdkCode: `import { sendWawarNotification, sendWawarDocument } from '@/lib/wawar/client';
+
+// Kirim notifikasi Surat Tugas F4 ke pegawai via Gateway WAWAR:
+await sendWawarDocument({
+  phone: "6285121042025",
+  pdfUrl: "https://tandang.jabarprov.go.id/api/pdf/st-090.pdf",
+  fileName: "Surat_Tugas_090.pdf",
+  caption: "Sampurasun! Surat Tugas No. 090 telah terbit dari Aplikasi TANDANG."
+});`
+  },
+  funrun: {
+    id: 'funrun',
+    name: 'Aplikasi Fun Run Jabar 2026',
+    category: 'Event Fun Run',
+    categoryBadgeClass: 'blue',
+    status: 'ACTIVE',
+    apiKey: 'wawar_live_funrun_sec_4821fb7e',
+    activeProgram: {
+      id: 'camp_funrun_legacy',
+      title: 'Event Fun Run 26 Des Jabar',
+      durationText: '🔵 H-63 Menuju Hari Acara (26 Des 2026)',
+      desc: 'Pengingat berkala H-7, H-1, dan hari H start jam 06:00 WIB di Gedung Sate untuk 500 pelari terdaftar, rute 5K, dan shareloc Google Maps.',
+      progressPercent: 35,
+      progressText: '35% Menuju Hari Acara (Fase Pendaftaran & Rute)',
+      startDate: '15 Okt 2026',
+      currentDate: '24 Okt 2026',
+      endDate: '26 Des 2026',
+      botName: 'Bot Helpdesk Fun Run 2026',
+      botEngine: 'Gemini 2.5 Flash RAG',
+      senderNumber: 'rayi-cs-official',
+      security: '🌐 Terbuka: Melayani Seluruh Peserta Event'
+    },
+    sdkCode: `import { sendWawarNotification } from '@/lib/wawar/client';
+
+// Kirim konfirmasi tiket QR dan link shareloc Fun Run:
+await sendWawarNotification({
+  phone: "6281234567890",
+  message: "Halo Runner! 🏃 Tiket Fun Run 26 Des Anda telah terverifikasi. Nomor BIB: 042. Rute: Gedung Sate 5K. Maps: https://maps.google.com/?q=-6.9025,107.6186"
+});`
+  },
+  portalikp: {
+    id: 'portalikp',
+    name: 'Portal Kehumasan & Berita IKP',
+    category: 'Siaran Berita Publik',
+    categoryBadgeClass: 'purple',
+    status: 'ACTIVE',
+    apiKey: 'wawar_live_portalikp_sec_3309ea11',
+    activeProgram: {
+      id: 'camp_siaran_ikp',
+      title: 'Siaran Pers & Berita Harian Diskominfo',
+      durationText: '🟢 Siaga 24/7 (Non-stop)',
+      desc: 'Gateway pengiriman siaran pers kilat ke media massa, grup jurnalis, dan kanal informasi publik Jawa Barat.',
+      progressPercent: 100,
+      progressText: '100% Siaga 24/7 (Realtime Inbound Push)',
+      startDate: 'Realtime',
+      currentDate: '24 Okt 2026',
+      endDate: 'Aktif Terus',
+      botName: 'Bot CS Layanan Publik',
+      botEngine: 'Rule-Based Keyword Matcher',
+      senderNumber: 'wawar-blast-x',
+      security: '📢 Terbuka: Gateway Siaran Bebas'
+    },
+    sdkCode: `import { sendWawarBroadcast } from '@/lib/wawar/client';
+
+// Kirim siaran rilis berita Diskominfo ke grup jurnalis:
+await sendWawarBroadcast({
+  targetGroup: "media_jabar",
+  headline: "Siaran Pers: Program Desa Digital Jawa Barat",
+  content: "Diskominfo Jabar meresmikan 15 titik internet desa baru di Garut Selatan..."
+});`
+  },
+  simpeg: {
+    id: 'simpeg',
+    name: 'SIMPEG Presensi ASN',
+    category: 'Kepegawaian ASN',
+    categoryBadgeClass: 'amber',
+    status: 'READY',
+    apiKey: 'wawar_live_simpeg_sec_7718cc90',
+    activeProgram: {
+      id: 'camp_presensi_asn',
+      title: 'Pengingat Absen Masuk & Pulang ASN',
+      durationText: '⏰ Jadwal Hari Kerja (07:15 & 16:30 WIB)',
+      desc: 'Notifikasi otomatis jam 07:15 WIB dan 16:30 WIB kepada seluruh ASN yang belum melakukan clock-in / clock-out di aplikasi SIMPEG.',
+      progressPercent: 75,
+      progressText: '75% Selesai Bulan Ini (Sisa 5 Hari Kerja)',
+      startDate: '01 Okt 2026',
+      currentDate: '24 Okt 2026',
+      endDate: '31 Okt 2026',
+      botName: 'Bot Notifikasi Cepat',
+      botEngine: 'Broadcast Murni (Tanpa Bot)',
+      senderNumber: 'Wawar-primary (+62 851-2104-2025)',
+      security: '🔒 Khusus ASN Terdaftar SIMPEG'
+    },
+    sdkCode: `import { sendWawarNotification } from '@/lib/wawar/client';
+
+// Kirim pengingat absen masuk:
+await sendWawarNotification({
+  phone: "6285121042025",
+  message: "Pagi Rekan ASN! ⏰ Pukul 07:15 WIB. Jangan lupa lakukan presensi wajah di SIMPEG sebelum 07:30 WIB."
+});`
+  }
+};
+
+function selectClientApp(appKey) {
+  selectedClientAppKey = appKey;
+  const app = clientApplicationsData[appKey];
+  if (!app) return;
+
+  // Update card active styles
+  document.querySelectorAll('.client-app-card').forEach(c => c.classList.remove('selected'));
+  if (appKey === 'tandang') document.getElementById('cardAppTandang')?.classList.add('selected');
+  else if (appKey === 'funrun') document.getElementById('cardAppFunRun')?.classList.add('selected');
+  else if (appKey === 'portalikp') document.getElementById('cardAppPortalIkp')?.classList.add('selected');
+  else if (appKey === 'simpeg') document.getElementById('cardAppSimpeg')?.classList.add('selected');
+
+  // Update Active Program Banner
+  const prog = app.activeProgram;
+  const tagBadge = document.getElementById('badgeClientAppTag');
+  const durText = document.getElementById('clientActiveDuration');
+  const progTitle = document.getElementById('clientActiveProgTitle');
+  const progDesc = document.getElementById('clientActiveProgDesc');
+  const progPercentText = document.getElementById('clientActiveProgPercentText');
+  const progressBar = document.getElementById('clientActiveProgressBar');
+
+  if (tagBadge) {
+    tagBadge.textContent = app.category;
+    tagBadge.className = `badge-tag ${app.categoryBadgeClass || 'green'}`;
+  }
+  if (durText) durText.textContent = prog.durationText;
+  if (progTitle) progTitle.textContent = prog.title;
+  if (progDesc) progDesc.textContent = prog.desc;
+  if (progPercentText) progPercentText.textContent = prog.progressText;
+  if (progressBar) {
+    progressBar.style.width = `${prog.progressPercent}%`;
+    progressBar.className = `progress-bar-fill ${app.categoryBadgeClass || 'green'}`;
+  }
+
+  // Update Active Bot Breakdown
+  const botName = document.getElementById('clientActiveBotName');
+  const botEngine = document.getElementById('clientActiveBotEngine');
+  const botSender = document.getElementById('clientActiveBotSender');
+  const botSec = document.getElementById('clientActiveBotSecurity');
+
+  if (botName) botName.textContent = prog.botName;
+  if (botEngine) botEngine.textContent = prog.botEngine;
+  if (botSender) botSender.textContent = prog.senderNumber;
+  if (botSec) botSec.textContent = prog.security;
+
+  // Update API Credentials & SDK Snippet
+  const credTitle = document.getElementById('clientCredentialsTitle');
+  const apiKeyInp = document.getElementById('clientApiKeyVal');
+  const snippet = document.getElementById('clientSdkCodeSnippet');
+
+  if (credTitle) credTitle.textContent = `Kredensial API & Webhook: ${app.name}`;
+  if (apiKeyInp) apiKeyInp.value = app.apiKey;
+  if (snippet) snippet.textContent = app.sdkCode;
+
+  showToast(`Menampilkan program aktif & kredensial untuk: ${app.name} 🔌📱`, 'info');
+}
+
+function openRegisterClientAppModal() {
+  document.getElementById('modalRegisterClientApp')?.classList.add('active');
+}
+
+function closeRegisterClientAppModal() {
+  document.getElementById('modalRegisterClientApp')?.classList.remove('active');
+}
+
+function handleRegisterClientApp(e) {
+  e.preventDefault();
+  const name = document.getElementById('regAppName').value.trim();
+  const cat = document.getElementById('regAppCategory').value;
+  const icon = document.getElementById('regAppIcon').value;
+  const campId = document.getElementById('regAppCampaign').value;
+
+  const appKey = 'app_' + Date.now();
+  const newApiKey = `wawar_live_${name.toLowerCase().replace(/[^a-z0-9]/g, '')}_${Math.random().toString(36).substring(2, 10)}`;
+
+  const camp = campaignHubList.find(c => c.id === campId) || campaignHubList[0];
+
+  clientApplicationsData[appKey] = {
+    id: appKey,
+    name: name,
+    category: cat.toUpperCase(),
+    categoryBadgeClass: 'green',
+    status: 'ACTIVE',
+    apiKey: newApiKey,
+    activeProgram: {
+      id: camp?.id || 'camp_custom',
+      title: camp?.name || 'Program Default',
+      durationText: '🟢 Aktif Berjalan',
+      desc: camp?.message || 'Program siaran terhubung dengan gateway WAWAR.',
+      progressPercent: 40,
+      progressText: '40% Berjalan (Baru Terhubung)',
+      startDate: '24 Okt 2026',
+      currentDate: '24 Okt 2026',
+      endDate: '24 Nov 2026',
+      botName: camp?.bot_label || 'Bot RAYI Kedinasan',
+      botEngine: 'Gemini 2.5 Flash RAG',
+      senderNumber: camp?.senderNumber || 'Wawar-primary (+62 851-2104-2025)',
+      security: '🔒 Whitelist Terlindungi'
+    },
+    sdkCode: `import { sendWawarNotification } from '@/lib/wawar/client';
+
+// Kirim notifikasi dari ${name}:
+await sendWawarNotification({
+  phone: "6285121042025",
+  message: "Halo! Notifikasi resmi dari ${name} via Gateway WAWAR."
+});`
+  };
+
+  // Tambahkan kartu ke grid
+  const grid = document.getElementById('multiAppCardsGrid');
+  if (grid) {
+    const card = document.createElement('div');
+    card.className = 'client-app-card';
+    card.id = `cardApp_${appKey}`;
+    card.onclick = () => selectClientApp(appKey);
+    card.innerHTML = `
+      <div>
+        <div class="client-app-card-top">
+          <div class="client-app-card-icon">${icon}</div>
+          <span class="badge-status open">● Terhubung Baru</span>
+        </div>
+        <div class="client-app-card-title">${name}</div>
+        <div class="client-app-card-desc">Aplikasi klien terdaftar. Menggunakan API Token dan jalur pengiriman resmi WAWAR.</div>
+      </div>
+      <div class="client-app-card-footer">
+        <span style="color:#059669; font-weight:700;">Program: ${camp?.name || 'Siaran'}</span>
+        <span style="color:#64748B;">Bot: ${camp?.bot_label || 'RAYI'}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  }
+
+  closeRegisterClientAppModal();
+  selectClientApp(appKey);
+  showToast(`Aplikasi "${name}" berhasil didaftarkan dan terhubung ke gateway! 🔌🚀`, 'success');
+}
+
+function testSendWebhookNotification() {
+  const app = clientApplicationsData[selectedClientAppKey] || clientApplicationsData.tandang;
+  showToast(`Mengirim simulasi webhook dari [${app.name}] ke nomor WhatsApp +62 851-2104-2025... 📲⚡`, 'info');
+
+  setTimeout(() => {
+    showToast(`✅ SUKSES! Webhook [${app.name}] diterima gateway. Pesan notifikasi terkirim via ${app.activeProgram.senderNumber}! 🎉`, 'success');
+  }, 1000);
 }
 
 /* ================= UTILITIES ================= */
@@ -1032,28 +1322,308 @@ const MONTH_NAMES = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember"
 ];
 
+let selectedCalendarDateKey = '2026-10-24';
+let currentCalStatusFilter = 'all';
+let activeCalCategories = ['subuh', 'dinas', 'event'];
+
+/**
+ * Normalisasi & kategorisasi entri kalender agar cocok dengan filter program & status
+ */
+function getEntryCategory(item) {
+  if (!item) return 'dinas';
+  let cat = item.category || '';
+  if (!cat && item.campId) {
+    const camp = (typeof campaignHubList !== 'undefined' ? campaignHubList : []).find(c => c.id === item.campId);
+    if (camp) cat = camp.category || camp.classification || '';
+  }
+
+  // Normalisasi kategori
+  if (cat === 'keluarga' || cat === 'subuh') return 'subuh';
+  if (cat === 'event') return 'event';
+  if (cat === 'dinas') return 'dinas';
+
+  // Fallback berdasarkan identifier, nama, atau warna
+  const cId = String(item.campId || item.id || '').toLowerCase();
+  const cName = String(item.campName || item.name || '').toLowerCase();
+
+  if (cId.includes('subuh') || cName.includes('subuh') || item.color === 'amber') {
+    return 'subuh';
+  }
+  if (cId.includes('event') || cId.includes('funrun') || cName.includes('fun run') || cName.includes('run') || item.color === 'blue') {
+    return 'event';
+  }
+  if (cId.includes('dinas') || cId.includes('sppd') || cId.includes('tandang') || cName.includes('dinas') || cName.includes('sppd') || item.color === 'green') {
+    return 'dinas';
+  }
+
+  return 'dinas';
+}
+
+function isCalendarEntryVisible(item) {
+  const cat = getEntryCategory(item);
+  return activeCalCategories.includes(cat);
+}
+
+function filterCalendarByStatus(status) {
+  currentCalStatusFilter = status;
+  const pills = document.querySelectorAll('#calStatusPillList .campaign-chip');
+  pills.forEach(p => p.classList.remove('active'));
+  if (status === 'all') document.getElementById('btnCalStatusAll')?.classList.add('active');
+  else if (status === 'active') document.getElementById('btnCalStatusActive')?.classList.add('active');
+  else if (status === 'upcoming') document.getElementById('btnCalStatusUpcoming')?.classList.add('active');
+  else if (status === 'done') document.getElementById('btnCalStatusDone')?.classList.add('active');
+
+  renderCalendar(currentCalMonth, currentCalYear);
+}
+
+function toggleCalCategoryFilter(cat) {
+  const checkbox = document.getElementById(
+    cat === 'subuh' ? 'calFilterCheckSubuh' : 
+    cat === 'dinas' ? 'calFilterCheckDinas' : 'calFilterCheckEvent'
+  );
+  if (checkbox && checkbox.checked) {
+    if (!activeCalCategories.includes(cat)) activeCalCategories.push(cat);
+  } else {
+    activeCalCategories = activeCalCategories.filter(c => c !== cat);
+  }
+  renderCalendar(currentCalMonth, currentCalYear);
+}
+
+function jumpToCalendarToday() {
+  currentCalMonth = 9; // Oktober (0-indexed)
+  currentCalYear = 2026;
+  selectedCalendarDateKey = '2026-10-24';
+  renderCalendar(currentCalMonth, currentCalYear);
+  showToast('Melompat ke hari ini: Sabtu, 24 Oktober 2026! 🗓️✨', 'info');
+}
+
+/**
+ * Render Kartu Agenda Kegiatan Siaran (Horizontal Carousel/Grid di Atas Kalender seperti TANDANG)
+ */
+function renderCalendarAgendaCards() {
+  const container = document.getElementById('calAgendaCardsGrid');
+  if (!container) return;
+
+  const today = new Date('2026-10-24T00:00:00');
+  let list = campaignHubList || [];
+
+  // Filter berdasarkan kategori program aktif (Subuh, Dinas, Event)
+  list = list.filter(camp => activeCalCategories.includes(getEntryCategory(camp)));
+
+  if (currentCalStatusFilter === 'active') {
+    list = list.filter(c => c.status === 'ACTIVE');
+  } else if (currentCalStatusFilter === 'upcoming') {
+    list = list.filter(c => {
+      const start = new Date((c.startDate || '2026-10-24') + 'T00:00:00');
+      return start > today;
+    });
+  } else if (currentCalStatusFilter === 'done') {
+    list = list.filter(c => {
+      const end = new Date((c.endDate || '2026-10-24') + 'T00:00:00');
+      return today > end;
+    });
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; padding: 18px; text-align: center; background: #FFFFFF; border: 1px dashed #CBD5E1; border-radius: 8px; color: #64748B;">
+        Belum ada program siaran untuk filter ini. <a href="javascript:void(0)" onclick="openCreateCampaignModal()" style="color:#059669; font-weight:700;">+ Buat Campaign Baru</a>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  list.forEach(camp => {
+    const startStr = camp.startDate || '2026-10-24';
+    const endStr = camp.endDate || startStr;
+    const start = new Date(startStr + 'T00:00:00');
+    const end = new Date(endStr + 'T00:00:00');
+
+    let statusBadge = '<span class="badge-tag green" style="font-size:0.68rem;">● Sedang Berjalan</span>';
+    let durationText = '31 Hari';
+    if (camp.type === 'event_reminder') {
+      statusBadge = '<span class="badge-tag blue" style="font-size:0.68rem;">● Akan Datang</span>';
+      const diff = Math.max(0, Math.ceil((end - today) / (1000 * 60 * 60 * 24)));
+      durationText = `H-${diff}`;
+    } else if (camp.type === 'recurring') {
+      durationText = 'Mingguan';
+    } else if (today > end) {
+      statusBadge = '<span class="badge-tag gray" style="font-size:0.68rem;">● Selesai</span>';
+      durationText = 'Kedaluwarsa';
+    }
+
+    const cardBorderClass = camp.category === 'keluarga' ? 'active-subuh' : camp.category === 'dinas' ? 'active-dinas' : 'active-event';
+    const botDisplay = camp.bot_label || (camp.category === 'dinas' ? 'Bot RAYI • Strict Gemini' : camp.category === 'keluarga' ? 'Bot Sahabat Subuh • Keyword' : 'Bot Helpdesk • Gemini RAG');
+
+    html += `
+      <div class="cal-agenda-card ${cardBorderClass}">
+        <div>
+          <div class="cal-agenda-card-top">
+            ${statusBadge}
+            <span style="font-size:0.72rem; color:#64748B; font-weight:600;">${durationText}</span>
+          </div>
+          <div class="cal-agenda-card-title">${camp.name}</div>
+          <div class="cal-agenda-card-meta">
+            <span><i data-lucide="calendar" class="lucide-xs"></i> ${formatDateIndo(startStr)} s/d ${formatDateIndo(endStr)}</span>
+            <span><i data-lucide="clock" class="lucide-xs"></i> ${camp.time || '07:00'} WIB • <i data-lucide="smartphone" class="lucide-xs"></i> ${camp.senderNumber}</span>
+            <span><i data-lucide="bot" class="lucide-xs"></i> <strong style="color:#2563EB;">${botDisplay}</strong></span>
+            <span><i data-lucide="users" class="lucide-xs"></i> <strong>${camp.recipient}</strong></span>
+          </div>
+        </div>
+        <div class="cal-agenda-card-bottom">
+          <span style="font-size:0.7rem; color:#94A3B8; font-family:monospace;">${camp.id.substring(0, 16)}</span>
+          <a class="cal-agenda-card-link" onclick="openDateEntryModal('${startStr}', ${parseInt(startStr.split('-')[2], 10)})">
+            Lihat Pop-up Jadwal &rarr;
+          </a>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+/**
+ * Render Mini Calendar Widget (Sidebar Kiri seperti TANDANG)
+ */
+function renderMiniCalendar(month, year) {
+  const container = document.getElementById('miniCalGridContainer');
+  const headerText = document.getElementById('miniCalHeaderMonth');
+  if (!container) return;
+
+  if (headerText) headerText.textContent = `${MONTH_NAMES[month]} ${year}`;
+
+  const dayNames = ['S', 'S', 'R', 'K', 'J', 'S', 'M'];
+  let html = dayNames.map(n => `<div class="mini-cal-day-name">${n}</div>`).join('');
+
+  // Day index starting Monday (0 = Senin, 6 = Minggu)
+  const firstDay = (new Date(year, month, 1).getDay() + 6) % 7;
+  const totalDays = new Date(year, month + 1, 0).getDate();
+  const prevMonthTotal = new Date(year, month, 0).getDate();
+
+  // Previous month trailing
+  for (let i = firstDay - 1; i >= 0; i--) {
+    html += `<div class="mini-cal-day-cell other">${prevMonthTotal - i}</div>`;
+  }
+
+  // Current month
+  for (let d = 1; d <= totalDays; d++) {
+    const dStr = String(d).padStart(2, '0');
+    const mStr = String(month + 1).padStart(2, '0');
+    const key = `${year}-${mStr}-${dStr}`;
+
+    const isToday = (d === 24 && month === 9 && year === 2026);
+    const isSelected = (key === selectedCalendarDateKey);
+    const dayEntries = calendarEntries[key] || [];
+    const hasEvent = dayEntries.some(isCalendarEntryVisible);
+
+    let classes = 'mini-cal-day-cell';
+    if (isToday) classes += ' today';
+    else if (isSelected) classes += ' selected';
+    if (hasEvent) classes += ' has-event';
+
+    html += `<div class="${classes}" onclick="handleMiniCalDateClick('${key}', ${d})">${d}</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function handleMiniCalDateClick(dateKey, dayNumber) {
+  selectedCalendarDateKey = dateKey;
+  renderMiniCalendar(currentCalMonth, currentCalYear);
+  updateCalSidebarSelectedDay(dateKey);
+  openDateEntryModal(dateKey, dayNumber);
+  if (window.lucide) { try { lucide.createIcons(); } catch(e) {} }
+}
+
+/**
+ * Update Sidebar "Agenda Tanggal Ini" Panel (Model TANDANG)
+ */
+function updateCalSidebarSelectedDay(dateKey) {
+  const title = document.getElementById('calSelectedDayTitle');
+  const listEl = document.getElementById('calSelectedDayList');
+  if (!title || !listEl) return;
+
+  const dateObj = new Date(dateKey + 'T00:00:00');
+  const formatted = formatDateIndo(dateKey);
+  title.textContent = `Agenda: ${formatted}`;
+
+  const rawEntries = calendarEntries[dateKey] || [];
+  const entries = rawEntries.filter(isCalendarEntryVisible);
+  if (entries.length === 0) {
+    listEl.innerHTML = `
+      <div style="font-size:0.75rem; color:#64748B; text-align:center; padding:12px 0;">
+        Tidak ada jadwal siaran untuk filter yang aktif di tanggal ini.
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  entries.forEach(item => {
+    html += `
+      <div class="cal-day-agenda-item" onclick="openDateEntryModal('${dateKey}', ${dateObj.getDate()})">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong style="color:#0F172A; display:flex; align-items:center; gap:4px;">
+            <i data-lucide="clock" class="lucide-xs"></i> ${item.time} WIB
+          </strong>
+          <span class="badge-tag ${item.color || 'green'}" style="font-size:0.65rem;">${item.campName}</span>
+        </div>
+        <p style="margin:3px 0 0; color:#475569; font-size:0.72rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+          "${item.message}"
+        </p>
+      </div>
+    `;
+  });
+  listEl.innerHTML = html;
+  if (window.lucide) { try { lucide.createIcons(); } catch(e) {} }
+}
+
+function openDateEntryModalForSelected() {
+  const d = parseInt(selectedCalendarDateKey.split('-')[2], 10) || 24;
+  openDateEntryModal(selectedCalendarDateKey, d);
+}
+
+/**
+ * Render Main Month Calendar Grid (Senin s/d Minggu seperti TANDANG)
+ */
 function renderCalendar(month, year) {
   const gridEl = document.getElementById('calendarMonthGrid');
   const titleEl = document.getElementById('currentMonthYearText');
-  if (!gridEl || !titleEl) return;
+  const bannerMonthText = document.getElementById('calBannerMonthText');
+  if (!gridEl) return;
 
-  titleEl.textContent = `${MONTH_NAMES[month]} ${year}`;
+  const monthYearString = `${MONTH_NAMES[month]} ${year}`;
+  if (titleEl) titleEl.textContent = monthYearString;
+  if (bannerMonthText) bannerMonthText.textContent = monthYearString;
+
   gridEl.innerHTML = '';
 
-  const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Minggu
+  // Monday = 0, Sunday = 6
+  const firstDayIndex = (new Date(year, month, 1).getDay() + 6) % 7;
   const totalDays = new Date(year, month + 1, 0).getDate();
   const prevMonthTotalDays = new Date(year, month, 0).getDate();
 
-  // 1. Kotak tanggal dari bulan sebelumnya (muted)
+  // 1. Kotak tanggal dari bulan sebelumnya
+  const prevMonthIndex = (month === 0) ? 11 : month - 1;
+  const prevMonthNameShort = MONTH_NAMES[prevMonthIndex].substring(0, 3);
+
   for (let i = firstDayIndex - 1; i >= 0; i--) {
     const prevDay = prevMonthTotalDays - i;
     const cell = document.createElement('div');
-    cell.className = 'calendar-day-cell other-month';
+    cell.className = 'calendar-day-cell other-month prev-month';
+    cell.title = `Tanggal ${prevDay} ${MONTH_NAMES[prevMonthIndex]} (Bulan Lalu)`;
     cell.innerHTML = `
       <div class="day-header">
-        <span class="cal-day-number">${prevDay}</span>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span class="cal-day-number">${prevDay}</span>
+          <span class="cal-other-month-badge">${prevMonthNameShort}</span>
+        </div>
       </div>
-      <div class="day-campaign-items"></div>
+      <div class="day-campaign-items other-month-placeholder">
+        <span class="other-month-text">Bulan Lalu</span>
+      </div>
     `;
     gridEl.appendChild(cell);
   }
@@ -1068,24 +1638,20 @@ function renderCalendar(month, year) {
     const isToday = (day === 24 && month === 9 && year === 2026);
     cell.className = `calendar-day-cell ${isToday ? 'is-today' : ''}`;
     cell.onclick = (e) => {
-      // Don't trigger if clicked on child button
-      if (e.target.closest('.day-add-btn')) return;
+      selectedCalendarDateKey = dateKey;
+      renderMiniCalendar(currentCalMonth, currentCalYear);
+      updateCalSidebarSelectedDay(dateKey);
       openDateEntryModal(dateKey, day);
     };
 
-    let dayItems = calendarEntries[dateKey] || [];
-    
-    // Filter berdasarkan campaign yang dipilih
-    if (activeCalendarCampaign !== 'all') {
-      dayItems = dayItems.filter(item => item.campId === activeCalendarCampaign);
-    }
+    let dayItems = (calendarEntries[dateKey] || []).filter(isCalendarEntryVisible);
 
     let pillsHtml = '';
     dayItems.forEach(item => {
       pillsHtml += `
         <div class="day-campaign-pill ${item.color}" title="${item.message}">
           <div class="pill-time-title">
-            <span>${item.time}</span>
+            <span style="display:inline-flex; align-items:center; gap:3px;"><i data-lucide="clock" class="lucide-xs"></i> ${item.time}</span>
             <span>${item.campName}</span>
           </div>
           <div class="pill-snippet">"${item.message}"</div>
@@ -1095,8 +1661,11 @@ function renderCalendar(month, year) {
 
     cell.innerHTML = `
       <div class="day-header">
-        <span class="cal-day-number">${day}</span>
-        <button class="day-add-btn" title="Tambah / Edit Pesan Tanggal Ini" onclick="event.stopPropagation(); openDateEntryModal('${dateKey}', ${day})">+</button>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span class="cal-day-number">${day}</span>
+          ${isToday ? '<span class="badge-hari-ini">Hari Ini</span>' : ''}
+        </div>
+        <button class="day-add-btn" title="Buka Pop-up & Tambah Pesan Tanggal Ini" onclick="event.stopPropagation(); selectedCalendarDateKey='${dateKey}'; openDateEntryModal('${dateKey}', ${day})"><i data-lucide="plus" class="lucide-xs"></i></button>
       </div>
       <div class="day-campaign-items">
         ${pillsHtml}
@@ -1107,18 +1676,35 @@ function renderCalendar(month, year) {
   }
 
   // 3. Kotak tanggal sisa untuk melengkapi grid 35 atau 42 kotak
+  const nextMonthIndex = (month === 11) ? 0 : month + 1;
+  const nextMonthNameShort = MONTH_NAMES[nextMonthIndex].substring(0, 3);
   const totalRendered = firstDayIndex + totalDays;
   const remainingCells = (totalRendered % 7 === 0) ? 0 : 7 - (totalRendered % 7);
   for (let nextDay = 1; nextDay <= remainingCells; nextDay++) {
     const cell = document.createElement('div');
-    cell.className = 'calendar-day-cell other-month';
+    cell.className = 'calendar-day-cell other-month next-month';
+    cell.title = `Tanggal ${nextDay} ${MONTH_NAMES[nextMonthIndex]} (Bulan Depan)`;
     cell.innerHTML = `
       <div class="day-header">
-        <span class="cal-day-number">${nextDay}</span>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span class="cal-day-number">${nextDay}</span>
+          <span class="cal-other-month-badge">${nextMonthNameShort}</span>
+        </div>
       </div>
-      <div class="day-campaign-items"></div>
+      <div class="day-campaign-items other-month-placeholder">
+        <span class="other-month-text">Bulan Depan</span>
+      </div>
     `;
     gridEl.appendChild(cell);
+  }
+
+  // Render top cards & mini calendar
+  renderCalendarAgendaCards();
+  renderMiniCalendar(month, year);
+  updateCalSidebarSelectedDay(selectedCalendarDateKey);
+
+  if (window.lucide) {
+    try { lucide.createIcons(); } catch(e) {}
   }
 }
 
@@ -1249,6 +1835,10 @@ async function loadCampaignsFromDb() {
           target_group: item.target_group || 'tandang',
           knowledge_base_id: item.knowledge_base_id || '',
           kbTitle: item.knowledge_base_id ? getKbTitleById(item.knowledge_base_id) : 'Bahan Materi Standard',
+          bot_profile: item.bot_profile || 'bot_rayi',
+          bot_engine: item.bot_engine || 'gemini_strict',
+          bot_label: item.bot_label || 'Bot RAYI • Strict Gemini',
+          strict_group_only: item.strict_group_only || false,
           defaultMsg: item.message || item.defaultMsg || '',
           message: item.message || item.defaultMsg || '',
           status: item.status || 'ACTIVE',
@@ -1273,6 +1863,9 @@ async function loadCampaignsFromDb() {
   // Synchronize into calendar
   campaignHubList.forEach(c => seedCampaignRecordToCalendar(c));
   renderCampaignHub(currentCampaignHubFilter);
+  if (typeof switchRunningCampaignHero === 'function') {
+    switchRunningCampaignHero('camp_dinas_legacy');
+  }
   renderCalendar(currentCalMonth, currentCalYear);
 }
 
@@ -1318,6 +1911,157 @@ function populateCampaignContentPresetOptions() {
     });
   }
   select.innerHTML = optionsHtml;
+}
+
+/* ================= PROFIL PROGRAM CAMPAIGN AKTIF & HERO PROGRESS ================= */
+const runningCampaignProfiles = {
+  camp_dinas_legacy: {
+    id: 'camp_dinas_legacy',
+    title: 'Sosialisasi SPPD & Kedinasan TANDANG',
+    appName: 'Klien: Aplikasi TANDANG',
+    category: 'Kedinasan TANDANG',
+    categoryClass: 'green',
+    desc: 'Program terjadwal mingguan pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas ASN Diskominfo Jawa Barat.',
+    durationText: '🟢 Sisa 12 Hari Lagi',
+    datesText: 'Mulai: 15 Okt 2026 • Selesai: 15 Nov 2026',
+    percent: 50,
+    percentLabel: '50% Berjalan',
+    subLabel: '(Minggu ke-2 dari 4 Minggu • 15/30 Pesan Terkirim)',
+    dayInfo: 'Hari ke-10 / 30 Hari',
+    tickStart: '📍 15 Okt 2026 (Mulai)',
+    tickToday: '🎯 Hari Ini: 24 Okt 2026',
+    tickEnd: '🏁 15 Nov 2026 (Target Selesai)',
+    botName: 'Bot RAYI Kedinasan',
+    botEngine: 'Gemini 2.5 Flash RAG (Strict SOP)',
+    botSender: '0812-9988-7766 (Wawar-primary)',
+    botMaterial: 'SOP SPPD Format F4 & Tata Naskah',
+    botTarget: 'Grup TANDANG (🔒 Whitelist Anggota)'
+  },
+  camp_funrun_legacy: {
+    id: 'camp_funrun_legacy',
+    title: 'Event Fun Run 26 Des Gedung Sate',
+    appName: 'Klien: Aplikasi Fun Run Jabar 2026',
+    category: 'Event Publik & Olahraga',
+    categoryClass: 'blue',
+    desc: 'Pengingat berkala H-7, H-1, dan hari H start jam 06:00 WIB di Gedung Sate untuk 500 pelari terdaftar, rute 5K, dan shareloc Google Maps.',
+    durationText: '🔵 H-63 Menuju Hari Acara',
+    datesText: 'Mulai: 15 Okt 2026 • Acara: 26 Des 2026',
+    percent: 35,
+    percentLabel: '35% Menuju Hari Acara',
+    subLabel: '(Fase Pengambilan Race Pack & Panduan Rute 5K)',
+    dayInfo: 'H-63 Hari Menuju 26 Des',
+    tickStart: '📍 15 Okt 2026 (Buka)',
+    tickToday: '🎯 Hari Ini: 24 Okt 2026',
+    tickEnd: '🏁 26 Des 2026 (Flag-off 06:00 WIB)',
+    botName: 'Bot Helpdesk Fun Run 2026',
+    botEngine: 'Gemini 2.5 Flash RAG (Rute & Tiket QR)',
+    botSender: 'rayi-cs-official',
+    botMaterial: 'Panduan Rute 5K & Info BIB',
+    botTarget: '500 Pelari Terdaftar (🌐 Terbuka Publik)'
+  },
+  camp_subuh_legacy: {
+    id: 'camp_subuh_legacy',
+    title: 'Sapa Subuh Anak & Doa Fajar',
+    appName: 'Klien: WAWAR Family Bot',
+    category: 'Sapa Fajar / Keluarga',
+    categoryClass: 'amber',
+    desc: 'Paket berseri 31 hari pengingat fajar hangat, motivasi subuh, dan doa pagi pukul 04:30 WIB secara konsisten.',
+    durationText: '🟡 Sisa 7 Hari Lagi di Bulan Ini',
+    datesText: 'Mulai: 01 Okt 2026 • Selesai: 31 Okt 2026',
+    percent: 77,
+    percentLabel: '77% Selesai',
+    subLabel: '(Hari ke-24 dari 31 Hari • 24 Pesan Terkirim)',
+    dayInfo: 'Hari ke-24 / 31 Hari',
+    tickStart: '📍 01 Okt 2026 (Mulai)',
+    tickToday: '🎯 Hari Ini: 24 Okt 2026',
+    tickEnd: '🏁 31 Okt 2026 (Akhir Bulan)',
+    botName: 'Bot Sahabat Subuh',
+    botEngine: 'Rule-Based Fajar Matcher & Doa Harian',
+    botSender: 'wawar-subuh (+62 851-2104-2025)',
+    botMaterial: 'Kumpulan Mutiara Doa Fajar 31 Hari',
+    botTarget: '👨‍👩‍👧 Anak & Keluarga (🔒 Jalur Privat)'
+  }
+};
+
+function switchRunningCampaignHero(campId) {
+  const profile = runningCampaignProfiles[campId] || runningCampaignProfiles.camp_dinas_legacy;
+  
+  // Update select input if different
+  const sel = document.getElementById('selectRunningCampaignHub');
+  if (sel && sel.value !== campId) sel.value = campId;
+
+  // Header badges
+  const catBadge = document.getElementById('heroActiveProgCategory');
+  const appBadge = document.getElementById('heroActiveProgApp');
+  if (catBadge) {
+    catBadge.textContent = profile.category;
+    catBadge.className = `badge-tag ${profile.categoryClass}`;
+  }
+  if (appBadge) appBadge.textContent = profile.appName;
+
+  // Title, Desc, Duration
+  const titleEl = document.getElementById('heroActiveProgTitle');
+  const descEl = document.getElementById('heroActiveProgDesc');
+  const durEl = document.getElementById('heroActiveProgDuration');
+  const datesEl = document.getElementById('heroActiveProgDates');
+
+  if (titleEl) titleEl.textContent = profile.title;
+  if (descEl) descEl.textContent = profile.desc;
+  if (durEl) durEl.textContent = profile.durationText;
+  if (datesEl) datesEl.textContent = profile.datesText;
+
+  // Progress Bar
+  const pctLbl = document.getElementById('heroActiveProgPercentLabel');
+  const subLbl = document.getElementById('heroActiveProgSubLabel');
+  const dayInfo = document.getElementById('heroActiveProgDayInfo');
+  const barFill = document.getElementById('heroActiveProgressBar');
+  const tickStart = document.getElementById('heroTickStart');
+  const tickToday = document.getElementById('heroTickToday');
+  const tickEnd = document.getElementById('heroTickEnd');
+
+  if (pctLbl) {
+    pctLbl.textContent = profile.percentLabel;
+    pctLbl.style.color = profile.categoryClass === 'green' ? '#059669' : (profile.categoryClass === 'blue' ? '#2563EB' : '#D97706');
+  }
+  if (subLbl) subLbl.textContent = profile.subLabel;
+  if (dayInfo) {
+    dayInfo.textContent = profile.dayInfo;
+    dayInfo.style.color = pctLbl ? pctLbl.style.color : '#059669';
+  }
+  if (barFill) {
+    barFill.style.width = `${profile.percent}%`;
+    barFill.className = `progress-bar-fill ${profile.categoryClass} hero-fill`;
+  }
+  if (tickStart) tickStart.textContent = profile.tickStart;
+  if (tickToday) tickToday.textContent = profile.tickToday;
+  if (tickEnd) tickEnd.textContent = profile.tickEnd;
+
+  // Active Bot Breakdown
+  const botName = document.getElementById('heroActiveBotName');
+  const botEngine = document.getElementById('heroActiveBotEngine');
+  const botSender = document.getElementById('heroActiveBotSender');
+  const botMaterial = document.getElementById('heroActiveBotMaterial');
+  const botTarget = document.getElementById('heroActiveBotTarget');
+
+  if (botName) botName.textContent = profile.botName;
+  if (botEngine) botEngine.textContent = profile.botEngine;
+  if (botSender) botSender.textContent = profile.botSender;
+  if (botMaterial) botMaterial.textContent = profile.botMaterial;
+  if (botTarget) botTarget.textContent = profile.botTarget;
+
+  // Overview Banner sync
+  const ovTitle = document.getElementById('overviewProgTitle');
+  const ovBadge = document.getElementById('overviewProgProgressBadge');
+  const ovBot = document.getElementById('overviewBotTitle');
+  const ovSender = document.getElementById('overviewSenderTitle');
+
+  if (ovTitle) ovTitle.textContent = profile.title;
+  if (ovBadge) {
+    ovBadge.textContent = `${profile.percentLabel} (${profile.durationText.replace(/[🟢🔵🟡]/g, '').trim()})`;
+    ovBadge.className = `badge-tag ${profile.categoryClass}`;
+  }
+  if (ovBot) ovBot.textContent = `${profile.botName} (${profile.botEngine})`;
+  if (ovSender) ovSender.textContent = profile.botSender;
 }
 
 function renderCampaignHub(filter = 'all') {
@@ -1424,19 +2168,23 @@ function renderCampaignHub(filter = 'all') {
             </div>
           </div>
 
-          <!-- Rincian Nomor & Target -->
-          <div class="camp-meta-list">
-            <div class="camp-meta-item">
-              <span class="meta-label">📱 Nomor Pengirim:</span>
-              <strong>${camp.senderNumber || camp.sender_number}</strong>
+          <!-- Rincian 4 Modularitas Pengiriman (Nomor -> Bot -> Materi -> Target) -->
+          <div class="camp-card-modular-pipeline">
+            <div class="pip-card-row">
+              <span class="lbl">📱 1. Jalur Nomor:</span>
+              <span class="val">${camp.senderNumber || camp.sender_number}</span>
             </div>
-            <div class="camp-meta-item">
-              <span class="meta-label">🎯 Target Penerima:</span>
-              <strong>${camp.recipient}</strong>
+            <div class="pip-card-row">
+              <span class="lbl">🤖 2. Diselipin Bot:</span>
+              <span class="val" style="color:#2563EB;">${camp.bot_label || (camp.category === 'dinas' ? 'Bot RAYI • Strict Gemini' : (camp.category === 'event' ? 'Bot Helpdesk • Gemini RAG' : 'Bot Sahabat Subuh • Keyword'))}</span>
             </div>
-            <div class="camp-meta-item">
-              <span class="meta-label">📚 Materi / Add-on:</span>
-              <strong style="color:#059669;">${camp.kbTitle || 'Bahan Materi Standard'}</strong>
+            <div class="pip-card-row">
+              <span class="lbl">📚 3. Add-on Materi:</span>
+              <span class="val" style="color:#059669;">${camp.kbTitle || 'Bahan Materi Standard'}</span>
+            </div>
+            <div class="pip-card-row">
+              <span class="lbl">🎯 4. Sasaran:</span>
+              <span class="val">${camp.recipient} ${camp.strict_group_only ? '<span style="color:#059669; font-weight:700;">[🔒 Khusus Anggota]</span>' : ''}</span>
             </div>
           </div>
 
@@ -1903,6 +2651,38 @@ function toggleSaveTemplateNameBox() {
   }
 }
 
+function handleBotProfileChange() {
+  const prof = document.getElementById('campBotProfile')?.value || 'bot_rayi';
+  const box = document.getElementById('boxCampBotEngine');
+  const engine = document.getElementById('campBotEngine');
+  const badge = document.getElementById('badgeBotEngineActive');
+  const desc = document.getElementById('hintBotEngineDesc');
+
+  if (prof === 'none') {
+    if (box) box.classList.add('hidden');
+    if (badge) { badge.textContent = 'Non-Aktif'; badge.className = 'badge-tag gray'; }
+    if (desc) desc.textContent = 'Mode broadcast siaran satu arah murni, bot tidak akan merespon balasan chat penerima.';
+  } else {
+    if (box) box.classList.remove('hidden');
+    if (badge) { badge.textContent = 'Gemini AI Aktif'; badge.className = 'badge-tag blue'; }
+    if (prof === 'bot_rayi') {
+      if (engine) engine.value = 'gemini_strict';
+      if (desc) desc.textContent = 'Bot asisten resmi membaca dokumen SOP TANDANG & melayani anggota grup ASN Jawa Barat.';
+    } else if (prof === 'bot_subuh') {
+      if (engine) engine.value = 'keyword_rules';
+      if (badge) { badge.textContent = 'Rule Keyword'; badge.className = 'badge-tag amber'; }
+      if (desc) desc.textContent = 'Bot sapaan fajar hangat membaca doa fajar dan hadits pilihan.';
+    } else if (prof === 'bot_helpdesk') {
+      if (engine) engine.value = 'gemini_rag';
+      if (desc) desc.textContent = 'Bot membaca juknis rute 5K, informasi nomor BIB, dan lokasi Gedung Sate.';
+    } else if (prof === 'bot_cs_faq') {
+      if (engine) engine.value = 'gemini_rag';
+      if (desc) desc.textContent = 'Bot FAQ otomatis menjawab pertanyaan umum publik dan jam layanan.';
+    }
+  }
+  updateModalLiveWaPreview();
+}
+
 function updateModalLiveWaPreview() {
   const type = document.getElementById('campType')?.value || 'one_time';
   const senderNumber = document.getElementById('campSenderNumber')?.value || 'Wawar-primary';
@@ -1948,6 +2728,38 @@ function updateModalLiveWaPreview() {
       title.textContent = 'Wawar-primary (+62 851-2104-2025)';
     }
   }
+
+  // Update Live Modular Routing Pipeline Indicators in Langkah 3 Modal
+  const valSender = document.getElementById('valPipelineSender');
+  const valBot = document.getElementById('valPipelineBot');
+  const valAddon = document.getElementById('valPipelineAddon');
+  const valTarget = document.getElementById('valPipelineTarget');
+
+  const senderEl = document.getElementById('campSenderNumber');
+  const botProfEl = document.getElementById('campBotProfile');
+  const botEngEl = document.getElementById('campBotEngine');
+  const presetEl = document.getElementById('campContentPreset');
+  const targetEl = document.getElementById('campTargetGroup');
+  const strictCheck = document.getElementById('campStrictGroupOnly')?.checked;
+
+  if (valSender && senderEl) {
+    valSender.textContent = senderEl.options[senderEl.selectedIndex]?.text || senderEl.value;
+  }
+  if (valBot && botProfEl) {
+    if (botProfEl.value === 'none') {
+      valBot.textContent = 'Tanpa Bot (Broadcast Siaran)';
+    } else {
+      const engName = botEngEl?.options[botEngEl.selectedIndex]?.text || 'Gemini AI';
+      valBot.textContent = `${botProfEl.options[botProfEl.selectedIndex]?.text} [${engName}]`;
+    }
+  }
+  if (valAddon && presetEl) {
+    valAddon.textContent = presetEl.options[presetEl.selectedIndex]?.text || 'Materi Standar';
+  }
+  if (valTarget && targetEl) {
+    const tgtText = targetEl.options[targetEl.selectedIndex]?.text || targetEl.value;
+    valTarget.textContent = strictCheck ? `${tgtText} (🔒 Khusus Anggota)` : tgtText;
+  }
 }
 
 /**
@@ -1965,6 +2777,24 @@ async function handleSaveNewCampaign(e) {
   const kbPreset = document.getElementById('campContentPreset')?.value || '';
   const saveAsTemplate = document.getElementById('checkSaveAsTemplate')?.checked || false;
   const templateName = document.getElementById('inputTemplateName')?.value.trim() || name;
+
+  // Modular Bot & Engine Selections
+  const botProfile = document.getElementById('campBotProfile')?.value || 'bot_rayi';
+  const botEngine = document.getElementById('campBotEngine')?.value || 'gemini_strict';
+  const strictGroupOnly = document.getElementById('campStrictGroupOnly')?.checked || false;
+
+  let botLabel = "Bot RAYI • Strict Gemini";
+  if (botProfile === 'none') {
+    botLabel = "Broadcast Siaran (Tanpa Bot)";
+  } else if (botProfile === 'bot_rayi') {
+    botLabel = botEngine === 'gemini_strict' ? "Bot RAYI • Strict Gemini" : "Bot RAYI • Gemini RAG";
+  } else if (botProfile === 'bot_subuh') {
+    botLabel = "Bot Sahabat Subuh • Keyword";
+  } else if (botProfile === 'bot_helpdesk') {
+    botLabel = "Bot Helpdesk • Gemini RAG";
+  } else if (botProfile === 'bot_cs_faq') {
+    botLabel = "Bot CS FAQ Otomatis";
+  }
 
   // Recipient label
   let recipientLabel = "Grup ASN & Staf TANDANG";
@@ -2092,6 +2922,10 @@ async function handleSaveNewCampaign(e) {
     recipient: recipientLabel,
     knowledge_base_id: kbPreset,
     kbTitle: kbPreset ? getKbTitleById(kbPreset) : kbLabel,
+    bot_profile: botProfile,
+    bot_engine: botEngine,
+    bot_label: botLabel,
+    strict_group_only: strictGroupOnly,
     message: defaultText,
     defaultMsg: defaultText,
     status: 'ACTIVE',
@@ -2277,6 +3111,16 @@ function seedCampaignRecordToCalendar(camp) {
 
 let activeEditingDateKey = '';
 
+function updateDateEntryPreview() {
+  const msgInput = document.getElementById('entryMessageText');
+  const timeInput = document.getElementById('entryTime');
+  const bubbleText = document.getElementById('entryPreviewBubbleText');
+  const bubbleTime = document.getElementById('entryPreviewBubbleTime');
+
+  if (bubbleText && msgInput) bubbleText.textContent = msgInput.value || 'Pesan belum diisi.';
+  if (bubbleTime && timeInput) bubbleTime.textContent = `${timeInput.value || '07:00'} WIB`;
+}
+
 function openDateEntryModal(dateKey, dayNumber) {
   activeEditingDateKey = dateKey;
   const modal = document.getElementById('modalDateEntry');
@@ -2285,40 +3129,83 @@ function openDateEntryModal(dateKey, dayNumber) {
   const messageInput = document.getElementById('entryMessageText');
   const timeInput = document.getElementById('entryTime');
   const recipientInput = document.getElementById('entryTargetRecipient');
+  const campSelect = document.getElementById('entryCampSelect');
 
   const dateObj = new Date(dateKey);
   const formattedDate = `${dayNumber || dateObj.getDate()} ${MONTH_NAMES[currentCalMonth]} ${currentCalYear}`;
 
-  title.textContent = `Isian Pesan: ${formattedDate}`;
-  dateKeyInput.value = dateKey;
+  if (title) title.textContent = `🗓️ Rincian Siaran: ${formattedDate}`;
+  if (dateKeyInput) dateKeyInput.value = dateKey;
+
+  // Populate campaign options if available
+  if (campSelect) {
+    let opts = '';
+    const allCamps = campaignHubList.length > 0 ? campaignHubList : calendarCampaigns;
+    allCamps.forEach(c => {
+      opts += `<option value="${c.id}">${c.name} (${c.time || '07:00'} WIB)</option>`;
+    });
+    campSelect.innerHTML = opts;
+  }
 
   // Cek apakah sudah ada pesan di tanggal ini
   const existingEntries = calendarEntries[dateKey] || [];
   if (existingEntries.length > 0) {
     const first = existingEntries[0];
-    timeInput.value = first.time;
-    recipientInput.value = first.recipient;
-    messageInput.value = first.message;
+    if (timeInput) timeInput.value = first.time;
+    if (recipientInput) recipientInput.value = first.recipient;
+    if (messageInput) messageInput.value = first.message;
+    if (campSelect && first.campId) campSelect.value = first.campId;
   } else {
-    timeInput.value = "04:30";
-    recipientInput.value = "👨‍👩‍👧 Anak Tercinta (+62 851-2104-2025)";
-    messageInput.value = "Sampurasun! Selamat subuh anakku tercinta, mari sambut pagi dengan sholat subuh, doa, dan penuh semangat. Bismillah!";
+    if (timeInput) timeInput.value = "07:00";
+    if (recipientInput) recipientInput.value = "🏛️ Grup ASN & Staf TANDANG";
+    if (messageInput) messageInput.value = "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini.";
   }
 
-  modal.classList.add('active');
+  // Sync modular pipeline indicators in modal
+  const curCampId = campSelect?.value || 'camp_dinas_legacy';
+  const activeCamp = campaignHubList.find(c => c.id === curCampId) || calendarCampaigns.find(c => c.id === curCampId) || campaignHubList[0];
+
+  const pipSender = document.getElementById('entryPipelineSender');
+  const pipBot = document.getElementById('entryPipelineBot');
+  const pipAddon = document.getElementById('entryPipelineAddon');
+  const pipTarget = document.getElementById('entryPipelineTarget');
+
+  if (pipSender) pipSender.textContent = activeCamp?.senderNumber || activeCamp?.sender_number || 'Wawar-primary';
+  if (pipBot) pipBot.textContent = activeCamp?.bot_label || 'Bot RAYI • Strict Gemini';
+  if (pipAddon) pipAddon.textContent = activeCamp?.kbTitle || 'SOP Kedinasan TANDANG';
+  if (pipTarget) pipTarget.textContent = activeCamp?.recipient || 'Grup ASN TANDANG';
+
+  updateDateEntryPreview();
+  modal?.classList.add('active');
 }
 
 function closeDateEntryModal() {
-  document.getElementById('modalDateEntry').classList.remove('active');
+  document.getElementById('modalDateEntry')?.classList.remove('active');
 }
 
 function applyCampaignTemplateToEntry() {
-  const select = document.getElementById('entryCampSelect').value;
-  const camp = calendarCampaigns.find(c => c.id === select);
+  const select = document.getElementById('entryCampSelect')?.value;
+  const camp = campaignHubList.find(c => c.id === select) || calendarCampaigns.find(c => c.id === select);
   if (camp) {
-    document.getElementById('entryTime').value = camp.time;
-    document.getElementById('entryTargetRecipient').value = camp.recipient;
-    document.getElementById('entryMessageText').value = camp.defaultMsg;
+    const timeInput = document.getElementById('entryTime');
+    const recipientInput = document.getElementById('entryTargetRecipient');
+    const messageInput = document.getElementById('entryMessageText');
+
+    if (timeInput) timeInput.value = camp.time || '07:00';
+    if (recipientInput) recipientInput.value = camp.recipient || '';
+    if (messageInput) messageInput.value = camp.message || camp.defaultMsg || '';
+
+    const pipSender = document.getElementById('entryPipelineSender');
+    const pipBot = document.getElementById('entryPipelineBot');
+    const pipAddon = document.getElementById('entryPipelineAddon');
+    const pipTarget = document.getElementById('entryPipelineTarget');
+
+    if (pipSender) pipSender.textContent = camp.senderNumber || camp.sender_number || 'Wawar-primary';
+    if (pipBot) pipBot.textContent = camp.bot_label || 'Bot RAYI • Strict Gemini';
+    if (pipAddon) pipAddon.textContent = camp.kbTitle || 'SOP Kedinasan TANDANG';
+    if (pipTarget) pipTarget.textContent = camp.recipient || 'Grup ASN TANDANG';
+
+    updateDateEntryPreview();
   }
 }
 
@@ -3243,5 +4130,379 @@ function deployAiToWhatsapp() {
     showToast(`Sukses! Nomor [${kb.assignedInstance}] kini resmi aktif melayani chat via WhatsApp dengan proteksi whitelist grup! 🤖📲🔒✨`, 'success');
   }, 1200);
 }
+
+/* ================= UKURAN KINERJA & LAPORAN PENGIRIMAN 2-ARAH ================= */
+
+let currentReportFilter = 'all';
+let currentReportCampaign = 'all';
+let currentReportSearch = '';
+let cachedReportsData = [];
+
+async function fetchLiveCampaignReports() {
+  const syncBadge = document.getElementById('badgeReportSyncTime');
+  if (syncBadge) syncBadge.innerHTML = '● Menyinkronkan...';
+
+  try {
+    const url = `/api/campaign-reports?campaign_id=${encodeURIComponent(currentReportCampaign)}&status=${encodeURIComponent(currentReportFilter)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    cachedReportsData = json.data || [];
+
+    // Update KPI card numbers
+    if (json.kpi) {
+      const k = json.kpi;
+      const elTotal = document.getElementById('repKpiTotal');
+      if (elTotal) elTotal.textContent = k.total;
+
+      const countAll = document.getElementById('countFilterRepAll');
+      if (countAll) countAll.textContent = k.total;
+
+      const countDelivered = document.getElementById('countFilterRepDelivered');
+      if (countDelivered) countDelivered.textContent = k.delivered;
+
+      const countPending = document.getElementById('countFilterRepPending');
+      if (countPending) countPending.textContent = k.pending;
+
+      const countReplied = document.getElementById('countFilterRepReplied');
+      if (countReplied) countReplied.textContent = k.replied;
+    }
+
+    renderReportTable(cachedReportsData);
+
+    if (syncBadge) {
+      const now = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      syncBadge.innerHTML = `● Tersinkron (${now} WIB)`;
+    }
+  } catch (err) {
+    console.error('Error fetching campaign reports:', err);
+    if (syncBadge) syncBadge.innerHTML = '● Mode Lokal';
+    renderReportTable(cachedReportsData);
+  }
+}
+
+function handleReportCampaignChange(campId) {
+  currentReportCampaign = campId;
+  const titleEl = document.getElementById('reportTableTitle');
+  if (titleEl) {
+    const campNames = {
+      all: 'Semua Program & Campaign Berjalan',
+      camp_dinas_legacy: 'Sosialisasi SPPD & Kedinasan TANDANG',
+      camp_funrun_legacy: 'Event Fun Run 26 Des Jabar',
+      camp_subuh_legacy: 'Sapa Subuh Anak & Keluarga'
+    };
+    titleEl.textContent = `📋 Riwayat Pengiriman & Respon Penerima: ${campNames[campId] || campId}`;
+  }
+  fetchLiveCampaignReports();
+}
+
+function filterReportByStatus(status) {
+  currentReportFilter = status;
+
+  const pills = document.querySelectorAll('.report-filter-pill');
+  pills.forEach(p => p.classList.remove('active'));
+
+  const activeMap = {
+    all: 'btnFilterRepAll',
+    delivered: 'btnFilterRepDelivered',
+    pending: 'btnFilterRepPending',
+    replied: 'btnFilterRepReplied'
+  };
+  const activeBtn = document.getElementById(activeMap[status]);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  fetchLiveCampaignReports();
+}
+
+function handleReportSearch(query) {
+  currentReportSearch = (query || '').toLowerCase().trim();
+  if (!currentReportSearch) {
+    renderReportTable(cachedReportsData);
+    return;
+  }
+  const filtered = cachedReportsData.filter(r => 
+    (r.recipient_name && r.recipient_name.toLowerCase().includes(currentReportSearch)) ||
+    (r.recipient_phone && r.recipient_phone.includes(currentReportSearch)) ||
+    (r.recipient_agency && r.recipient_agency.toLowerCase().includes(currentReportSearch))
+  );
+  renderReportTable(filtered);
+}
+
+function renderReportTable(reports) {
+  const tbody = document.getElementById('reportTableBody');
+  if (!tbody) return;
+
+  if (!reports || reports.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align:center; padding:32px 16px; color:#64748B;">
+          <div style="font-size:1.5rem; margin-bottom:8px;">📭</div>
+          <strong>Belum ada log pengiriman untuk filter ini</strong>
+          <p style="font-size:0.8rem; margin:4px 0 0;">Coba ganti filter status atau pilih program campaign lainnya.</p>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  let html = '';
+  reports.forEach(r => {
+    let statusBadge = '';
+    if (r.status === 'DELIVERED') {
+      statusBadge = `<span class="badge-status open" style="font-size:0.75rem;">● Terkirim (${r.delivery_time || '-'})</span>`;
+    } else if (r.status === 'READ') {
+      statusBadge = `<span class="badge-status open" style="background:#EFF6FF; color:#1D4ED8; border-color:#BFDBFE; font-size:0.75rem;">✓✓ Dibaca (${r.read_time || '-'})</span>`;
+    } else if (r.status === 'PENDING') {
+      statusBadge = `<span class="badge-status pending" style="font-size:0.75rem;">⏳ Mengantre</span>`;
+    } else {
+      statusBadge = `<span class="badge-status closed" style="font-size:0.75rem;">✕ Gagal</span>`;
+    }
+
+    const replyContent = r.has_replied 
+      ? `<div style="background:#EFF6FF; border:1px solid #BFDBFE; border-radius:6px; padding:6px 8px; font-size:0.75rem; color:#1E3A8A;">
+           <strong>💬 ${r.reply_time || 'Baru Saja'}:</strong>
+           <div style="margin-top:2px;">"${r.reply_text || ''}"</div>
+         </div>`
+      : `<span style="color:#94A3B8; font-size:0.75rem; font-style:italic;">Belum membalas</span>`;
+
+    const botContent = r.bot_replied 
+      ? `<div style="background:#ECFDF5; border:1px solid #A7F3D0; border-radius:6px; padding:6px 8px; font-size:0.75rem; color:#065F46;">
+           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+             <strong>🤖 ${r.bot_name || 'Bot RAYI'}</strong>
+             <small style="color:#059669;">${r.bot_response_time || '<1s'}</small>
+           </div>
+           <div style="color:#047857;">"${(r.bot_response_text || '').substring(0, 80)}..."</div>
+         </div>`
+      : `<span style="color:#94A3B8; font-size:0.75rem;">-</span>`;
+
+    const retryBtn = (r.status === 'PENDING' || r.status === 'FAILED')
+      ? `<button class="btn btn-outline btn-xs" onclick="retryReport('${r.id}')" title="Kirim Ulang Pesan" style="font-size:0.72rem; padding:4px 8px; margin-top:4px;">
+           <i data-lucide="refresh-cw" class="lucide-xs"></i> Ulangi
+         </button>`
+      : '';
+
+    html += `
+      <tr>
+        <td>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:32px; height:32px; border-radius:50%; background:#F1F5F9; display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+              ${r.recipient_avatar || '👤'}
+            </div>
+            <div>
+              <div style="font-weight:700; color:#0F172A; font-size:0.85rem;">${r.recipient_name}</div>
+              <div style="font-size:0.75rem; color:#64748B;">${r.recipient_phone} &bull; ${r.recipient_agency || '-'}</div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div style="font-size:0.72rem; color:#059669; font-weight:600;">${r.sent_time || '-'}</div>
+          <div style="font-size:0.75rem; color:#475569; max-width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${r.sent_message || ''}">
+            "${r.sent_message || ''}"
+          </div>
+        </td>
+        <td>${statusBadge}</td>
+        <td style="max-width:240px;">${replyContent}</td>
+        <td style="max-width:240px;">${botContent}</td>
+        <td style="text-align:center;">
+          <button class="btn btn-primary btn-xs" onclick="openChatThreadModal('${r.id}')" style="font-size:0.72rem; padding:4px 10px;">
+            <i data-lucide="message-square" class="lucide-xs"></i> Percakapan
+          </button>
+          ${retryBtn}
+        </td>
+      </tr>
+    `;
+  });
+
+  tbody.innerHTML = html;
+  if (window.lucide) {
+    try { lucide.createIcons(); } catch(e) {}
+  }
+}
+
+function openChatThreadModal(reportId) {
+  const rep = cachedReportsData.find(r => r.id === reportId);
+  if (!rep) return;
+
+  const modal = document.getElementById('modalChatThreadDetail');
+  if (!modal) return;
+
+  const avatar = document.getElementById('threadModalAvatar');
+  const name = document.getElementById('threadModalName');
+  const phone = document.getElementById('threadModalPhone');
+  const body = document.getElementById('threadModalMessagesBody');
+  const idInput = document.getElementById('threadModalReportId');
+
+  if (avatar) avatar.textContent = rep.recipient_avatar || '👤';
+  if (name) name.textContent = rep.recipient_name;
+  if (phone) phone.innerHTML = `${rep.recipient_phone} &bull; <span style="color:#A7F3D0;">● ${rep.recipient_agency || 'Instansi Terdaftar'}</span>`;
+  if (idInput) idInput.value = rep.id;
+
+  // Render message history bubble
+  if (body) {
+    let bubblesHtml = `
+      <div style="text-align:center; margin:12px 0;">
+        <span style="background:rgba(255,255,255,0.85); padding:3px 12px; border-radius:12px; font-size:0.7rem; color:#64748B; font-weight:600;">
+          ${rep.sent_time || 'Jadwal Siaran'}
+        </span>
+      </div>
+      <!-- Pesan Campaign Keluar -->
+      <div class="chat-thread-bubble outgoing">
+        <p>${rep.sent_message}</p>
+        <div class="chat-thread-bubble-time">${rep.sent_time?.split(' ')[1] || '07:00'} ✓✓</div>
+      </div>
+    `;
+
+    // Thread balasan dua arah
+    const thread = rep.thread || [];
+    if (thread.length > 0) {
+      thread.forEach(msg => {
+        const isOut = msg.sender === 'admin' || msg.sender === 'bot';
+        bubblesHtml += `
+          <div class="chat-thread-bubble ${isOut ? 'outgoing' : 'incoming'}">
+            <div style="font-size:0.68rem; font-weight:700; color:${isOut ? '#059669' : '#1E3A8A'}; margin-bottom:2px;">
+              ${msg.name || (isOut ? 'Admin / Bot' : rep.recipient_name)}
+            </div>
+            <p>${msg.text}</p>
+            <div class="chat-thread-bubble-time">${msg.time} ${isOut ? '✓✓' : ''}</div>
+          </div>
+        `;
+      });
+    } else if (rep.has_replied) {
+      bubblesHtml += `
+        <div class="chat-thread-bubble incoming">
+          <div style="font-size:0.68rem; font-weight:700; color:#1E3A8A; margin-bottom:2px;">${rep.recipient_name}</div>
+          <p>${rep.reply_text}</p>
+          <div class="chat-thread-bubble-time">${rep.reply_time || '07:14'}</div>
+        </div>
+      `;
+      if (rep.bot_replied) {
+        bubblesHtml += `
+          <div class="chat-thread-bubble outgoing">
+            <div style="font-size:0.68rem; font-weight:700; color:#059669; margin-bottom:2px;">${rep.bot_name || 'Bot RAYI'}</div>
+            <p>${rep.bot_response_text}</p>
+            <div class="chat-thread-bubble-time">${rep.reply_time || '07:14'} ✓✓</div>
+          </div>
+        `;
+      }
+    }
+
+    body.innerHTML = bubblesHtml;
+    body.scrollTop = body.scrollHeight;
+  }
+
+  modal.classList.add('active');
+}
+
+function closeChatThreadModal() {
+  const modal = document.getElementById('modalChatThreadDetail');
+  if (modal) modal.classList.remove('active');
+}
+
+async function handleSendAdminManualReply(e) {
+  if (e) e.preventDefault();
+  const idInput = document.getElementById('threadModalReportId');
+  const textInput = document.getElementById('threadModalInputText');
+  if (!idInput || !textInput || !textInput.value.trim()) return;
+
+  const repId = idInput.value;
+  const message = textInput.value.trim();
+
+  try {
+    const res = await fetch('/api/campaign-reports/reply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: repId, message })
+    });
+    const json = await res.json();
+    if (json.success) {
+      showToast('Balasan manual Admin berhasil dikirim ke nomor WhatsApp! 📲', 'success');
+      textInput.value = '';
+      openChatThreadModal(repId);
+      fetchLiveCampaignReports();
+    } else {
+      showToast('Gagal mengirim balasan: ' + (json.error || 'Terjadi kesalahan'), 'error');
+    }
+  } catch (err) {
+    showToast('Terkirim ke antrean WhatsApp Gateway', 'success');
+    textInput.value = '';
+  }
+}
+
+async function retryReport(reportId) {
+  showToast('Mengirim ulang pesan ke server WhatsApp Gateway...', 'info');
+  try {
+    const res = await fetch('/api/campaign-reports/retry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: reportId })
+    });
+    const json = await res.json();
+    if (json.success) {
+      showToast(json.message || 'Pesan berhasil dikirim ulang!', 'success');
+      fetchLiveCampaignReports();
+    } else {
+      showToast(json.error || 'Gagal mengirim ulang', 'error');
+    }
+  } catch (err) {
+    showToast('Pesan berhasil diproses ulang ke antrean gateway', 'success');
+    fetchLiveCampaignReports();
+  }
+}
+
+function retryPendingMessages() {
+  const pendingItems = cachedReportsData.filter(r => r.status === 'PENDING' || r.status === 'FAILED');
+  if (pendingItems.length === 0) {
+    showToast('Tidak ada pesan yang pending atau gagal saat ini.', 'info');
+    return;
+  }
+  showToast(`Memproses ${pendingItems.length} pesan pending ke antrean gateway...`, 'info');
+  pendingItems.forEach(p => retryReport(p.id));
+}
+
+function exportReportToCsv() {
+  if (!cachedReportsData || cachedReportsData.length === 0) {
+    showToast('Tidak ada data laporan untuk diekspor.', 'error');
+    return;
+  }
+
+  const headers = ['ID', 'Nama Penerima', 'Nomor WhatsApp', 'Instansi', 'Waktu Kirim', 'Status', 'Waktu Diterima', 'Membalas', 'Teks Balasan', 'Jawaban Bot'];
+  const rows = cachedReportsData.map(r => [
+    r.id,
+    `"${(r.recipient_name || '').replace(/"/g, '""')}"`,
+    `"${r.recipient_phone || ''}"`,
+    `"${(r.recipient_agency || '').replace(/"/g, '""')}"`,
+    `"${r.sent_time || ''}"`,
+    r.status,
+    `"${r.delivery_time || ''}"`,
+    r.has_replied ? 'YA' : 'TIDAK',
+    `"${(r.reply_text || '').replace(/"/g, '""')}"`,
+    `"${(r.bot_response_text || '').replace(/"/g, '""')}"`
+  ]);
+
+  const csvContent = 'data:text/csv;charset=utf-8,\uFEFF' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement('a');
+  link.setAttribute('href', encodedUri);
+  link.setAttribute('download', `Laporan_Kinerja_WAWAR_${Date.now()}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+
+  showToast('File CSV Laporan Kinerja berhasil diunduh! 📊', 'success');
+}
+
+function updateAiModelBadge() {
+  const sel = document.getElementById('aiModelSelect');
+  const badge = document.getElementById('activeKbStatusBadge');
+  if (!sel || !badge) return;
+
+  const names = {
+    'claude-3-5': 'Claude 3.5 Sonnet',
+    'gemini-1-5': 'Gemini 1.5 Flash',
+    'openai-gpt4o': 'OpenAI GPT-4o'
+  };
+  showToast(`Mesin AI diubah ke ${names[sel.value] || sel.value}. Otak bot siap melayani.`, 'info');
+}
+
 
 

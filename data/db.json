@@ -1,6 +1,28 @@
 {
   "campaigns": [
     {
+      "id": "camp_test_series_1792848839552",
+      "name": "Kultum Subuh Ramadhan Series",
+      "type": "series",
+      "category": "keluarga",
+      "sender_number": "wawar-subuh (+62 851-2104-2025)",
+      "target_group": "keluarga",
+      "recipient": "👨‍👩‍👧 Jamaah & Keluarga ASN",
+      "message": "Hari ke-1: Awali hari dengan niat tulus dan membaca doa fajar. Selamat beraktivitas.",
+      "status": "ACTIVE",
+      "color": "amber",
+      "icon": "🌅",
+      "config": {
+        "start_date": "2026-11-01",
+        "end_date": "2026-11-30",
+        "total_messages": 30,
+        "series_time": "04:15"
+      },
+      "user_id": "usr_admin",
+      "created_at": "2026-10-24T13:33:59.554Z",
+      "updated_at": "2026-10-24T13:33:59.554Z"
+    },
+    {
       "id": "camp_subuh_legacy",
       "user_id": "usr_admin",
       "name": "Sapa Subuh Anak & Keluarga",
@@ -10,6 +32,10 @@
       "target_group": "keluarga",
       "recipient": "👨‍👩‍👧 Anak & Keluarga (+62 851-2104-2025)",
       "knowledge_base_id": "kb_subuh",
+      "bot_profile": "bot_subuh",
+      "bot_engine": "keyword_rules",
+      "bot_label": "Bot Sahabat Subuh • Keyword",
+      "strict_group_only": true,
       "message": "Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.",
       "status": "ACTIVE",
       "color": "amber",
@@ -33,6 +59,10 @@
       "target_group": "event_runners",
       "recipient": "🏃 500 Peserta Fun Run 26 Des",
       "knowledge_base_id": "kb_funrun",
+      "bot_profile": "bot_helpdesk",
+      "bot_engine": "gemini_rag",
+      "bot_label": "Bot Helpdesk • Gemini RAG",
+      "strict_group_only": false,
       "message": "Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186",
       "status": "ACTIVE",
       "color": "blue",
@@ -59,6 +89,10 @@
       "target_group": "tandang",
       "recipient": "🏛️ Grup ASN & Staf TANDANG",
       "knowledge_base_id": "kb_tandang",
+      "bot_profile": "bot_rayi",
+      "bot_engine": "gemini_strict",
+      "bot_label": "Bot RAYI • Strict Gemini",
+      "strict_group_only": true,
       "message": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
       "status": "ACTIVE",
       "color": "green",
@@ -131,6 +165,292 @@
       },
       "created_at": "2026-10-24T16:00:00.000Z",
       "updated_at": "2026-10-24T16:00:00.000Z"
+    }
+  ],
+  "campaign_delivery_reports": [
+    {
+      "id": "rep_tandang_001",
+      "campaign_id": "camp_dinas_legacy",
+      "campaign_name": "Sosialisasi SPPD & Kedinasan TANDANG",
+      "recipient_name": "Rudi Hermawan, S.Kom",
+      "recipient_phone": "+62 812-3344-5566",
+      "recipient_agency": "Diskominfo Jabar / Bidang IKP",
+      "recipient_avatar": "👨‍💼",
+      "sent_time": "2026-10-24 07:00:14 WIB",
+      "sent_message": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+      "status": "DELIVERED",
+      "delivery_time": "20.33.59 WIB",
+      "read_time": "07:02:45 WIB",
+      "has_replied": true,
+      "reply_time": "07:14:10 WIB",
+      "reply_text": "Pak, apakah format F4 bisa diganti lampiran PDF dari HP langsung atau harus scan ulang lewat mesin scanner?",
+      "bot_replied": true,
+      "bot_name": "Bot RAYI (Gemini AI RAG)",
+      "bot_engine": "Gemini 2.5 Flash RAG",
+      "bot_response_time": "2.1 detik",
+      "bot_response_text": "Sampurasun Pak Rudi! Tentu bisa. Anda dapat langsung mengunggah file PDF digital dari HP melalui menu 'Unggah Berkas SPPD' di aplikasi TANDANG tanpa perlu scan ulang fisik. Pastikan ukuran file di bawah 5MB dan terbaca jelas.",
+      "thread": [
+        {
+          "sender": "wawar",
+          "name": "WAWAR Gateway",
+          "text": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+          "time": "07:00 WIB",
+          "status": "READ"
+        },
+        {
+          "sender": "recipient",
+          "name": "Rudi Hermawan, S.Kom",
+          "text": "Pak, apakah format F4 bisa diganti lampiran PDF dari HP langsung atau harus scan ulang lewat mesin scanner?",
+          "time": "07:14 WIB"
+        },
+        {
+          "sender": "bot",
+          "name": "Bot RAYI (Gemini AI)",
+          "text": "Sampurasun Pak Rudi! Tentu bisa. Anda dapat langsung mengunggah file PDF digital dari HP melalui menu 'Unggah Berkas SPPD' di aplikasi TANDANG tanpa perlu scan ulang fisik. Pastikan ukuran file di bawah 5MB dan terbaca jelas.",
+          "time": "07:14:12 WIB"
+        },
+        {
+          "sender": "recipient",
+          "name": "Rudi Hermawan, S.Kom",
+          "text": "Alhamdulillah hatur nuhun Bot RAYI, langsung abdi unggah via HP ayeuna.",
+          "time": "07:15 WIB"
+        },
+        {
+          "sender": "bot",
+          "name": "Bot RAYI (Gemini AI)",
+          "text": "Sami-sami Pak Rudi! Selamat bertugas dan sukses selalu untuk Diskominfo Jawa Barat.",
+          "time": "07:15:08 WIB"
+        },
+        {
+          "sender": "admin",
+          "name": "Admin Diskominfo",
+          "text": "Terima kasih konfirmasinya, berkas Anda sudah kami terima.",
+          "time": "20.33 WIB",
+          "status": "SENT"
+        }
+      ]
+    },
+    {
+      "id": "rep_tandang_002",
+      "campaign_id": "camp_dinas_legacy",
+      "campaign_name": "Sosialisasi SPPD & Kedinasan TANDANG",
+      "recipient_name": "Hj. Dewi Sartika, M.Si",
+      "recipient_phone": "+62 813-8899-1122",
+      "recipient_agency": "Diskominfo Jabar / Sekretariat",
+      "recipient_avatar": "🧕",
+      "sent_time": "2026-10-24 07:00:19 WIB",
+      "sent_message": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+      "status": "READ",
+      "delivery_time": "07:00:22 WIB",
+      "read_time": "07:05:12 WIB",
+      "has_replied": false,
+      "reply_time": "-",
+      "reply_text": "",
+      "bot_replied": false,
+      "bot_name": "Bot RAYI (Gemini AI)",
+      "bot_engine": "Gemini 2.5 Flash RAG",
+      "bot_response_time": "-",
+      "bot_response_text": "",
+      "thread": [
+        {
+          "sender": "wawar",
+          "name": "WAWAR Gateway",
+          "text": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+          "time": "07:00 WIB",
+          "status": "READ"
+        }
+      ]
+    },
+    {
+      "id": "rep_tandang_003",
+      "campaign_id": "camp_dinas_legacy",
+      "campaign_name": "Sosialisasi SPPD & Kedinasan TANDANG",
+      "recipient_name": "Ahmad Fauzi, S.T",
+      "recipient_phone": "+62 852-7711-4433",
+      "recipient_agency": "Diskominfo Jabar / E-Government",
+      "recipient_avatar": "👨‍💻",
+      "sent_time": "2026-10-24 07:00:24 WIB",
+      "sent_message": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+      "status": "READ",
+      "delivery_time": "07:00:27 WIB",
+      "read_time": "07:08:33 WIB",
+      "has_replied": true,
+      "reply_time": "07:22:04 WIB",
+      "reply_text": "Batas akhir verifikasi berkas SPPD minggu ini hari apa ya?",
+      "bot_replied": true,
+      "bot_name": "Bot RAYI (Gemini AI RAG)",
+      "bot_engine": "Gemini 2.5 Flash RAG",
+      "bot_response_time": "1.9 detik",
+      "bot_response_text": "Sesuai SOP TANDANG Bab 3 Pasal 4, batas pengunggahan dan verifikasi berkas SPPD adalah hari Jumat pukul 16:30 WIB setiap pekannya sebelum penutupan anggaran kedinasan.",
+      "thread": [
+        {
+          "sender": "wawar",
+          "name": "WAWAR Gateway",
+          "text": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+          "time": "07:00 WIB",
+          "status": "READ"
+        },
+        {
+          "sender": "recipient",
+          "name": "Ahmad Fauzi, S.T",
+          "text": "Batas akhir verifikasi berkas SPPD minggu ini hari apa ya?",
+          "time": "07:22 WIB"
+        },
+        {
+          "sender": "bot",
+          "name": "Bot RAYI (Gemini AI)",
+          "text": "Sesuai SOP TANDANG Bab 3 Pasal 4, batas pengunggahan dan verifikasi berkas SPPD adalah hari Jumat pukul 16:30 WIB setiap pekannya sebelum penutupan anggaran kedinasan.",
+          "time": "07:22:06 WIB"
+        }
+      ]
+    },
+    {
+      "id": "rep_tandang_004",
+      "campaign_id": "camp_dinas_legacy",
+      "campaign_name": "Sosialisasi SPPD & Kedinasan TANDANG",
+      "recipient_name": "Budi Santoso",
+      "recipient_phone": "+62 878-1234-9001",
+      "recipient_agency": "Diskominfo Jabar / Tim Lapangan",
+      "recipient_avatar": "👷",
+      "sent_time": "2026-10-24 07:00:29 WIB",
+      "sent_message": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+      "status": "DELIVERED",
+      "delivery_time": "07:00:33 WIB",
+      "read_time": "-",
+      "has_replied": false,
+      "reply_time": "-",
+      "reply_text": "",
+      "bot_replied": false,
+      "bot_name": "Bot RAYI (Gemini AI)",
+      "bot_engine": "Gemini 2.5 Flash RAG",
+      "bot_response_time": "-",
+      "bot_response_text": "",
+      "thread": [
+        {
+          "sender": "wawar",
+          "name": "WAWAR Gateway",
+          "text": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+          "time": "07:00 WIB",
+          "status": "DELIVERED"
+        }
+      ]
+    },
+    {
+      "id": "rep_tandang_005",
+      "campaign_id": "camp_dinas_legacy",
+      "campaign_name": "Sosialisasi SPPD & Kedinasan TANDANG",
+      "recipient_name": "Siti Nurhaliza, A.Md",
+      "recipient_phone": "+62 896-5544-3322",
+      "recipient_agency": "Diskominfo Jabar / Keuangan",
+      "recipient_avatar": "👩‍💼",
+      "sent_time": "2026-10-24 07:00:35 WIB",
+      "sent_message": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+      "status": "PENDING",
+      "delivery_time": "-",
+      "read_time": "-",
+      "has_replied": false,
+      "reply_time": "-",
+      "reply_text": "",
+      "bot_replied": false,
+      "bot_name": "Bot RAYI (Gemini AI)",
+      "bot_engine": "Gemini 2.5 Flash RAG",
+      "bot_response_time": "-",
+      "bot_response_text": "",
+      "thread": [
+        {
+          "sender": "wawar",
+          "name": "WAWAR Gateway",
+          "text": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+          "time": "07:00 WIB",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "rep_funrun_001",
+      "campaign_id": "camp_funrun_legacy",
+      "campaign_name": "Event Fun Run 26 Des Jabar",
+      "recipient_name": "Gita Pratama (Runner #088)",
+      "recipient_phone": "+62 811-2233-4455",
+      "recipient_agency": "Komunitas Lari Bandung Runner",
+      "recipient_avatar": "🏃",
+      "sent_time": "2026-10-24 09:00:05 WIB",
+      "sent_message": "Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186",
+      "status": "READ",
+      "delivery_time": "09:00:09 WIB",
+      "read_time": "09:01:20 WIB",
+      "has_replied": true,
+      "reply_time": "09:03:15 WIB",
+      "reply_text": "Pengambilan race pack jersey dan nomor BIB mulai jam berapa ya kak?",
+      "bot_replied": true,
+      "bot_name": "Bot Helpdesk Fun Run 2026",
+      "bot_engine": "Gemini 2.5 Flash RAG",
+      "bot_response_time": "1.7 detik",
+      "bot_response_text": "Halo Runner! Pengambilan race pack (jersey + BIB) dilayani di Lobby Gedung Sate pada tanggal 24-25 Desember 2026 pukul 09:00 - 18:00 WIB dengan menunjukkan QR Code tiket ini.",
+      "thread": [
+        {
+          "sender": "wawar",
+          "name": "WAWAR Gateway",
+          "text": "Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186",
+          "time": "09:00 WIB",
+          "status": "READ"
+        },
+        {
+          "sender": "recipient",
+          "name": "Gita Pratama",
+          "text": "Pengambilan race pack jersey dan nomor BIB mulai jam berapa ya kak?",
+          "time": "09:03 WIB"
+        },
+        {
+          "sender": "bot",
+          "name": "Bot Helpdesk 2026",
+          "text": "Halo Runner! Pengambilan race pack (jersey + BIB) dilayani di Lobby Gedung Sate pada tanggal 24-25 Desember 2026 pukul 09:00 - 18:00 WIB dengan menunjukkan QR Code tiket ini.",
+          "time": "09:03:17 WIB"
+        }
+      ]
+    },
+    {
+      "id": "rep_subuh_001",
+      "campaign_id": "camp_subuh_legacy",
+      "campaign_name": "Sapa Subuh Anak & Keluarga",
+      "recipient_name": "Anakku Tercinta (+62 851-2104-2025)",
+      "recipient_phone": "+62 851-2104-2025",
+      "recipient_agency": "Keluarga Inti",
+      "recipient_avatar": "👶",
+      "sent_time": "2026-10-24 04:30:00 WIB",
+      "sent_message": "Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.",
+      "status": "READ",
+      "delivery_time": "04:30:04 WIB",
+      "read_time": "04:35:10 WIB",
+      "has_replied": true,
+      "reply_time": "04:38:22 WIB",
+      "reply_text": "Aamiin ya rabbal alamin, nuhun Pah tos gugahkeun subuh.",
+      "bot_replied": true,
+      "bot_name": "Bot Sahabat Subuh",
+      "bot_engine": "Rule-Based Fajar Matcher",
+      "bot_response_time": "2.0 detik",
+      "bot_response_text": "Alhamdulillah, barakallahu fiik. Selamat belajar dan beraktivitas hari ini ya nak!",
+      "thread": [
+        {
+          "sender": "wawar",
+          "name": "WAWAR Gateway",
+          "text": "Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.",
+          "time": "04:30 WIB",
+          "status": "READ"
+        },
+        {
+          "sender": "recipient",
+          "name": "Anakku Tercinta",
+          "text": "Aamiin ya rabbal alamin, nuhun Pah tos gugahkeun subuh.",
+          "time": "04:38 WIB"
+        },
+        {
+          "sender": "bot",
+          "name": "Bot Sahabat Subuh",
+          "text": "Alhamdulillah, barakallahu fiik. Selamat belajar dan beraktivitas hari ini ya nak!",
+          "time": "04:38:24 WIB"
+        }
+      ]
     }
   ],
   "migrations": {

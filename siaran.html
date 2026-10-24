@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Siaran Pesan — WAWAR Gateway</title>
+  
+  <!-- IBM Plex Sans & IBM Plex Mono untuk antarmuka operasional padat & angka tabular stabil -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       TOKEN DESAIN OPERASIONAL WAWAR
+       ========================================================================== */
+    :root {
+      /* Palet Warna 6-Tinta Fungsional */
+      --tinta-utama: #0f172a;       /* Slate 900: Kontras 13:1, keterbacaan teks utama */
+      --tinta-sekunder: #475569;    /* Slate 600: Kontras 5.5:1, label kolom dan meta */
+      --tinta-lemah: #94a3b8;       /* Slate 400: Garis placeholder & ikon netral */
+      --latar-kanvas: #f8fafc;      /* Slate 50: Latar kerja teduh untuk monitor kantor */
+      --latar-permukaan: #ffffff;   /* Putih murni untuk panel kerja dan tabel */
+      --garis-batas: #e2e8f0;       /* Slate 200: Pemisah baris dan input */
+      --garis-tegas: #cbd5e1;       /* Slate 300: Batas input saat diam */
+
+      /* Aksen Identitas: Hijau Pinus Wawar (bukan neon, berakar pada komunikasi resmi) */
+      --pinus-utama: #0f766e;       /* Teal 700: Tombol utama & identitas siaran */
+      --pinus-hover: #115e59;       /* Teal 800 */
+      --pinus-terang: #f0fdfa;      /* Teal 50: Latar baris terpilih */
+      --pinus-batas: #99f6e4;       /* Teal 200 */
+
+      /* Status Pengiriman Multimodal */
+      --status-kirim-teks: #065f46;
+      --status-kirim-latar: #ecfdf5;
+      --status-kirim-garis: #a7f3d0;
+
+      --status-antre-teks: #92400e;
+      --status-antre-latar: #fffbeb;
+      --status-antre-garis: #fde68a;
+
+      --status-gagal-teks: #991b1b;
+      --status-gagal-latar: #fef2f2;
+      --status-gagal-garis: #fecaca;
+
+      --status-jeda-teks: #475569;
+      --status-jeda-latar: #f1f5f9;
+      --status-jeda-garis: #cbd5e1;
+
+      /* Tipografi */
+      --font-teks: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-kode: 'IBM Plex Mono', Consolas, Monaco, monospace;
+
+      /* Ukuran Geometris Disiplin */
+      --radius-sm: 4px;
+      --radius-md: 6px;
+      --radius-lg: 8px;
+      --tinggi-baris: 40px;
+    }
+
+    /* Reset & Dasar */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-teks);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--tinta-utama);
+      background-color: var(--latar-kanvas);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* Utilitas Aksesibilitas Keyboard */
+    :focus-visible {
+      outline: 2px solid var(--pinus-utama);
+      outline-offset: 2px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ==========================================================================
+       TATA LETAK STRUKTURAL (SIDEBAR + KONTEN OPERASIONAL)
+       ========================================================================== */
+    .app-kerangka {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Operasional */
+    .app-sidebar {
+      background: var(--latar-permukaan);
+      border-right: 1px solid var(--garis-batas);
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .brand-wawar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 8px;
+    }
+
+    .brand-logo-wawar {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: var(--pinus-utama);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-teks h1 {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--tinta-utama);
+    }
+
+    .brand-teks p {
+      font-size: 11px;
+      color: var(--tinta-sekunder);
+    }
+
+    .nav-kelompok {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--tinta-lemah);
+      padding: 8px 8px 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: var(--radius-sm);
+      color: var(--tinta-sekunder);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .nav-item:hover {
+      background: var(--latar-kanvas);
+      color: var(--tinta-utama);
+    }
+
+    .nav-item.aktif {
+      background: var(--pinus-terang);
+      color: var(--pinus-utama);
+      font-weight: 600;
+    }
+
+    .nav-item svg {
+      width: 16px;
+      height: 16px;
+      stroke-width: 1.75;
+      flex-shrink: 0;
+    }
+
+    .nav-badge-hitung {
+      margin-left: auto;
+      font-family: var(--font-kode);
+      font-size: 11px;
+      background: var(--garis-batas);
+      color: var(--tinta-sekunder);
+      padding: 1px 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      padding: 12px 8px;
+      border-top: 1px solid var(--garis-batas);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+    }
+
+    .status-sinyal-titik {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      flex-shrink: 0;
+    }
+
+    /* Area Kerja Utama */
+    .app-utama {
+      padding: 24px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow-y: auto;
+      max-width: 1360px;
+    }
+
+    /* Header Halaman Operasional */
+    .halaman-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .halaman-judul h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--tinta-utama);
+      letter-spacing: -0.2px;
+    }
+
+    .halaman-judul p {
+      font-size: 13px;
+      color: var(--tinta-sekunder);
+      margin-top: 2px;
+    }
+
+    /* Bilah Metrik Satu-Baris (Bukan Kartu Bertingkat) */
+    .bilah-metrik {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      background: var(--latar-permukaan);
+      border: 1px solid var(--garis-batas);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .metrik-item {
+      padding: 12px 16px;
+      border-right: 1px solid var(--garis-batas);
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .metrik-item:last-child {
+      border-right: none;
+    }
+
+    .metrik-label {
+      font-size: 12px;
+      color: var(--tinta-sekunder);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .metrik-nilai {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--tinta-utama);
+      font-family: var(--font-kode);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .metrik-sub {
+      font-size: 11px;
+      color: var(--tinta-lemah);
+    }
+
+    /* Bilah Filter & Kendali */
+    .bilah-filter {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .grup-tab-filter {
+      display: inline-flex;
+      background: var(--latar-permukaan);
+      border: 1px solid var(--garis-batas);
+      border-radius: var(--radius-sm);
+      padding: 2px;
+    }
+
+    .tab-filter-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--tinta-sekunder);
+      border-radius: calc(var(--radius-sm) - 1px);
+      cursor: pointer;
+    }
+
+    .tab-filter-btn:hover {
+      color: var(--tinta-utama);
+    }
+
+    .tab-filter-btn.aktif {
+      background: var(--latar-kanvas);
+      color: var(--tinta-utama);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .grup-filter-kanan {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-cari-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-cari-wrap svg {
+      position: absolute;
+      left: 10px;
+      width: 14px;
+      height: 14px;
+      color: var(--tinta-lemah);
+    }
+
+    .input-teks, .select-input {
+      font-family: var(--font-teks);
+      font-size: 13px;
+      color: var(--tinta-utama);
+      background: var(--latar-permukaan);
+      border: 1px solid var(--garis-tegas);
+      border-radius: var(--radius-sm);
+      padding: 7px 10px;
+      height: 34px;
+      min-width: 180px;
+    }
+
+    .input-cari-wrap input {
+      padding-left: 30px;
+    }
+
+    .input-teks:focus, .select-input:focus {
+      border-color: var(--pinus-utama);
+      outline: none;
+    }
+
+    /* Tombol-tombol Standar Operasional */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-family: var(--font-teks);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-primer {
+      background: var(--pinus-utama);
+      color: #ffffff;
+      border-color: var(--pinus-utama);
+    }
+
+    .btn-primer:hover {
+      background: var(--pinus-hover);
+    }
+
+    .btn-sekunder {
+      background: var(--latar-permukaan);
+      color: var(--tinta-utama);
+      border-color: var(--garis-tegas);
+    }
+
+    .btn-sekunder:hover {
+      background: var(--latar-kanvas);
+      border-color: var(--tinta-lemah);
+    }
+
+    .btn-bahaya-ringan {
+      background: transparent;
+      color: var(--tinta-sekunder);
+      border-color: transparent;
+    }
+
+    .btn-bahaya-ringan:hover {
+      background: var(--status-gagal-latar);
+      color: var(--status-gagal-teks);
+    }
+
+    .btn-mini {
+      height: 28px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .btn svg {
+      width: 15px;
+      height: 15px;
+      stroke-width: 1.75;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       TABEL DATA OPERASIONAL PADAT (Bukan Kartu)
+       ========================================================================== */
+    .panel-tabel {
+      background: var(--latar-permukaan);
+      border: 1px solid var(--garis-batas);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    .tabel-siaran {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 13px;
+    }
+
+    .tabel-siaran th {
+      background: #fafbfc;
+      color: var(--tinta-sekunder);
+      font-weight: 600;
+      font-size: 12px;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--garis-batas);
+      white-space: nowrap;
+    }
+
+    .tabel-siaran td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--garis-batas);
+      vertical-align: middle;
+      color: var(--tinta-utama);
+    }
+
+    .tabel-siaran tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tabel-siaran tr:hover td {
+      background: #fafcff;
+    }
+
+    /* Elemen Kolom Spesifik */
+    .nama-siaran-judul {
+      font-weight: 600;
+      color: var(--tinta-utama);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nomor-jalur-sub {
+      font-family: var(--font-kode);
+      font-size: 11px;
+      color: var(--tinta-sekunder);
+      margin-top: 2px;
+    }
+
+    .jenis-pill {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 2px 6px;
+      background: var(--latar-kanvas);
+      border: 1px solid var(--garis-batas);
+      border-radius: var(--radius-sm);
+      color: var(--tinta-sekunder);
+      white-space: nowrap;
+    }
+
+    .jadwal-waktu {
+      font-family: var(--font-kode);
+      font-variant-numeric: tabular-nums;
+      font-size: 12px;
+      color: var(--tinta-utama);
+    }
+
+    .jadwal-pola {
+      font-size: 11px;
+      color: var(--tinta-sekunder);
+    }
+
+    /* Status Multimodal (Teks + Ikon + Warna) */
+    .badge-status-operasional {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .badge-status-operasional svg {
+      width: 12px;
+      height: 12px;
+      stroke-width: 2;
+    }
+
+    .badge-status-operasional.berjalan {
+      background: var(--status-kirim-latar);
+      color: var(--status-kirim-teks);
+      border: 1px solid var(--status-kirim-garis);
+    }
+
+    .badge-status-operasional.terjadwal {
+      background: var(--status-antre-latar);
+      color: var(--status-antre-teks);
+      border: 1px solid var(--status-antre-garis);
+    }
+
+    .badge-status-operasional.selesai {
+      background: var(--latar-kanvas);
+      color: var(--tinta-sekunder);
+      border: 1px solid var(--garis-batas);
+    }
+
+    .badge-status-operasional.dijeda {
+      background: var(--status-jeda-latar);
+      color: var(--status-jeda-teks);
+      border: 1px solid var(--status-jeda-garis);
+    }
+
+    .badge-status-operasional.gagal {
+      background: var(--status-gagal-latar);
+      color: var(--status-gagal-teks);
+      border: 1px solid var(--status-gagal-garis);
+    }
+
+    /* Kemajuan Kirim Baris */
+    .bar-kemajuan-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 110px;
+    }
+
+    .bar-kemajuan-teks {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      font-family: var(--font-kode);
+      font-variant-numeric: tabular-nums;
+      color: var(--tinta-sekunder);
+    }
+
+    .bar-kemajuan-rel {
+      height: 4px;
+      background: var(--garis-batas);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .bar-kemajuan-isi {
+      height: 100%;
+      background: var(--pinus-utama);
+      border-radius: 2px;
+    }
+
+    /* Tombol Aksi Baris */
+    .aksi-baris-grup {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      justify-content: flex-end;
+    }
+
+    /* Keadaan Kosong (Ajakan Bertindak Spesifik) */
+    .tabel-keadaan-kosong {
+      padding: 48px 24px;
+      text-align: center;
+      color: var(--tinta-sekunder);
+    }
+
+    .tabel-keadaan-kosong svg {
+      width: 32px;
+      height: 32px;
+      stroke-width: 1.5;
+      color: var(--tinta-lemah);
+      margin-bottom: 8px;
+    }
+
+    .tabel-keadaan-kosong h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--tinta-utama);
+    }
+
+    .tabel-keadaan-kosong p {
+      font-size: 12px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+    }
+
+    /* ==========================================================================
+       PANEL MODAL BUAT SIARAN: SPLIT 2-KOLOM (FORM + PRATINJAU WHATSAPP REAL-TIME)
+       ========================================================================== */
+    .modal-latar {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-latar.buka {
+      display: flex;
+    }
+
+    .panel-form-siaran {
+      background: var(--latar-permukaan);
+      border: 1px solid var(--garis-batas);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 980px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 16px 36px -8px rgba(15, 23, 42, 0.16);
+      overflow: hidden;
+    }
+
+    .panel-form-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--garis-batas);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-form-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--tinta-utama);
+    }
+
+    .panel-form-header p {
+      font-size: 12px;
+      color: var(--tinta-sekunder);
+    }
+
+    .btn-tutup-silang {
+      border: none;
+      background: none;
+      color: var(--tinta-lemah);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+      display: flex;
+    }
+
+    .btn-tutup-silang:hover {
+      color: var(--tinta-utama);
+      background: var(--latar-kanvas);
+    }
+
+    /* Wadah Split Dua Kolom */
+    .form-split-konten {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .form-kolom-kiri {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      border-right: 1px solid var(--garis-batas);
+    }
+
+    .form-kolom-kanan {
+      background: #f1f5f9;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-grup {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--tinta-utama);
+    }
+
+    .form-wajib {
+      color: var(--status-gagal-teks);
+    }
+
+    .form-bantuan {
+      font-size: 11px;
+      color: var(--tinta-sekunder);
+    }
+
+    .form-galat {
+      font-size: 11px;
+      color: var(--status-gagal-teks);
+      font-weight: 500;
+      display: none;
+    }
+
+    .form-grup.ada-galat .form-galat {
+      display: block;
+    }
+
+    .form-grup.ada-galat .input-teks,
+    .form-grup.ada-galat .textarea-pesan,
+    .form-grup.ada-galat .select-input {
+      border-color: var(--status-gagal-teks);
+      background: var(--status-gagal-latar);
+    }
+
+    .grid-form-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .textarea-pesan {
+      font-family: var(--font-teks);
+      font-size: 13px;
+      color: var(--tinta-utama);
+      background: var(--latar-permukaan);
+      border: 1px solid var(--garis-tegas);
+      border-radius: var(--radius-sm);
+      padding: 8px 10px;
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+
+    .textarea-pesan:focus {
+      border-color: var(--pinus-utama);
+      outline: none;
+    }
+
+    .sisipan-variabel-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .chip-variabel {
+      font-family: var(--font-kode);
+      font-size: 11px;
+      background: var(--latar-kanvas);
+      border: 1px solid var(--garis-tegas);
+      border-radius: var(--radius-sm);
+      padding: 2px 6px;
+      color: var(--tinta-sekunder);
+      cursor: pointer;
+    }
+
+    .chip-variabel:hover {
+      background: #e2e8f0;
+      color: var(--tinta-utama);
+    }
+
+    /* Pilihan Opsi Lampiran Dokumen */
+    .lampiran-opsi-box {
+      border: 1px solid var(--garis-batas);
+      background: var(--latar-kanvas);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .lampiran-opsi-box label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--tinta-utama);
+      cursor: pointer;
+    }
+
+    /* ==========================================================================
+       PRATINJAU CIRI KHAS: GELEMBUNG WHATSAPP AKURAT (DISIPLIN & PRESISI)
+       ========================================================================== */
+    .pratinjau-header-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--tinta-sekunder);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .wa-mockup-layar {
+      background: #efeae2;
+      border: 1px solid #d1d7db;
+      border-radius: var(--radius-md);
+      padding: 14px 12px;
+      min-height: 310px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+    }
+
+    .wa-tanggal-pembagi {
+      align-self: center;
+      background: rgba(255, 255, 255, 0.92);
+      color: #54656f;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 1px 1px rgba(11, 20, 26, 0.08);
+      margin-bottom: 12px;
+    }
+
+    .wa-gelembung-keluar {
+      align-self: flex-end;
+      background: #d9fdd3;
+      border-radius: 7.5px 0 7.5px 7.5px;
+      box-shadow: 0 1px 1px rgba(11, 20, 26, 0.12);
+      max-width: 88%;
+      padding: 6px 9px 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .wa-lampiran-pdf-kartu {
+      background: #ffffff;
+      border: 1px solid #d1d7db;
+      border-radius: var(--radius-sm);
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .wa-pdf-ikon {
+      width: 24px;
+      height: 24px;
+      background: #fee2e2;
+      color: #dc2626;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .wa-pesan-teks {
+      font-size: 13px;
+      color: #111b21;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.4;
+    }
+
+    .wa-meta-waktu {
+      align-self: flex-end;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 11px;
+      color: #667781;
+      margin-top: 1px;
+      font-family: var(--font-kode);
+    }
+
+    .wa-centang-ganda {
+      color: #53bdeb;
+      font-weight: 700;
+    }
+
+    /* Footer Form */
+    .panel-form-footer {
+      padding: 14px 20px;
+      border-top: 1px solid var(--garis-batas);
+      background: var(--latar-permukaan);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Dialog Konfirmasi Hapus Spesifik */
+    .dialog-konfirmasi {
+      background: var(--latar-permukaan);
+      border: 1px solid var(--garis-batas);
+      border-radius: var(--radius-md);
+      max-width: 440px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.2);
+    }
+
+    .dialog-konfirmasi h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--tinta-utama);
+    }
+
+    .dialog-konfirmasi p {
+      font-size: 13px;
+      color: var(--tinta-sekunder);
+    }
+
+    .dialog-aksi {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    /* Notifikasi Toast */
+    .toast-wadah {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 200;
+    }
+
+    .toast-item {
+      background: var(--tinta-utama);
+      color: #ffffff;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Responsif Ponsel (min-width 768px kebawah) */
+    @media (max-width: 860px) {
+      .app-kerangka {
+        grid-template-columns: 1fr;
+      }
+      .app-sidebar {
+        display: none; /* Sembunyikan sidebar di mobile untuk fokus operasional */
+      }
+      .app-utama {
+        padding: 16px;
+      }
+      .bilah-metrik {
+        grid-template-columns: 1fr 1fr;
+      }
+      .form-split-konten {
+        grid-template-columns: 1fr;
+      }
+      .form-kolom-kanan {
+        border-top: 1px solid var(--garis-batas);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-kerangka">
+    
+    <!-- SIDEBAR OPERASIONAL WAWAR (Tertata per fungsi tanpa emoji) -->
+    <aside class="app-sidebar" aria-label="Navigasi aplikasi">
+      <div class="brand-wawar">
+        <div class="brand-logo-wawar">W</div>
+        <div class="brand-teks">
+          <h1>WAWAR</h1>
+          <p>Gateway warta &amp; siaran</p>
+        </div>
+      </div>
+
+      <nav class="nav-kelompok" aria-label="Menu utama">
+        <span class="nav-label">PENGIRIMAN</span>
+        
+        <button type="button" class="nav-item aktif" aria-current="page">
+          <!-- Ikon Garis: Radio / Siaran -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49m-8.48-.01a6 6 0 0 1 0-8.49m11.31-2.82a10 10 0 0 1 0 14.14m-14.14 0a10 10 0 0 1 0-14.14"/></svg>
+          <span>Siaran pesan</span>
+          <span class="nav-badge-hitung" id="badgeJumlahSiaran">3</span>
+        </button>
+
+        <button type="button" class="nav-item" onclick="pindahTab('laporan')">
+          <!-- Ikon Garis: Bar Chart / Log -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <span>Log &amp; kinerja</span>
+        </button>
+
+        <button type="button" class="nav-item" onclick="pindahTab('kontak')">
+          <!-- Ikon Garis: Users / Sasaran -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <span>Grup sasaran</span>
+        </button>
+      </nav>
+
+      <nav class="nav-kelompok" aria-label="Konfigurasi teknis">
+        <span class="nav-label">KONFIGURASI</span>
+
+        <button type="button" class="nav-item" onclick="pindahTab('nomor')">
+          <!-- Ikon Garis: Telepon -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <span>Nomor pengirim</span>
+        </button>
+
+        <button type="button" class="nav-item" onclick="pindahTab('api')">
+          <!-- Ikon Garis: Terminal / Kunci -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          <span>Aplikasi klien &amp; API</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div style="display:flex; align-items:center; gap:8px; width:100%; margin-bottom:8px; padding-bottom:8px; border-bottom:1px solid var(--garis);">
+          <span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:#10B981;"></span>
+          <span style="font-size:11px; font-weight:600; color:var(--tinta-sekunder);">BANGKIT Beruang Ecosystem</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span class="status-sinyal-titik" title="Gateway online"></span>
+          <div>
+            <strong style="display:block; font-size:12px; font-weight:600;">Wawar-primary</strong>
+            <span style="font-family:var(--font-kode); font-size:11px; color:var(--tinta-sekunder);">+62 851-2104-2025</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- AREA UTAMA: LAYAR SIARAN -->
+    <main class="app-utama" id="kontenUtama">
+      
+      <!-- 1. Header Operasional -->
+      <header class="halaman-header">
+        <div class="halaman-judul">
+          <h2>Siaran pesan</h2>
+          <p>Jadwal dan riwayat pengiriman pesan massal melalui gateway WhatsApp.</p>
+        </div>
+
+        <button type="button" class="btn btn-primer" onclick="bukaModalBuatSiaran()">
+          <!-- Ikon Plus Garis -->
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span>Buat siaran</span>
+        </button>
+      </header>
+
+      <!-- 2. Bilah Ringkasan Kinerja (Bukan kartu bertingkat, tapi 1 baris tabular) -->
+      <section class="bilah-metrik" aria-label="Ringkasan pengiriman hari ini">
+        <div class="metrik-item">
+          <span class="metrik-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            Siaran aktif
+          </span>
+          <span class="metrik-nilai" id="metrikAktif">3 program</span>
+          <span class="metrik-sub">1 berjalan, 2 terjadwal</span>
+        </div>
+
+        <div class="metrik-item">
+          <span class="metrik-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Terkirim hari ini
+          </span>
+          <span class="metrik-nilai" id="metrikTerkirim" style="color:var(--status-kirim-teks);">438 pesan</span>
+          <span class="metrik-sub">97,3% tingkat penerimaan</span>
+        </div>
+
+        <div class="metrik-item">
+          <span class="metrik-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Mengantre
+          </span>
+          <span class="metrik-nilai" id="metrikMengantre" style="color:var(--status-antre-teks);">12 pesan</span>
+          <span class="metrik-sub">Jeda pengaman jitter</span>
+        </div>
+
+        <div class="metrik-item">
+          <span class="metrik-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Gagal kirim
+          </span>
+          <span class="metrik-nilai" id="metrikGagal">0 pesan</span>
+          <span class="metrik-sub">Nomor tujuan valid</span>
+        </div>
+      </section>
+
+      <!-- 3. Bilah Filter & Pencarian -->
+      <section class="bilah-filter" aria-label="Filter tabel siaran">
+        <div class="grup-tab-filter" role="tablist">
+          <button type="button" class="tab-filter-btn aktif" onclick="terapkanFilterStatus('semua', this)">Semua</button>
+          <button type="button" class="tab-filter-btn" onclick="terapkanFilterStatus('berjalan', this)">Sedang berjalan</button>
+          <button type="button" class="tab-filter-btn" onclick="terapkanFilterStatus('terjadwal', this)">Terjadwal</button>
+          <button type="button" class="tab-filter-btn" onclick="terapkanFilterStatus('selesai', this)">Selesai</button>
+          <button type="button" class="tab-filter-btn" onclick="terapkanFilterStatus('dijeda', this)">Dijeda</button>
+        </div>
+
+        <div class="grup-filter-kanan">
+          <select class="select-input" id="filterNomorPengirim" onchange="terapkanFilterNomor(this.value)" aria-label="Filter nomor pengirim">
+            <option value="semua">Semua nomor pengirim</option>
+            <option value="+62 851-2104-2025">+62 851-2104-2025 (Wawar-primary)</option>
+          </select>
+
+          <div class="input-cari-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" class="input-teks" id="inputCariSiaran" placeholder="Cari nama siaran..." oninput="tanganiPencarian(this.value)">
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Tabel Daftar Siaran Terjadwal & Berjalan -->
+      <section class="panel-tabel" aria-label="Daftar siaran">
+        <table class="tabel-siaran">
+          <thead>
+            <tr>
+              <th scope="col" style="width:28%;">Nama siaran &amp; pengirim</th>
+              <th scope="col" style="width:14%;">Jenis</th>
+              <th scope="col" style="width:18%;">Jadwal &amp; jam (WIB)</th>
+              <th scope="col" style="width:16%;">Sasaran penerima</th>
+              <th scope="col" style="width:12%;">Status</th>
+              <th scope="col" style="width:12%;">Kemajuan</th>
+              <th scope="col" style="width:10%; text-align:right;">Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="badanTabelSiaran">
+            <!-- Diisi secara dinamis oleh script -->
+          </tbody>
+        </table>
+
+        <!-- Keadaan Kosong (Muncul hanya jika filter tidak cocok) -->
+        <div id="wadahKeadaanKosong" class="tabel-keadaan-kosong" style="display:none;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+          <h3>Tidak ada siaran yang cocok</h3>
+          <p>Coba pilih tab filter status lain atau hapus kata kunci pada kolom pencarian.</p>
+          <button type="button" class="btn btn-sekunder btn-mini" onclick="resetSemuaFilter()">Reset filter</button>
+        </div>
+      </section>
+
+      <!-- Footer Halaman (BANGKIT Beruang Ecosystem) -->
+      <footer style="margin-top:40px; padding:16px 0 24px; border-top:1px solid var(--garis); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:12px; color:var(--tinta-sekunder);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <strong style="color:var(--tinta-utama);">WAWAR</strong>
+          <span style="color:var(--garis-tegas);">•</span>
+          <span style="color:var(--aksen-utama); font-weight:600;">BANGKIT Beruang Ecosystem</span>
+          <span style="color:var(--garis-tegas);">•</span>
+          <span>v2.3.7</span>
+        </div>
+        <div style="font-size:11px;">
+          Modul Pengelolaan Siaran Pesan Massal &amp; Gateway WhatsApp WIB
+        </div>
+      </footer>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL / DRAWER: BUAT SIARAN BARU (SPLIT FORM + PRATINJAU WHATSAPP REAL-TIME)
+       ========================================================================== -->
+  <div id="modalBuatSiaran" class="modal-latar" role="dialog" aria-modal="true" aria-labelledby="judulModalForm">
+    <div class="panel-form-siaran">
+      
+      <div class="panel-form-header">
+        <div>
+          <h3 id="judulModalForm">Buat siaran baru</h3>
+          <p>Tentukan jadwal siaran, nomor pengirim, sasaran, dan pesan pengumuman.</p>
+        </div>
+        <button type="button" class="btn-tutup-silang" onclick="tutupModalBuatSiaran()" aria-label="Tutup formulir">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form id="formSiaran" onsubmit="tanganiSimpanSiaran(event)" novalidate>
+        <div class="form-split-konten">
+          
+          <!-- Kolom Kiri: Input Formulir Operasional -->
+          <div class="form-kolom-kiri">
+            
+            <div class="form-grup" id="grupNamaSiaran">
+              <label class="form-label" for="inpNamaSiaran">Nama siaran <span class="form-wajib">*</span></label>
+              <input type="text" id="inpNamaSiaran" class="input-teks" placeholder="Contoh: Pemberitahuan Verifikasi SPPD Triwulan IV" required onblur="validasiFieldNama(this)" oninput="updateLivePreview()">
+              <span class="form-bantuan">Judul internal untuk memudahkan pemantauan staf.</span>
+              <span class="form-galat">Nama siaran harus diisi minimal 5 karakter.</span>
+            </div>
+
+            <div class="grid-form-2">
+              <div class="form-grup">
+                <label class="form-label" for="inpNomorPengirim">Nomor pengirim <span class="form-wajib">*</span></label>
+                <select id="inpNomorPengirim" class="select-input" onchange="updateLivePreview()">
+                  <option value="+62 851-2104-2025">+62 851-2104-2025 (Wawar-primary)</option>
+                  <option value="+62 812-3456-7890">+62 812-3456-7890 (Cadangan Bappeda)</option>
+                </select>
+              </div>
+
+              <div class="form-grup">
+                <label class="form-label" for="inpJenisSiaran">Jenis siaran</label>
+                <select id="inpJenisSiaran" class="select-input" onchange="updateLivePreview()">
+                  <option value="Satu waktu">Satu waktu (Sekali kirim)</option>
+                  <option value="Berseri">Berseri (Harian bertahap)</option>
+                  <option value="Berulang">Berulang mingguan</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid-form-2">
+              <div class="form-grup" id="grupTanggalKirim">
+                <label class="form-label" for="inpTanggalKirim">Tanggal mulai <span class="form-wajib">*</span></label>
+                <input type="date" id="inpTanggalKirim" class="input-teks" value="2026-10-25" required onblur="validasiTanggal(this)" onchange="updateLivePreview()">
+                <span class="form-galat">Tanggal tidak boleh di masa lampau.</span>
+              </div>
+
+              <div class="form-grup" id="grupJamKirim">
+                <label class="form-label" for="inpJamKirim">Jam pengiriman (WIB) <span class="form-wajib">*</span></label>
+                <input type="time" id="inpJamKirim" class="input-teks" value="08:30" required onchange="updateLivePreview()">
+                <span class="form-bantuan">Format 24 jam Waktu Indonesia Barat.</span>
+              </div>
+            </div>
+
+            <div class="form-grup">
+              <label class="form-label" for="inpSasaranGrup">Grup sasaran penerima <span class="form-wajib">*</span></label>
+              <select id="inpSasaranGrup" class="select-input" onchange="updateLivePreview()">
+                <option value="Pegawai Bappeda Jabar (450 kontak)">Pegawai Bappeda Jabar (450 kontak)</option>
+                <option value="Pejabat PPTK &amp; Keuangan (86 kontak)">Pejabat PPTK &amp; Keuangan (86 kontak)</option>
+                <option value="Peserta Fun Run Gedung Sate (320 kontak)">Peserta Fun Run Gedung Sate (320 kontak)</option>
+                <option value="Grup Sapa Warga &amp; Keluarga (150 kontak)">Grup Sapa Warga &amp; Keluarga (150 kontak)</option>
+              </select>
+            </div>
+
+            <div class="form-grup" id="grupPesanTeks">
+              <label class="form-label" for="inpIsiPesan">Isi pesan WhatsApp <span class="form-wajib">*</span></label>
+              <textarea id="inpIsiPesan" class="textarea-pesan" placeholder="Tulis isi pengumuman..." required onblur="validasiIsiPesan(this)" oninput="updateLivePreview()">Sampurasun {nama}, surat tugas dan lampiran dokumen SPPD perjalanan dinas Anda telah terbit melalui sistem TANDANG. Mohon periksa kelengkapan administrasi sebelum keberangkatan.</textarea>
+              
+              <div class="sisipan-variabel-bar">
+                <span style="font-size:11px; color:var(--tinta-sekunder);">Sisipkan variabel:</span>
+                <button type="button" class="chip-variabel" onclick="sisipkanVariabel('{nama}')">{nama}</button>
+                <button type="button" class="chip-variabel" onclick="sisipkanVariabel('{nomor_surat}')">{nomor_surat}</button>
+                <button type="button" class="chip-variabel" onclick="sisipkanVariabel('{tanggal}')">{tanggal}</button>
+              </div>
+              <span class="form-galat">Isi pesan tidak boleh kosong.</span>
+            </div>
+
+            <div class="lampiran-opsi-box">
+              <label for="chkLampiranPdf">
+                <input type="checkbox" id="chkLampiranPdf" checked onchange="updateLivePreview()">
+                <span>Lampirkan dokumen naskah dinas resmi (Format Folio/F4 .PDF)</span>
+              </label>
+              <span style="font-size:11px; font-family:var(--font-kode); color:var(--tinta-sekunder);">Surat_Tugas_090.pdf</span>
+            </div>
+
+          </div>
+
+          <!-- Kolom Kanan: Pratinjau WhatsApp Real-Time (Ciri Khas) -->
+          <div class="form-kolom-kanan">
+            <div class="pratinjau-header-label">
+              <span>Pratinjau tampilan penerima</span>
+              <span style="font-size:11px; font-family:var(--font-kode);" id="pratinjauNomorLabel">+62 851-2104-2025</span>
+            </div>
+
+            <div class="wa-mockup-layar">
+              <div class="wa-tanggal-pembagi" id="pratinjauTanggalLabel">25 Okt 2026</div>
+
+              <div class="wa-gelembung-keluar">
+                
+                <div class="wa-lampiran-pdf-kartu" id="pratinjauPdfBox">
+                  <div class="wa-pdf-ikon">PDF</div>
+                  <div>
+                    <strong style="display:block; font-size:11px; color:#0f172a;">Surat_Tugas_090_ST.pdf</strong>
+                    <span style="font-size:10px; color:#64748b;">Format F4 • 2 halaman • Dokumen Resmi</span>
+                  </div>
+                </div>
+
+                <div class="wa-pesan-teks" id="pratinjauTeksPesan">Sampurasun Kang Rudi, surat tugas dan lampiran dokumen SPPD perjalanan dinas Anda telah terbit melalui sistem TANDANG. Mohon periksa kelengkapan administrasi sebelum keberangkatan.</div>
+
+                <div class="wa-meta-waktu">
+                  <span id="pratinjauJamLabel">08:30</span>
+                  <span class="wa-centang-ganda">✓✓</span>
+                </div>
+              </div>
+
+            </div>
+
+            <p style="font-size:11px; color:var(--tinta-sekunder); line-height:1.4;">
+              Pratinjau ini diperbarui secara langsung saat Anda mengetik. Variabel <code style="font-family:var(--font-kode);">{nama}</code> akan otomatis disesuaikan dengan nama penerima di buku kontak.
+            </p>
+          </div>
+
+        </div>
+
+        <div class="panel-form-footer">
+          <button type="button" class="btn btn-sekunder" onclick="tutupModalBuatSiaran()">Batal</button>
+          <button type="submit" class="btn btn-primer">Jadwalkan siaran</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL KONFIRMASI HAPUS (SEBUTKAN OBJEKNYA SECARA EKSPLISIT)
+       ========================================================================== -->
+  <div id="modalKonfirmasiHapus" class="modal-latar" role="dialog" aria-modal="true" aria-labelledby="judulKonfirmasiHapus">
+    <div class="dialog-konfirmasi">
+      <h4 id="judulKonfirmasiHapus">Hapus siaran</h4>
+      <p id="pesanKonfirmasiHapus">Apakah Anda yakin ingin menghapus siaran ini? Tindakan ini tidak dapat dibatalkan.</p>
+      <div class="dialog-aksi">
+        <button type="button" class="btn btn-sekunder btn-mini" onclick="tutupKonfirmasiHapus()">Batal</button>
+        <button type="button" class="btn btn-primer btn-mini" style="background:var(--status-gagal-teks); border-color:var(--status-gagal-teks);" onclick="eksekusiHapusSiaran()">Hapus siaran</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- WADAH TOAST NOTIFIKASI -->
+  <div class="toast-wadah" id="wadahToast" aria-live="polite"></div>
+
+  <!-- ==========================================================================
+       LOGIKA APLIKASI (JAVASCRIPT OPERASIONAL)
+       ========================================================================== */ -->
+  <script>
+    // Data Siaran Riil & Kontekstual Pemerintahan / Program Daerah
+    let daftarSiaran = [
+      {
+        id: "SR-2026-001",
+        nama: "Sosialisasi SPPD & Surat Tugas TANDANG",
+        pengirim: "+62 851-2104-2025",
+        jenis: "Satu waktu",
+        jadwalTgl: "24 Okt 2026",
+        jadwalJam: "08:30 WIB",
+        jadwalIso: "2026-10-24T08:30:00",
+        sasaranNama: "Pegawai Bappeda Jabar",
+        sasaranJumlah: 450,
+        status: "berjalan",
+        statusLabel: "Sedang berjalan",
+        terkirim: 438,
+        total: 450,
+        pesan: "Sampurasun {nama}, surat tugas dan rincian SPPD telah diterbitkan oleh sistem TANDANG. Silakan konfirmasi berkas administrasi sebelum tanggal keberangkatan.",
+        lampiran: "Surat_Tugas_090_ST.pdf"
+      },
+      {
+        id: "SR-2026-002",
+        nama: "Pemberitahuan Race Pack Fun Run 26 Des",
+        pengirim: "+62 851-2104-2025",
+        jenis: "Berseri",
+        jadwalTgl: "20 Des 2026",
+        jadwalJam: "09:00 WIB",
+        jadwalIso: "2026-12-20T09:00:00",
+        sasaranNama: "Peserta Fun Run Gedung Sate",
+        sasaranJumlah: 320,
+        status: "terjadwal",
+        statusLabel: "Terjadwal",
+        terkirim: 0,
+        total: 320,
+        pesan: "Sampurasun Runners! Pengambilan race pack Fun Run 26 Desember dapat dilakukan di Plaza Gedung Sate Bandung mulai 21-23 Desember 2026 pukul 09:00 - 16:00 WIB.",
+        lampiran: "Panduan_FunRun_2026.pdf"
+      },
+      {
+        id: "SR-2026-003",
+        nama: "Pengingat Laporan Kinerja Bulanan ASN",
+        pengirim: "+62 851-2104-2025",
+        jenis: "Berulang",
+        jadwalTgl: "30 Okt 2026",
+        jadwalJam: "15:00 WIB",
+        jadwalIso: "2026-10-30T15:00:00",
+        sasaranNama: "Pejabat PPTK & Keuangan",
+        sasaranJumlah: 86,
+        status: "terjadwal",
+        statusLabel: "Terjadwal",
+        terkirim: 0,
+        total: 86,
+        pesan: "Mengingatkan Bapak/Ibu PPTK, batas akhir unggah berkas SPJ dan verifikasi dokumen SPPD bulan Oktober ditutup pada hari Jumat pukul 17:00 WIB.",
+        lampiran: null
+      }
+    ];
+
+    let filterStatusAktif = "semua";
+    let filterNomorAktif = "semua";
+    let kataKunciPencarian = "";
+    let idSiaranDihapus = null;
+
+    // Render Awal saat Halaman Dimuat
+    document.addEventListener("DOMContentLoaded", () => {
+      renderTabelSiaran();
+      updateRingkasanMetrik();
+      updateLivePreview();
+    });
+
+    // Render Tabel Siaran Berdasarkan Filter
+    function renderTabelSiaran() {
+      const tbody = document.getElementById("badanTabelSiaran");
+      const wadahKosong = document.getElementById("wadahKeadaanKosong");
+      
+      const filtered = daftarSiaran.filter(item => {
+        const cocokStatus = (filterStatusAktif === "semua") || (item.status === filterStatusAktif);
+        const cocokNomor = (filterNomorAktif === "semua") || (item.pengirim === filterNomorAktif);
+        const cocokCari = !kataKunciPencarian || 
+          item.nama.toLowerCase().includes(kataKunciPencarian) || 
+          item.pesan.toLowerCase().includes(kataKunciPencarian) ||
+          item.sasaranNama.toLowerCase().includes(kataKunciPencarian);
+        return cocokStatus && cocokNomor && cocokCari;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = "";
+        wadahKosong.style.display = "block";
+        return;
+      }
+
+      wadahKosong.style.display = "none";
+      let barisHtml = "";
+
+      filtered.forEach(s => {
+        const persenKirim = s.total > 0 ? Math.round((s.terkirim / s.total) * 100) : 0;
+        
+        // Ikon Status Garis Konsisten
+        let statusIkon = "";
+        if (s.status === "berjalan") {
+          statusIkon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`;
+        } else if (s.status === "terjadwal") {
+          statusIkon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+        } else if (s.status === "dijeda") {
+          statusIkon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>`;
+        } else {
+          statusIkon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>`;
+        }
+
+        const tombolJedaLabel = (s.status === "dijeda") ? "Lanjutkan" : "Jeda";
+
+        barisHtml += `
+          <tr>
+            <td>
+              <div class="nama-siaran-judul">${s.nama}</div>
+              <div class="nomor-jalur-sub">${s.pengirim} &bull; ID: ${s.id}</div>
+            </td>
+            <td>
+              <span class="jenis-pill">${s.jenis}</span>
+            </td>
+            <td>
+              <div class="jadwal-waktu">${s.jadwalTgl}</div>
+              <div class="jadwal-pola">${s.jadwalJam}</div>
+            </td>
+            <td>
+              <div style="font-weight:500;">${s.sasaranNama}</div>
+              <div style="font-size:11px; color:var(--tinta-sekunder); font-family:var(--font-kode);">${s.sasaranJumlah} kontak sasaran</div>
+            </td>
+            <td>
+              <span class="badge-status-operasional ${s.status}">
+                ${statusIkon}
+                <span>${s.statusLabel}</span>
+              </span>
+            </td>
+            <td>
+              <div class="bar-kemajuan-wrap">
+                <div class="bar-kemajuan-teks">
+                  <span>${s.terkirim}/${s.total}</span>
+                  <span>${persenKirim}%</span>
+                </div>
+                <div class="bar-kemajuan-rel">
+                  <div class="bar-kemajuan-isi" style="width:${persenKirim}%;"></div>
+                </div>
+              </div>
+            </td>
+            <td style="text-align:right;">
+              <div class="aksi-baris-grup">
+                <button type="button" class="btn btn-sekunder btn-mini" onclick="toggleJedaSiaran('${s.id}')" title="${tombolJedaLabel} siaran ini">
+                  ${tombolJedaLabel}
+                </button>
+                <button type="button" class="btn btn-bahaya-ringan btn-mini" onclick="mintaKonfirmasiHapus('${s.id}')" title="Hapus siaran ini">
+                  Hapus
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = barisHtml;
+      document.getElementById("badgeJumlahSiaran").textContent = daftarSiaran.length;
+    }
+
+    // Perbarui Metrik Kinerja 1 Baris
+    function updateRingkasanMetrik() {
+      const aktif = daftarSiaran.filter(s => s.status === "berjalan" || s.status === "terjadwal").length;
+      document.getElementById("metrikAktif").textContent = `${aktif} program`;
+    }
+
+    // Filter Status Tab
+    function terapkanFilterStatus(status, el) {
+      filterStatusAktif = status;
+      document.querySelectorAll(".tab-filter-btn").forEach(btn => btn.classList.remove("aktif"));
+      el.classList.add("aktif");
+      renderTabelSiaran();
+    }
+
+    // Filter Nomor Pengirim
+    function terapkanFilterNomor(nomor) {
+      filterNomorAktif = nomor;
+      renderTabelSiaran();
+    }
+
+    // Pencarian Real-Time
+    function tanganiPencarian(val) {
+      kataKunciPencarian = val.trim().toLowerCase();
+      renderTabelSiaran();
+    }
+
+    // Reset Semua Filter
+    function resetSemuaFilter() {
+      filterStatusAktif = "semua";
+      filterNomorAktif = "semua";
+      kataKunciPencarian = "";
+      document.getElementById("inputCariSiaran").value = "";
+      document.getElementById("filterNomorPengirim").value = "semua";
+      document.querySelectorAll(".tab-filter-btn").forEach(b => b.classList.remove("aktif"));
+      document.querySelector(".tab-filter-btn").classList.add("aktif");
+      renderTabelSiaran();
+    }
+
+    // Live Preview WhatsApp Gelembung Akurat
+    function updateLivePreview() {
+      const teksInput = document.getElementById("inpIsiPesan").value;
+      const jamInput = document.getElementById("inpJamKirim").value || "08:30";
+      const tglInput = document.getElementById("inpTanggalKirim").value;
+      const nomorInput = document.getElementById("inpNomorPengirim").value;
+      const chkPdf = document.getElementById("chkLampiranPdf").checked;
+
+      // Format teks dengan simulasi variabel nama
+      let teksPratinjau = teksInput.replace(/\{nama\}/g, "Kang Rudi").replace(/\{nomor_surat\}/g, "090/ST-DIS/X/2026").replace(/\{tanggal\}/g, "26 Okt 2026");
+      if (!teksPratinjau.trim()) {
+        teksPratinjau = "(Ketik pesan di formulir sebelah kiri untuk melihat tampilan di sini...)";
+      }
+
+      document.getElementById("pratinjauTeksPesan").textContent = teksPratinjau;
+      document.getElementById("pratinjauJamLabel").textContent = jamInput;
+      document.getElementById("pratinjauNomorLabel").textContent = nomorInput;
+      document.getElementById("pratinjauPdfBox").style.display = chkPdf ? "flex" : "none";
+
+      if (tglInput) {
+        try {
+          const d = new Date(tglInput + "T00:00:00");
+          const opsi = { day: 'numeric', month: 'short', year: 'numeric' };
+          document.getElementById("pratinjauTanggalLabel").textContent = d.toLocaleDateString('id-ID', opsi);
+        } catch {
+          document.getElementById("pratinjauTanggalLabel").textContent = tglInput;
+        }
+      }
+    }
+
+    // Sisipkan Variabel Teks
+    function sisipkanVariabel(varTag) {
+      const textarea = document.getElementById("inpIsiPesan");
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const val = textarea.value;
+      textarea.value = val.substring(0, start) + varTag + val.substring(end);
+      textarea.focus();
+      textarea.selectionStart = textarea.selectionEnd = start + varTag.length;
+      updateLivePreview();
+    }
+
+    // Buka & Tutup Modal Form
+    function bukaModalBuatSiaran() {
+      document.getElementById("modalBuatSiaran").classList.add("buka");
+      document.getElementById("inpNamaSiaran").focus();
+    }
+
+    function tutupModalBuatSiaran() {
+      document.getElementById("modalBuatSiaran").classList.remove("buka");
+      document.querySelectorAll(".form-grup").forEach(g => g.classList.remove("ada-galat"));
+    }
+
+    // Validasi Field saat Blur
+    function validasiFieldNama(input) {
+      const grup = document.getElementById("grupNamaSiaran");
+      if (!input.value.trim() || input.value.trim().length < 5) {
+        grup.classList.add("ada-galat");
+        return false;
+      }
+      grup.classList.remove("ada-galat");
+      return true;
+    }
+
+    function validasiTanggal(input) {
+      const grup = document.getElementById("grupTanggalKirim");
+      const tglPilihan = new Date(input.value + "T00:00:00");
+      const hariIni = new Date();
+      hariIni.setHours(0, 0, 0, 0);
+
+      if (!input.value || tglPilihan < hariIni) {
+        grup.classList.add("ada-galat");
+        return false;
+      }
+      grup.classList.remove("ada-galat");
+      return true;
+    }
+
+    function validasiIsiPesan(input) {
+      const grup = document.getElementById("grupPesanTeks");
+      if (!input.value.trim()) {
+        grup.classList.add("ada-galat");
+        return false;
+      }
+      grup.classList.remove("ada-galat");
+      return true;
+    }
+
+    // Simpan Form Siaran Baru
+    function tanganiSimpanSiaran(e) {
+      e.preventDefault();
+      const inpNama = document.getElementById("inpNamaSiaran");
+      const inpTgl = document.getElementById("inpTanggalKirim");
+      const inpPesan = document.getElementById("inpIsiPesan");
+
+      const v1 = validasiFieldNama(inpNama);
+      const v2 = validasiTanggal(inpTgl);
+      const v3 = validasiIsiPesan(inpPesan);
+
+      if (!v1 || !v2 || !v3) {
+        tampilkanToast("Periksa kembali kolom yang bertanda galat sebelum menyimpan.");
+        return;
+      }
+
+      const nama = inpNama.value.trim();
+      const nomor = document.getElementById("inpNomorPengirim").value;
+      const jenis = document.getElementById("inpJenisSiaran").value;
+      const jam = document.getElementById("inpJamKirim").value;
+      const sasaranText = document.getElementById("inpSasaranGrup").value;
+      const chkPdf = document.getElementById("chkLampiranPdf").checked;
+
+      // Ekstraksi tanggal format Indonesia
+      const d = new Date(inpTgl.value + "T00:00:00");
+      const tglFormatted = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+
+      const itemBaru = {
+        id: `SR-2026-00${daftarSiaran.length + 1}`,
+        nama: nama,
+        pengirim: nomor,
+        jenis: jenis,
+        jadwalTgl: tglFormatted,
+        jadwalJam: `${jam} WIB`,
+        jadwalIso: `${inpTgl.value}T${jam}:00`,
+        sasaranNama: sasaranText.split(" (")[0],
+        sasaranJumlah: parseInt(sasaranText.match(/\d+/)?.[0] || "100", 10),
+        status: "terjadwal",
+        statusLabel: "Terjadwal",
+        terkirim: 0,
+        total: parseInt(sasaranText.match(/\d+/)?.[0] || "100", 10),
+        pesan: inpPesan.value.trim(),
+        lampiran: chkPdf ? "Surat_Tugas_090.pdf" : null
+      };
+
+      daftarSiaran.unshift(itemBaru);
+      renderTabelSiaran();
+      updateRingkasanMetrik();
+      tutupModalBuatSiaran();
+      tampilkanToast(`Siaran "${nama}" berhasil dijadwalkan.`);
+    }
+
+    // Jeda / Lanjutkan Siaran
+    function toggleJedaSiaran(id) {
+      const item = daftarSiaran.find(s => s.id === id);
+      if (!item) return;
+
+      if (item.status === "dijeda") {
+        item.status = "terjadwal";
+        item.statusLabel = "Terjadwal";
+        tampilkanToast(`Siaran "${item.nama}" dilanjutkan.`);
+      } else {
+        item.status = "dijeda";
+        item.statusLabel = "Dijeda";
+        tampilkanToast(`Siaran "${item.nama}" dijeda sementara.`);
+      }
+      renderTabelSiaran();
+      updateRingkasanMetrik();
+    }
+
+    // Modal Konfirmasi Hapus yang Menyebutkan Objek
+    function mintaKonfirmasiHapus(id) {
+      const item = daftarSiaran.find(s => s.id === id);
+      if (!item) return;
+      idSiaranDihapus = id;
+      document.getElementById("pesanKonfirmasiHapus").textContent = `Apakah Anda yakin ingin menghapus siaran "${item.nama}"? Pengiriman terjadwal ke ${item.sasaranJumlah} kontak akan dibatalkan permanen.`;
+      document.getElementById("modalKonfirmasiHapus").classList.add("buka");
+    }
+
+    function tutupKonfirmasiHapus() {
+      idSiaranDihapus = null;
+      document.getElementById("modalKonfirmasiHapus").classList.remove("buka");
+    }
+
+    function eksekusiHapusSiaran() {
+      if (!idSiaranDihapus) return;
+      const item = daftarSiaran.find(s => s.id === idSiaranDihapus);
+      const nama = item ? item.nama : "Siaran";
+      daftarSiaran = daftarSiaran.filter(s => s.id !== idSiaranDihapus);
+      tutupKonfirmasiHapus();
+      renderTabelSiaran();
+      updateRingkasanMetrik();
+      tampilkanToast(`Siaran "${nama}" telah dihapus.`);
+    }
+
+    // Toast Notifikasi Sederhana
+    function tampilkanToast(pesan) {
+      const wadah = document.getElementById("wadahToast");
+      const item = document.createElement("div");
+      item.className = "toast-item";
+      item.textContent = pesan;
+      wadah.appendChild(item);
+
+      setTimeout(() => {
+        item.style.opacity = "0";
+        item.style.transition = "opacity 0.2s ease";
+        setTimeout(() => item.remove(), 250);
+      }, 3500);
+    }
+
+    // Fungsi Navigasi Tab Placeholder
+    function pindahTab(namaTab) {
+      if (namaTab === 'laporan') {
+        window.location.href = '/';
+      } else {
+        tampilkanToast(`Membuka modul ${namaTab}...`);
+      }
+    }
+  </script>
+</body>
+</html>

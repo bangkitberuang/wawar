@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="/node_modules/lucide/dist/umd/lucide.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -27,7 +28,7 @@
       </div>
 
       <nav class="nav-menu">
-        <a href="#fitur" class="nav-link" onclick="switchView('landing')">Fitur Utama</a>
+        <a href="#keunggulan" class="nav-link" onclick="switchView('landing')">Keunggulan Utama</a>
         <a href="#omnichannel" class="nav-link" onclick="switchView('landing')">Omnichannel</a>
         <a href="#rayi" class="nav-link highlight" onclick="switchView('landing')">Kenalan dengan RAYI 🤖</a>
         <a href="#arsitektur" class="nav-link" onclick="switchView('landing')">Arsitektur</a>
@@ -152,6 +153,123 @@
           </ul>
           <div class="card-footer-badge amber">Enterprise Security</div>
         </div>
+      </div>
+    </section>
+
+    <!-- 6 Keunggulan Utama WAWAR (Inovasi & Nilai Tambah Nyata) -->
+    <section class="container section" id="keunggulan">
+      <div class="section-header text-center">
+        <span class="section-tag" style="display:inline-flex; align-items:center; gap:6px;">
+          <i data-lucide="sparkles" class="lucide-xs"></i> KEUNGGULAN UTAMA WAWAR
+        </span>
+        <h2>Lebih Dari Sekadar Gateway Biasa</h2>
+        <p>Dirancang khusus untuk kebutuhan birokrasi pemerintahan dan diseminasi publik yang terjadwal, terukur, dan bebas ribet.</p>
+      </div>
+
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
+        
+        <!-- Keunggulan 1: Kalender Siaran 31 Hari -->
+        <div class="panel-card" style="padding:28px 24px; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:#ECFDF5; color:#059669; display:flex; align-items:center; justify-content:center;">
+              <i data-lucide="calendar" class="lucide-md"></i>
+            </div>
+            <span class="badge-tag green" style="font-size:0.7rem;">Model TANDANG</span>
+          </div>
+          <h3 style="font-size:1.15rem; color:#0F172A; margin-bottom:8px; font-weight:700;">Kalender Siaran Interaktif 31 Hari</h3>
+          <p style="color:#64748B; font-size:0.88rem; line-height:1.5; margin-bottom:16px; flex-grow:1;">
+            Pantau seluruh jadwal pesan harian (Senin–Minggu) secara visual. Lengkap dengan filter program dinamis (Sapa Subuh, SPPD Kedinasan, Event Publik), pop-up pratinjau pesan per tanggal, dan fitur import massal via file Excel.
+          </p>
+          <div style="border-top:1px solid #F1F5F9; padding-top:12px; font-size:0.78rem; color:#059669; font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="check-circle-2" class="lucide-xs"></i> Visualisasi penuh tanpa tebak-tebak tanggal
+          </div>
+        </div>
+
+        <!-- Keunggulan 2: 4 Pola Kampanye Cerdas -->
+        <div class="panel-card" style="padding:28px 24px; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:#EFF6FF; color:#2563EB; display:flex; align-items:center; justify-content:center;">
+              <i data-lucide="layers" class="lucide-md"></i>
+            </div>
+            <span class="badge-tag blue" style="font-size:0.7rem;">Multi-Archetype</span>
+          </div>
+          <h3 style="font-size:1.15rem; color:#0F172A; margin-bottom:8px; font-weight:700;">4 Pola Kampanye Siaran Otomatis</h3>
+          <p style="color:#64748B; font-size:0.88rem; line-height:1.5; margin-bottom:16px; flex-grow:1;">
+            Mendukung 4 pola pengiriman nyata: <strong>Series Harian</strong> (pesan berganti tiap subuh selama 31 hari), <strong>Pengingat Berkala</strong> (rutin tiap Senin apel &amp; SPPD), <strong>Event Countdown</strong> (H-7, H-1, Hari-H acara publik), dan <strong>Broadcast Sekali Kirim</strong>.
+          </p>
+          <div style="border-top:1px solid #F1F5F9; padding-top:12px; font-size:0.78rem; color:#2563EB; font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="check-circle-2" class="lucide-xs"></i> Penjadwalan cerdas anti-repot
+          </div>
+        </div>
+
+        <!-- Keunggulan 3: Bot AI Berbasis Knowledge Base Resmi -->
+        <div class="panel-card" style="padding:28px 24px; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:#FEF3C7; color:#D97706; display:flex; align-items:center; justify-content:center;">
+              <i data-lucide="bot" class="lucide-md"></i>
+            </div>
+            <span class="badge-tag amber" style="font-size:0.7rem;">Gemini RAG &amp; Strict</span>
+          </div>
+          <h3 style="font-size:1.15rem; color:#0F172A; margin-bottom:8px; font-weight:700;">Bot AI Berpijak Dokumen Resmi</h3>
+          <p style="color:#64748B; font-size:0.88rem; line-height:1.5; margin-bottom:16px; flex-grow:1;">
+            Bot asisten <strong>RAYI</strong> menjawab pertanyaan penerima berlandaskan dokumen materi (Knowledge Base) resmi seperti PDF Surat Tugas, SOP Kedinasan, atau Panduan Event. Bebas halusinasi dan tidak mengarang jawaban di luar data dinas.
+          </p>
+          <div style="border-top:1px solid #F1F5F9; padding-top:12px; font-size:0.78rem; color:#D97706; font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="check-circle-2" class="lucide-xs"></i> Jawaban kredibel &amp; akurat 100%
+          </div>
+        </div>
+
+        <!-- Keunggulan 4: Laporan & Kinerja Pengiriman Transparan -->
+        <div class="panel-card" style="padding:28px 24px; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:#F1F5F9; color:#475569; display:flex; align-items:center; justify-content:center;">
+              <i data-lucide="bar-chart-3" class="lucide-md"></i>
+            </div>
+            <span class="badge-tag gray" style="font-size:0.7rem;">Ukuran Kinerja</span>
+          </div>
+          <h3 style="font-size:1.15rem; color:#0F172A; margin-bottom:8px; font-weight:700;">Laporan Kinerja Pengiriman Transparan</h3>
+          <p style="color:#64748B; font-size:0.88rem; line-height:1.5; margin-bottom:16px; flex-grow:1;">
+            Menyajikan audit trail lengkap dan riwayat pesan sebagai tolok ukur kinerja birokrasi: siapa yang menerima, pesan yang tertunda/gagal, hingga log siapa saja yang membalas. Dilengkapi tombol ekspor data laporan untuk pimpinan.
+          </p>
+          <div style="border-top:1px solid #F1F5F9; padding-top:12px; font-size:0.78rem; color:#475569; font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="check-circle-2" class="lucide-xs"></i> Akuntabilitas pengiriman terverifikasi
+          </div>
+        </div>
+
+        <!-- Keunggulan 5: Trio Nomor & Multi-Instance Baileys -->
+        <div class="panel-card" style="padding:28px 24px; background:#FFFFFF; border:1px solid #E2E8F0; border-radius:12px; box-shadow:0 1px 3px rgba(0,0,0,0.05); display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:#ECFDF5; color:#059669; display:flex; align-items:center; justify-content:center;">
+              <i data-lucide="smartphone" class="lucide-md"></i>
+            </div>
+            <span class="badge-tag green" style="font-size:0.7rem;">Trio Nomor Siaga</span>
+          </div>
+          <h3 style="font-size:1.15rem; color:#0F172A; margin-bottom:8px; font-weight:700;">Trio Nomor Strategis &amp; Anti-Banned</h3>
+          <p style="color:#64748B; font-size:0.88rem; line-height:1.5; margin-bottom:16px; flex-grow:1;">
+            Mendukung multi-instance terpisah untuk pemisahan peran: nomor khusus Kedinasan TANDANG, nomor Layanan Helpdesk Publik, dan nomor Siaran Sapa Subuh. Dilengkapi antrean acak (jitter delay) agar nomor aman dari risiko banned.
+          </p>
+          <div style="border-top:1px solid #F1F5F9; padding-top:12px; font-size:0.78rem; color:#059669; font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="check-circle-2" class="lucide-xs"></i> Isolasi trafik aman &amp; stabil 24/7
+          </div>
+        </div>
+
+        <!-- Keunggulan 6: Bagian dari BANGKIT Beruang Ecosystem -->
+        <div class="panel-card" style="padding:28px 24px; background:#0F172A; color:#F8FAFC; border:1px solid #1E293B; border-radius:12px; box-shadow:0 4px 12px rgba(15,23,42,0.15); display:flex; flex-direction:column;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+            <div style="width:48px; height:48px; border-radius:12px; background:rgba(16,185,129,0.15); color:#10B981; display:flex; align-items:center; justify-content:center;">
+              <i data-lucide="globe" class="lucide-md"></i>
+            </div>
+            <span class="badge-tag green" style="background:#064E3B; color:#A7F3D0; border:1px solid #059669; font-size:0.7rem;">Terintegrasi Penuh</span>
+          </div>
+          <h3 style="font-size:1.15rem; color:#F8FAFC; margin-bottom:8px; font-weight:700;">BANGKIT Beruang Ecosystem</h3>
+          <p style="color:#94A3B8; font-size:0.88rem; line-height:1.5; margin-bottom:16px; flex-grow:1;">
+            WAWAR menjadi pilar jalur komunikasi terpusat yang terhubung erat dengan <strong>TANDANG</strong> (Tata Naskah &amp; SPPD Elektronik), <strong>GENTRA</strong> (Voice-over AI &amp; Sintesis Audio), dan aplikasi mitra internal pemerintah daerah.
+          </p>
+          <div style="border-top:1px solid #1E293B; padding-top:12px; font-size:0.78rem; color:#10B981; font-weight:600; display:flex; align-items:center; gap:6px;">
+            <i data-lucide="check-circle-2" class="lucide-xs"></i> Solusi digital mandiri &amp; berdaulat
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -312,6 +430,27 @@
       </div>
     </section>
 
+    <!-- LANDING FOOTER (BANGKIT Beruang Ecosystem) -->
+    <footer class="landing-footer" style="margin-top:60px; padding:32px 24px; background:#0F172A; border-top:1px solid #1E293B; color:#94A3B8; text-align:center;">
+      <div style="max-width:1080px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:10px;">
+        <div style="display:flex; align-items:center; gap:8px; font-weight:700; color:#F8FAFC; font-size:0.95rem;">
+          <img src="assets/logo-wawar.jpg" alt="WAWAR" style="width:24px; height:24px; border-radius:6px; object-fit:cover;">
+          <span>WAWAR Gateway</span>
+          <span style="color:#475569;">•</span>
+          <span style="color:#10B981; display:inline-flex; align-items:center; gap:4px;">
+            <span style="width:6px; height:6px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+            BANGKIT Beruang Ecosystem
+          </span>
+        </div>
+        <p style="margin:0; font-size:0.78rem; color:#94A3B8; max-width:600px;">
+          Layanan pengirim pesan terjadwal, OTP, notifikasi kedinasan, dan integrasi omnichannel terpadu untuk Pemerintah Daerah &amp; Layanan Publik.
+        </p>
+        <div style="font-size:0.72rem; color:#64748B; margin-top:4px;">
+          © 2026 BANGKIT Beruang Ecosystem • Rekayasa Digital Independen
+        </div>
+      </div>
+    </footer>
+
   </main>
 
   <!-- ================= VIEW 2: AUTH MODAL / LOGIN ================= -->
@@ -377,48 +516,63 @@
 
         <nav class="dash-nav">
           <button class="dash-link" onclick="switchDashTab('overview')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <i data-lucide="layout-dashboard"></i>
             <span>Overview</span>
           </button>
           <button class="dash-link" onclick="switchDashTab('campaign')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-            <span>📢 Campaign &amp; Program</span>
+            <i data-lucide="radio"></i>
+            <span>Campaign &amp; Program</span>
           </button>
+          <a href="/siaran.html" class="dash-link" style="color:#0F766E; font-weight:700; background:#F0FDFA; text-decoration:none;" title="Buka antarmuka baru halaman Siaran">
+            <i data-lucide="send"></i>
+            <span>Layar Siaran (Desain Baru)</span>
+          </a>
           <button class="dash-link" onclick="switchDashTab('calendar')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span>🗓️ Kalender Siar (1–31)</span>
+            <i data-lucide="calendar"></i>
+            <span>Kalender Siar (1–31)</span>
+          </button>
+          <button class="dash-link" onclick="switchDashTab('reports')">
+            <i data-lucide="bar-chart-2"></i>
+            <span>Laporan &amp; Kinerja 2-Arah</span>
           </button>
           <button class="dash-link" onclick="switchDashTab('contacts')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <i data-lucide="users"></i>
             <span>Grup &amp; Buku Kontak</span>
           </button>
           <button class="dash-link" onclick="switchDashTab('whatsapp')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <i data-lucide="phone"></i>
             <span>WhatsApp &amp; Nomor</span>
           </button>
           <button class="dash-link" onclick="switchDashTab('rayiai')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 0 0-8 8c0 3.37 2.08 6.25 5 7.42V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2.58c2.92-1.17 5-4.05 5-7.42a8 8 0 0 0-8-8z"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/><path d="M8 13a4 4 0 0 0 8 0"/></svg>
+            <i data-lucide="bot"></i>
             <span>Otak AI &amp; Pelatihan RAYI</span>
           </button>
           <button class="dash-link" onclick="switchDashTab('quicksend')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <i data-lucide="file-text"></i>
             <span>Kirim Pesan &amp; PDF</span>
           </button>
           <button class="dash-link" onclick="switchDashTab('telegram')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            <i data-lucide="message-square"></i>
             <span>Telegram Gateway</span>
           </button>
           <button class="dash-link" onclick="switchDashTab('emailotp')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <i data-lucide="mail"></i>
             <span>Email &amp; Modul OTP</span>
           </button>
           <button class="dash-link" onclick="switchDashTab('integrasi')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            <span>Klien: TANDANG &amp; API</span>
+            <i data-lucide="code-2"></i>
+            <span>Multi-Aplikasi Klien &amp; API</span>
           </button>
         </nav>
 
         <div class="dash-sidebar-footer">
+          <div class="ecosystem-sidebar-badge" style="display:flex; align-items:center; gap:8px; padding:8px 10px; background:rgba(255,255,255,0.06); border-radius:6px; margin-bottom:10px; border:1px solid rgba(255,255,255,0.1);">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#10B981;"></span>
+            <div style="line-height:1.2;">
+              <div style="font-size:0.65rem; color:#94A3B8; text-transform:uppercase; letter-spacing:0.04em;">Ekosistem Aplikasi</div>
+              <div style="font-size:0.75rem; font-weight:700; color:#F8FAFC;">BANGKIT Beruang Ecosystem</div>
+            </div>
+          </div>
           <div class="active-instance-pill">
             <span class="dot-green"></span>
             <div>
@@ -445,6 +599,20 @@
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                 <span>Sinkronkan Status</span>
               </button>
+            </div>
+          </div>
+
+          <!-- HIGHLIGHT PROGRAM CAMPAIGN SEDANG BERJALAN & BOT AKTIF (OVERVIEW) -->
+          <div class="active-prog-overview-pill mb-4" onclick="switchDashTab('campaign')" style="cursor:pointer;" title="Klik untuk membuka detail program berjalan">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <span class="badge-status open" style="font-size:0.72rem; padding:3px 10px; font-weight:700;">● PROGRAM AKTIF BERJALAN</span>
+              <span style="font-size:0.88rem; font-weight:800; color:#0F172A;" id="overviewProgTitle">Sosialisasi SPPD &amp; Kedinasan TANDANG</span>
+              <span class="badge-tag green" id="overviewProgProgressBadge" style="font-size:0.72rem;">50% Selesai (Sisa 12 Hari)</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:14px; font-size:0.78rem; color:#475569; flex-wrap:wrap;">
+              <span>🤖 Bot Aktif: <strong id="overviewBotTitle" style="color:#2563EB;">Bot RAYI (Gemini 2.5 Flash RAG)</strong></span>
+              <span>📱 Jalur WA: <strong id="overviewSenderTitle">Wawar-primary (+62 851-2104-2025)</strong></span>
+              <span style="color:#059669; font-weight:700;">Buka Detail &amp; Progress Bar &rarr;</span>
             </div>
           </div>
 
@@ -541,8 +709,108 @@
                 <span>Lihat Kalender Harian (1–31) &rarr;</span>
               </button>
               <button class="btn btn-primary btn-sm" onclick="openCreateCampaignModal()">
-                <span>✨ + Buat Campaign Baru</span>
+                <span>+ Buat Campaign Baru</span>
               </button>
+            </div>
+          </div>
+
+          <!-- BANNER UTAMA: PROGRAM CAMPAIGN YANG SEDANG BERJALAN & PROGRESS BAR & BOT AKTIF -->
+          <div class="active-running-campaign-hub-banner mb-4" id="activeRunningCampaignHero">
+            <div class="active-running-header">
+              <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span class="badge-status open" style="font-weight:700;">● PROGRAM CAMPAIGN SEDANG BERJALAN AKTIF</span>
+                <span class="badge-tag green" id="heroActiveProgCategory">Kedinasan TANDANG</span>
+                <span class="badge-tag gray" id="heroActiveProgApp">Klien: Aplikasi TANDANG</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <label style="font-size:0.75rem; color:#64748B; font-weight:600;">Ganti Tampilan Program:</label>
+                <select id="selectRunningCampaignHub" onchange="switchRunningCampaignHero(this.value)" class="form-select" style="width:auto; padding:4px 10px; font-size:0.78rem; font-weight:700; background:#FFFFFF;">
+                  <option value="camp_dinas_legacy">🏛️ Sosialisasi SPPD &amp; Kedinasan TANDANG (50% Berjalan)</option>
+                  <option value="camp_funrun_legacy">🏃 Event Fun Run 26 Des Gedung Sate (35% Menuju Hari H)</option>
+                  <option value="camp_subuh_legacy">🌅 Sapa Subuh Anak &amp; Doa Fajar (77% Selesai)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="active-running-body">
+              <div class="active-running-title-row">
+                <div>
+                  <h3 id="heroActiveProgTitle" style="font-size:1.15rem; font-weight:800; color:#0F172A; margin:0 0 4px;">Sosialisasi SPPD &amp; Kedinasan TANDANG</h3>
+                  <p id="heroActiveProgDesc" style="font-size:0.83rem; color:#475569; margin:0; line-height:1.45;">
+                    Program terjadwal mingguan pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas ASN Diskominfo Jawa Barat.
+                  </p>
+                </div>
+                <div class="active-running-timing-box">
+                  <span class="timing-badge" id="heroActiveProgDuration">🟢 Sisa 12 Hari Lagi</span>
+                  <small id="heroActiveProgDates" style="font-size:0.72rem; color:#64748B;">Mulai: 15 Okt 2026 &bull; Selesai: 15 Nov 2026</small>
+                </div>
+              </div>
+
+              <!-- BAR PROGRESS BERJALAN -->
+              <div class="hero-progress-section">
+                <div class="hero-progress-labels">
+                  <span style="font-weight:700; color:#1E293B; font-size:0.8rem;">
+                    📊 Kemajuan Program: <strong id="heroActiveProgPercentLabel" style="color:#059669;">50% Berjalan</strong>
+                    <span style="font-weight:400; color:#64748B; font-size:0.76rem;" id="heroActiveProgSubLabel">(Minggu ke-2 dari 4 Minggu &bull; 15/30 Pesan Terkirim)</span>
+                  </span>
+                  <span style="font-size:0.75rem; font-weight:700; color:#059669;" id="heroActiveProgDayInfo">Hari ke-10 / 30 Hari</span>
+                </div>
+                <div class="progress-bar-track hero-track">
+                  <div class="progress-bar-fill green hero-fill" id="heroActiveProgressBar" style="width: 50%;"></div>
+                </div>
+                <div class="hero-progress-ticks">
+                  <span id="heroTickStart">📍 15 Okt 2026 (Mulai)</span>
+                  <span class="tick-today" id="heroTickToday">🎯 Hari Ini: 24 Okt 2026</span>
+                  <span id="heroTickEnd">🏁 15 Nov 2026 (Target Selesai)</span>
+                </div>
+              </div>
+
+              <!-- RINCIAN BOT & ENGINE YANG AKTIF DIPAKAI DI PROGRAM INI -->
+              <div class="hero-bot-status-card">
+                <div class="hero-bot-status-head">
+                  <span style="font-size:0.78rem; font-weight:800; color:#0F172A; display:flex; align-items:center; gap:6px;">
+                    🤖 BOT &amp; ENGINE YANG AKTIF DIPAKAI DI PROGRAM INI:
+                  </span>
+                  <span class="badge-status open" id="heroActiveBotLiveStatus" style="font-size:0.68rem;">● BOT STANDBY ON</span>
+                </div>
+                <div class="hero-bot-pipeline-grid">
+                  <div class="bot-pip-step">
+                    <div class="pip-icon">🤖</div>
+                    <div class="pip-info">
+                      <span class="pip-lbl">Persona Bot:</span>
+                      <strong class="pip-val" id="heroActiveBotName" style="color:#2563EB;">Bot RAYI Kedinasan</strong>
+                    </div>
+                  </div>
+                  <div class="bot-pip-step">
+                    <div class="pip-icon">🧠</div>
+                    <div class="pip-info">
+                      <span class="pip-lbl">Engine AI &amp; Aturan:</span>
+                      <strong class="pip-val" id="heroActiveBotEngine">Gemini 2.5 Flash RAG</strong>
+                    </div>
+                  </div>
+                  <div class="bot-pip-step">
+                    <div class="pip-icon">📱</div>
+                    <div class="pip-info">
+                      <span class="pip-lbl">Nomor WhatsApp:</span>
+                      <strong class="pip-val" id="heroActiveBotSender">0812-9988-7766 (Wawar-primary)</strong>
+                    </div>
+                  </div>
+                  <div class="bot-pip-step">
+                    <div class="pip-icon">📚</div>
+                    <div class="pip-info">
+                      <span class="pip-lbl">Materi Add-on:</span>
+                      <strong class="pip-val" id="heroActiveBotMaterial">SOP SPPD Format F4</strong>
+                    </div>
+                  </div>
+                  <div class="bot-pip-step">
+                    <div class="pip-icon">🎯</div>
+                    <div class="pip-info">
+                      <span class="pip-lbl">Sasaran &amp; Whitelist:</span>
+                      <strong class="pip-val" id="heroActiveBotTarget" style="color:#059669;">Grup TANDANG (🔒 Whitelist Anggota)</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -593,74 +861,197 @@
           </div>
         </section>
 
-        <!-- DASH TAB 2: KALENDER SIAR HARIAN (KOTAK TANGGAL 1-31) (SEPARATED TAB) -->
+        <!-- DASH TAB 2: KALENDER SIAR HARIAN (MODEL TANDANG & POP-UP INTERAKTIF) -->
         <section id="dashTab-calendar" class="dash-tab">
+          
+          <!-- Header Kalender -->
           <div class="dash-header">
             <div>
-              <h2>🗓️ Kalender Siar Harian (Tanggal 1–31)</h2>
-              <p>Kotak visual tanggal pengiriman. Klik tanggal mana saja untuk melihat atau mengganti isi pesan bot hari tersebut.</p>
+              <h2><i data-lucide="calendar" class="lucide-md"></i> Kalender Jadwal Siaran WhatsApp</h2>
+              <p>Visualisasi jadwal siaran pesan yang sedang berjalan, akan datang, dan telah tuntas dikirim. Klik tanggal mana saja untuk membuka pop-up rincian.</p>
             </div>
             <div class="dash-header-actions">
-              <button class="btn btn-outline btn-sm" onclick="switchDashTab('campaign')" title="Kembali ke Daftar Campaign & Hub Siaran">
-                <span>📢 &larr; Daftar Campaign</span>
+              <button class="btn btn-outline btn-sm" onclick="switchDashTab('campaign')" title="Kembali ke Daftar Campaign &amp; Hub Siaran">
+                <i data-lucide="arrow-left" class="lucide-xs"></i>
+                <span>Daftar Campaign</span>
               </button>
               <button class="btn btn-outline btn-sm" onclick="downloadExcelTemplate()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <i data-lucide="download" class="lucide-xs"></i>
                 <span>Unduh Template Excel</span>
               </button>
               <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleExcelUpload(event)">
               <button class="btn btn-secondary btn-sm" onclick="document.getElementById('excelFileInput').click()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <i data-lucide="upload" class="lucide-xs"></i>
                 <span>Import Excel ke Kalender</span>
               </button>
               <button class="btn btn-primary btn-sm" onclick="openCreateCampaignModal()">
-                <span>+ Buat Campaign Baru</span>
+                <i data-lucide="plus" class="lucide-xs"></i>
+                <span>Buat Campaign Baru</span>
               </button>
             </div>
           </div>
 
-          <!-- Active Campaigns Pill Filter in Calendar -->
-          <div class="campaign-selector-bar">
-            <span class="label">Tampilkan di Kotak Tanggal:</span>
-            <div class="campaign-pill-list" id="activeCampaignList">
-              <button class="campaign-chip active" onclick="selectCalendarCampaign('all')">Semua Campaign</button>
-              <button class="campaign-chip amber" onclick="selectCalendarCampaign('subuh')">🌅 Sapa Subuh Anak &amp; Keluarga</button>
-              <button class="campaign-chip green" onclick="selectCalendarCampaign('dinas')">🏛️ Agenda Kedinasan IKP</button>
-              <button class="campaign-chip blue" onclick="selectCalendarCampaign('event')">🏃 Event Fun Run 26 Des</button>
-              <button class="campaign-chip blue" onclick="selectCalendarCampaign('sppd')">💼 Pengingat SPPD TANDANG</button>
+          <!-- Filter Status Top Bar (Model TANDANG) -->
+          <div class="campaign-selector-bar" style="justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div class="campaign-pill-list" id="calStatusPillList">
+              <button class="campaign-chip active" id="btnCalStatusAll" onclick="filterCalendarByStatus('all')">Semua Jadwal</button>
+              <button class="campaign-chip" id="btnCalStatusActive" onclick="filterCalendarByStatus('active')">● Sedang Berjalan</button>
+              <button class="campaign-chip" id="btnCalStatusUpcoming" onclick="filterCalendarByStatus('upcoming')">● Akan Datang</button>
+              <button class="campaign-chip" id="btnCalStatusDone" onclick="filterCalendarByStatus('done')">● Selesai</button>
+            </div>
+            <div>
+              <button class="btn btn-primary btn-xs" onclick="openCreateCampaignModal()" style="font-size:0.75rem; padding:4px 10px;">
+                <i data-lucide="plus" class="lucide-xs"></i>
+                <span>Tambah Program Siaran</span>
+              </button>
             </div>
           </div>
 
-          <!-- True Visual Month Calendar Grid -->
-          <div class="calendar-wrapper-card panel-card">
-            <div class="calendar-top-bar">
-              <div class="calendar-nav-controls">
-                <button class="cal-nav-btn" onclick="prevMonth()">&larr; Bulan Sebelumnya</button>
-                <h3 id="currentMonthYearText">Oktober 2026</h3>
-                <button class="cal-nav-btn" onclick="nextMonth()">Bulan Berikutnya &rarr;</button>
+          <!-- Month Summary Strip Banner (Model TANDANG) -->
+          <div class="panel-card mb-3" style="padding:10px 16px; background:#FFFFFF; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; background:#ECFDF5; color:#059669;">
+                <i data-lucide="calendar-days" class="lucide-md"></i>
+              </span>
+              <div>
+                <strong style="font-size:1rem; color:#0F172A;" id="calBannerMonthText">Oktober 2026</strong>
+                <span class="badge-tag green" style="font-size:0.7rem; margin-left:6px;" id="calBannerCountBadge">3 Program di Bulan Ini</span>
+                <p style="font-size:0.75rem; color:#64748B; margin:0;">Menampilkan jadwal siaran aktif dan pengingat bot pada bulan Oktober 2026</p>
               </div>
-              <div class="calendar-legend">
-                <span class="legend-item"><span class="dot-amber"></span> Keluarga / Subuh</span>
-                <span class="legend-item"><span class="dot-green"></span> Kedinasan IKP</span>
-                <span class="legend-item"><span class="dot-blue"></span> Event Fun Run / SPPD</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button class="btn btn-outline btn-xs" onclick="jumpToCalendarToday()" style="font-size:0.75rem; padding:4px 8px;">Hari Ini (24 Okt)</button>
+              <button class="btn btn-outline btn-xs" onclick="filterCalendarByStatus('all')" style="font-size:0.75rem; padding:4px 8px;">Semua Bulan</button>
+              <div style="display:inline-flex; border:1px solid #E2E8F0; border-radius:6px; overflow:hidden;">
+                <button class="cal-nav-btn" onclick="prevMonth()" style="padding:4px 10px; font-size:0.8rem; background:#F8FAFC; border:none; cursor:pointer;" title="Bulan Sebelumnya">
+                  <i data-lucide="chevron-left" class="lucide-xs"></i>
+                </button>
+                <button class="cal-nav-btn" onclick="nextMonth()" style="padding:4px 10px; font-size:0.8rem; background:#F8FAFC; border:none; border-left:1px solid #E2E8F0; cursor:pointer;" title="Bulan Berikutnya">
+                  <i data-lucide="chevron-right" class="lucide-xs"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="cal-agenda-strip-header">
+            <h3><i data-lucide="calendar-range" class="lucide-sm" style="color:#059669;"></i> Kartu Agenda Siaran <span style="font-weight:400; font-size:0.76rem; color:#64748B;">• Klik kartu untuk melihat pop-up jadwal</span></h3>
+            <span style="font-size:0.75rem; color:#64748B;">Geser ke samping untuk melihat semua agenda</span>
+          </div>
+          <div class="cal-agenda-cards-grid" id="calAgendaCardsGrid">
+            <!-- Populated dynamically via renderCalendarAgendaCards() in app.js -->
+          </div>
+
+          <!-- 2-COLUMN CALENDAR LAYOUT (SIDEBAR + MAIN GRID LIKE TANDANG) -->
+          <div class="cal-two-column-layout">
+            
+            <!-- SIDEBAR KIRI: MINI CALENDAR + FILTER + AGENDA HARI INI -->
+            <div class="cal-sidebar">
+              
+              <!-- 1. Mini Calendar Card -->
+              <div class="mini-cal-card">
+                <div class="mini-cal-header">
+                  <strong id="miniCalHeaderMonth">Oktober 2026</strong>
+                  <div style="display:flex; gap:4px;">
+                    <button type="button" class="btn btn-outline btn-xs" onclick="prevMonth()" style="padding:2px 6px; font-size:0.7rem;" title="Bulan Sebelumnya">
+                      <i data-lucide="chevron-left" class="lucide-xs"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline btn-xs" onclick="nextMonth()" style="padding:2px 6px; font-size:0.7rem;" title="Bulan Berikutnya">
+                      <i data-lucide="chevron-right" class="lucide-xs"></i>
+                    </button>
+                  </div>
+                </div>
+                <div class="mini-cal-grid" id="miniCalGridContainer">
+                  <!-- Mini calendar populated via renderMiniCalendar() in app.js -->
+                </div>
+              </div>
+
+              <!-- 2. Filter Kategori & Status (Checkboxes like TANDANG) -->
+              <div class="cal-sidebar-filter">
+                <div class="cal-sidebar-filter-title">Filter Program &amp; Status</div>
+                <div class="cal-sidebar-checkbox-list">
+                  <label class="cal-sidebar-checkbox-item">
+                    <span style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="calFilterCheckSubuh" checked onchange="toggleCalCategoryFilter('subuh')">
+                      <span class="pill-status-dot amber"></span>
+                      <i data-lucide="sun-dim" class="lucide-xs" style="color:#D97706;"></i>
+                      <span>Sapa Subuh (Fajar)</span>
+                    </span>
+                    <span class="badge-tag amber" style="font-size:0.65rem; padding:0 4px;">Aktif</span>
+                  </label>
+                  <label class="cal-sidebar-checkbox-item">
+                    <span style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="calFilterCheckDinas" checked onchange="toggleCalCategoryFilter('dinas')">
+                      <span class="pill-status-dot green"></span>
+                      <i data-lucide="landmark" class="lucide-xs" style="color:#059669;"></i>
+                      <span>Kedinasan TANDANG</span>
+                    </span>
+                    <span class="badge-tag green" style="font-size:0.65rem; padding:0 4px;">Aktif</span>
+                  </label>
+                  <label class="cal-sidebar-checkbox-item">
+                    <span style="display:flex; align-items:center; gap:8px;">
+                      <input type="checkbox" id="calFilterCheckEvent" checked onchange="toggleCalCategoryFilter('event')">
+                      <span class="pill-status-dot blue"></span>
+                      <i data-lucide="flag" class="lucide-xs" style="color:#2563EB;"></i>
+                      <span>Event Fun Run 26 Des</span>
+                    </span>
+                    <span class="badge-tag blue" style="font-size:0.65rem; padding:0 4px;">Terjadwal</span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- 3. Agenda Tanggal Ini (Panel Fokus Tanggal Terpilih) -->
+              <div class="cal-day-agenda-box" id="calSelectedDayBox">
+                <div class="cal-day-agenda-header">
+                  <strong id="calSelectedDayTitle">Agenda: 24 Oktober</strong>
+                  <span class="badge-hari-ini">Hari Ini</span>
+                </div>
+                <div class="cal-day-agenda-list" id="calSelectedDayList">
+                  <!-- Populated by updateCalSidebarSelectedDay() -->
+                </div>
+                <div style="margin-top:10px; text-align:center;">
+                  <button type="button" class="btn btn-outline btn-xs btn-block" onclick="openDateEntryModalForSelected()" style="font-size:0.75rem; padding:5px 8px; display:inline-flex; align-items:center; justify-content:center; gap:4px;">
+                    <i data-lucide="plus" class="lucide-xs"></i>
+                    <span>Buka Pop-up &amp; Tambah Pesan</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- MAIN KALENDER GRID KANAN (MODEL TANDANG) -->
+            <div class="calendar-wrapper-card panel-card" style="margin-bottom:0;">
+              
+              <!-- Bar Kontrol Kalender Atas -->
+              <div class="calendar-top-bar" style="margin-bottom:10px;">
+                <div class="calendar-nav-controls">
+                  <button class="cal-nav-btn" onclick="prevMonth()">&larr; Bulan Sebelumnya</button>
+                  <h3 id="currentMonthYearText" style="font-size:1.05rem; font-weight:800;">Oktober 2026</h3>
+                  <button class="cal-nav-btn" onclick="nextMonth()">Bulan Berikutnya &rarr;</button>
+                </div>
+                <div class="calendar-legend">
+                  <span class="legend-item"><span class="dot-amber"></span> Keluarga / Subuh</span>
+                  <span class="legend-item"><span class="dot-green"></span> Kedinasan TANDANG</span>
+                  <span class="legend-item"><span class="dot-blue"></span> Event Fun Run / SPPD</span>
+                </div>
+              </div>
+
+              <!-- Header Hari (Senin s/d Minggu seperti TANDANG) -->
+              <div class="calendar-grid-header">
+                <div>Senin</div>
+                <div>Selasa</div>
+                <div>Rabu</div>
+                <div>Kamis</div>
+                <div>Jumat</div>
+                <div class="cal-header-sat">Sabtu</div>
+                <div class="cal-header-sun">Minggu</div>
+              </div>
+
+              <!-- Kotak Tanggal Kalender (Populated by app.js renderCalendar()) -->
+              <div class="calendar-month-grid" id="calendarMonthGrid">
+                <!-- Injected by app.js renderCalendar() -->
               </div>
             </div>
 
-            <!-- Calendar Days Header -->
-            <div class="calendar-grid-header">
-              <div>Min</div>
-              <div>Sen</div>
-              <div>Sel</div>
-              <div>Rab</div>
-              <div>Kam</div>
-              <div>Jum</div>
-              <div>Sab</div>
-            </div>
-
-            <!-- 35-Cell Month Grid (Populated via JS) -->
-            <div class="calendar-month-grid" id="calendarMonthGrid">
-              <!-- Injected by app.js renderCalendar() -->
-            </div>
           </div>
 
           <!-- Excel Preview Modal (When imported) -->
@@ -692,6 +1083,190 @@
             </div>
           </div>
         </section>
+
+        <!-- DASH TAB: LAPORAN & RIWAYAT KINERJA DUA ARAH (CAMPAIGN REPORTS & 2-WAY HISTORY) -->
+        <section id="dashTab-reports" class="dash-tab">
+          <div class="dash-header">
+            <div>
+              <h2>📊 Laporan &amp; Ukuran Kinerja Campaign (Interaksi 2-Arah)</h2>
+              <p>Rekap pengiriman real-time, status siapa yang terima &amp; dibaca, antrian pending, serta catatan balasan chat dua arah yang ditangani otomatis oleh Bot AI.</p>
+            </div>
+            <div class="dash-header-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
+              <select id="reportCampaignSelect" class="form-select" onchange="handleReportCampaignChange(this.value)" style="width:auto; font-weight:700; font-size:0.8rem; background:#FFFFFF;">
+                <option value="all">Semua Program Campaign</option>
+                <option value="camp_dinas_legacy" selected>🏛️ Sosialisasi SPPD &amp; Kedinasan TANDANG</option>
+                <option value="camp_funrun_legacy">🏃 Event Fun Run 26 Des Gedung Sate</option>
+                <option value="camp_subuh_legacy">🌅 Sapa Subuh Anak &amp; Doa Fajar</option>
+              </select>
+              <button class="btn btn-outline btn-sm" onclick="exportReportToCsv()" title="Unduh rekap kinerja dalam format CSV / Excel">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Unduh CSV / Excel</span>
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="fetchLiveCampaignReports()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span>Muat Ulang Realtime</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 4 KARTU UKURAN KINERJA UTAMA (DELIVERY & TWO-WAY BOT KPIS) -->
+          <div class="report-kpi-grid">
+            <!-- KPI 1: TOTAL SASARAN -->
+            <div class="report-kpi-card blue">
+              <div class="report-kpi-top">
+                <span class="report-kpi-label">Total Sasaran Pengiriman</span>
+                <span class="badge-icon">🎯</span>
+              </div>
+              <div class="report-kpi-number">
+                <span id="repKpiTotal">450</span>
+                <small style="font-size:0.8rem; font-weight:600; color:#64748B;">Penerima</small>
+              </div>
+              <div class="report-kpi-foot">
+                <span>Alokasi Trio Nomor: 100% Siap</span>
+                <strong style="color:#2563EB;">Terkirim: 438</strong>
+              </div>
+            </div>
+
+            <!-- KPI 2: SIAPA YANG TERIMA & DIBACA -->
+            <div class="report-kpi-card green">
+              <div class="report-kpi-top">
+                <span class="report-kpi-label">Siapa yang Terima &amp; Dibaca</span>
+                <span class="badge-del-status read">✓✓ 97.3% Sukses</span>
+              </div>
+              <div class="report-kpi-number">
+                <span id="repKpiDelivered" style="color:#059669;">438</span>
+                <span class="report-kpi-percent" style="color:#059669;">(97.3%)</span>
+              </div>
+              <div class="report-kpi-foot">
+                <span id="repKpiReadBreakdown">✓✓ Dibaca: <strong>412</strong> • Diterima: <strong>26</strong></span>
+                <span style="color:#059669; font-weight:700;">● Tinggi</span>
+              </div>
+            </div>
+
+            <!-- KPI 3: YANG PENDING -->
+            <div class="report-kpi-card amber">
+              <div class="report-kpi-top">
+                <span class="report-kpi-label">Yang Masih Pending</span>
+                <span class="badge-del-status pending">⏳ Dalam Antrian</span>
+              </div>
+              <div class="report-kpi-number">
+                <span id="repKpiPending" style="color:#D97706;">12</span>
+                <span class="report-kpi-percent" style="color:#D97706;">(2.7%)</span>
+              </div>
+              <div class="report-kpi-foot">
+                <span>8 Luar Sinyal • 4 Jitter Pengaman</span>
+                <button class="btn btn-outline btn-xs" onclick="retryPendingMessages()" style="font-size:0.68rem; padding:1px 6px;">
+                  🔁 Ulangi Kirim
+                </button>
+              </div>
+            </div>
+
+            <!-- KPI 4: YANG BALAS SIAPA AJA (INTERAKSI 2-ARAH) -->
+            <div class="report-kpi-card purple">
+              <div class="report-kpi-top">
+                <span class="report-kpi-label">Yang Membalas (Dua Arah)</span>
+                <span class="badge-tag purple" style="font-size:0.68rem;">🤖 100% Dijawab Bot</span>
+              </div>
+              <div class="report-kpi-number">
+                <span id="repKpiReplied" style="color:#7C3AED;">64</span>
+                <span class="report-kpi-percent" style="color:#7C3AED;">(14.2%)</span>
+              </div>
+              <div class="report-kpi-foot">
+                <span>Respon AI Rata-rata: <strong>2.1 detik</strong></span>
+                <strong style="color:#7C3AED;">Bot RAYI Aktif</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- BAR FILTER STATUS LAPORAN & PENCARIAN PENERIMA -->
+          <div class="report-filter-bar">
+            <div class="report-pill-group" id="reportPillGroup">
+              <button class="report-filter-pill active" id="btnFilterRepAll" onclick="filterReportByStatus('all')">
+                <span>Semua Sasaran</span>
+                <span class="pill-count" id="countFilterRepAll">450</span>
+              </button>
+              <button class="report-filter-pill" id="btnFilterRepDelivered" onclick="filterReportByStatus('delivered')">
+                <span>✅ Diterima &amp; Dibaca</span>
+                <span class="pill-count" id="countFilterRepDelivered">438</span>
+              </button>
+              <button class="report-filter-pill" id="btnFilterRepPending" onclick="filterReportByStatus('pending')">
+                <span>⏳ Masih Pending</span>
+                <span class="pill-count" id="countFilterRepPending">12</span>
+              </button>
+              <button class="report-filter-pill" id="btnFilterRepReplied" onclick="filterReportByStatus('replied')">
+                <span>💬 Yang Membalas (Dua Arah)</span>
+                <span class="pill-count" id="countFilterRepReplied" style="background:#2563EB; color:#FFF;">64</span>
+              </button>
+            </div>
+
+            <div class="report-search-wrap">
+              <span style="font-size:0.85rem; margin-right:6px;">🔍</span>
+              <input type="text" id="reportSearchInput" placeholder="Cari nama atau nomor WhatsApp..." oninput="handleReportSearch(this.value)">
+            </div>
+          </div>
+
+          <!-- TABEL DETAIL LAPORAN & INTERAKSI DUA ARAH -->
+          <div class="panel-card mb-4">
+            <div class="panel-header">
+              <div>
+                <h3 style="font-size:0.98rem; font-weight:800; color:#0F172A;" id="reportTableTitle">
+                  📋 Riwayat Pengiriman &amp; Respon Penerima: Sosialisasi SPPD TANDANG
+                </h3>
+                <span class="text-muted" style="font-size:0.75rem;">Klik "Lihat Percakapan" untuk membuka rekaman balasan chat asli dan jawaban bot</span>
+              </div>
+              <span class="badge-status open" id="badgeReportSyncTime">● Realtime Terhubung</span>
+            </div>
+
+            <div class="table-responsive">
+              <table class="dash-table">
+                <thead>
+                  <tr>
+                    <th>Penerima &amp; Instansi</th>
+                    <th>Waktu &amp; Pesan Campaign</th>
+                    <th>Status Kinerja</th>
+                    <th>Balasan Penerima (Masuk)</th>
+                    <th>Respon Bot AI (Keluar)</th>
+                    <th style="text-align:center;">Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="reportTableBody">
+                  <!-- Injected dynamically by renderReportTable() -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- MODAL: PERCAKAPAN DUA ARAH LENGKAP (THREAD DETAIL) -->
+        <div id="modalChatThreadDetail" class="modal-overlay">
+          <div class="modal-chat-thread-box">
+            <!-- Header WhatsApp Style -->
+            <div class="chat-thread-header">
+              <div class="chat-thread-contact">
+                <div class="chat-thread-avatar" id="threadModalAvatar">👨‍💼</div>
+                <div class="chat-thread-meta">
+                  <h4 id="threadModalName">Rudi Hermawan, S.Kom</h4>
+                  <small id="threadModalPhone">+62 812-3344-5566 &bull; <span style="color:#A7F3D0;">● Bot RAYI Siaga</span></small>
+                </div>
+              </div>
+              <button class="modal-close" style="color:#FFFFFF; position:static;" onclick="closeChatThreadModal()">&times;</button>
+            </div>
+
+            <!-- Chat Bubble Body Container -->
+            <div class="chat-thread-body" id="threadModalMessagesBody">
+              <!-- Injected dynamically by renderThreadModalMessages() -->
+            </div>
+
+            <!-- Admin Takeover Quick Reply -->
+            <form onsubmit="handleSendAdminManualReply(event)" class="chat-thread-footer">
+              <input type="hidden" id="threadModalReportId">
+              <input type="text" id="threadModalInputText" class="chat-thread-input" placeholder="Ketik pesan balasan manual sebagai Admin ke nomor ini..." required>
+              <button type="submit" class="btn btn-primary btn-sm" style="border-radius:20px; padding:8px 16px;">
+                <span>Kirim 📲</span>
+              </button>
+            </form>
+          </div>
+        </div>
 
         <!-- MODAL: BUAT CAMPAIGN BARU (WIZARD 4 LANGKAH BERDASARKAN JENIS PENGIRIMAN) -->
         <div id="modalCreateCampaign" class="modal-overlay">
@@ -957,14 +1532,20 @@
                 </div>
               </div>
 
-              <!-- LANGKAH 3: NOMOR & TARGET -->
+              <!-- LANGKAH 3: RAKIT 4 BLOK MODULAR PROGRAM (PAKE NOMOR, BOT & ENGINE, ADD-ON MATERI, KE SIAPA) -->
               <div class="mb-3">
-                <label style="font-weight:800; font-size:0.92rem; margin-bottom:8px; display:block; color:#0F172A;">Langkah 3: Tentukan Nama, Target &amp; Nomor Pengirim:</label>
-                
-                <div class="card-grid-2 mb-2">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                  <label style="font-weight:800; font-size:0.95rem; margin:0; color:#0F172A;">
+                    Langkah 3: Rakit 4 Modul Program (Nomor Pengirim, Bot &amp; Engine, Add-on Materi, Sasaran):
+                  </label>
+                  <span class="badge-tag green" style="font-size:0.75rem;">🧩 Desain Modular (Plug &amp; Play)</span>
+                </div>
+
+                <!-- Nama Campaign & Kategori -->
+                <div class="card-grid-2 mb-3">
                   <div class="form-group" style="margin-bottom:0;">
                     <label style="font-weight:700;">Nama Campaign:</label>
-                    <input type="text" id="campName" placeholder="Contoh: Pengumuman Rapat Dinas IKP" value="Campaign Siaran Baru" oninput="updateModalLiveWaPreview()" required>
+                    <input type="text" id="campName" placeholder="Contoh: Sapa Subuh / SPPD TANDANG / Pengumuman" value="Campaign Baru" oninput="updateModalLiveWaPreview()" required>
                   </div>
 
                   <div class="form-group" style="margin-bottom:0;">
@@ -972,50 +1553,144 @@
                     <select id="campClassification" class="form-select" onchange="autoSyncSenderByClassification(); updateModalLiveWaPreview();">
                       <option value="siaran" selected>📢 Siaran Umum &amp; Pengumuman</option>
                       <option value="keluarga">🌅 Keluarga &amp; Sapaan Personal</option>
-                      <option value="event">🏃 Event &amp; Publik</option>
+                      <option value="event">🏃 Event &amp; Publik (Fun Run)</option>
                       <option value="dinas">🏛️ Kedinasan &amp; Pemerintahan (TANDANG)</option>
                     </select>
                   </div>
                 </div>
 
-                <div class="card-grid-2 mb-2">
-                  <div class="form-group" style="margin-bottom:0;">
-                    <label style="font-weight:700;">🎯 Kirim ke Siapa? (Target Penerima):</label>
+                <!-- 4 KARTU BLOK MODULAR (PAKE NOMOR MANA, SELIPIN BOT APA & ENGINE APA, ADD-ON MATERI APA, KE SIAPA) -->
+                <div class="custom-config-pillars-grid mb-3">
+                  
+                  <!-- MODUL 1: PAKE NOMOR MANA -->
+                  <div class="custom-config-card">
+                    <div class="pillar-header">
+                      <span class="pillar-number">1</span>
+                      <div>
+                        <strong>Pake Nomor Mana?</strong>
+                        <small>Jalur WhatsApp Pengirim</small>
+                      </div>
+                    </div>
+                    <select id="campSenderNumber" class="form-select wrap-text" onchange="updateModalLiveWaPreview()" title="Pilih jalur nomor WhatsApp pengirim">
+                      <option value="Wawar-primary" selected title="Wawar-primary (+62 851-2104-2025) — Jalur Notifikasi Resmi Kedinasan">📱 Wawar-primary (+62 851-2104-2025) — Notifikasi Dinas</option>
+                      <option value="wawar-subuh" title="wawar-subuh (+62 851-2104-2025) — Jalur Khusus Pesan Fajar &amp; Keluarga">🌅 wawar-subuh (+62 851-2104-2025) — Khusus Subuh &amp; Keluarga</option>
+                      <option value="rayi-cs-official" title="rayi-cs-official — Khusus Chatbot Cerdas RAYI &amp; Helpdesk Event">🤖 rayi-cs-official — Bot CS &amp; Event</option>
+                      <option value="wawar-blast-x" title="wawar-blast-x — Khusus Siaran Massal &amp; Pengumuman Bebas">📢 wawar-blast-x — Siaran Massal</option>
+                    </select>
+                    <div class="pillar-hint" id="hintSenderRole">
+                      <span>Jalur pengirim resmi dengan proteksi Anti-Banned.</span>
+                    </div>
+                  </div>
+
+                  <!-- MODUL 2: SELIPIN BOT APA & ENGINE APA -->
+                  <div class="custom-config-card">
+                    <div class="pillar-header">
+                      <span class="pillar-number">2</span>
+                      <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                          <strong>Selipin Bot &amp; Engine?</strong>
+                          <span class="badge-tag blue" style="font-size:0.68rem; padding:1px 5px;" id="badgeBotEngineActive">Gemini AI</span>
+                        </div>
+                        <small>Kecerdasan Bot yang Disematkan</small>
+                      </div>
+                    </div>
+                    <div class="form-group mb-2">
+                      <label style="font-size:0.75rem; font-weight:700; color:#334155; margin-bottom:2px;">Diselipin Bot Mana?</label>
+                      <select id="campBotProfile" class="form-select wrap-text" onchange="handleBotProfileChange(); updateModalLiveWaPreview();">
+                        <option value="bot_rayi" selected>🤖 Bot RAYI (Asisten AI IKP &amp; TANDANG)</option>
+                        <option value="bot_subuh">🌅 Bot Sahabat Subuh (Pengingat Doa &amp; Sapaan)</option>
+                        <option value="bot_helpdesk">🏃 Bot Helpdesk Acara (Panduan Fun Run &amp; Rute)</option>
+                        <option value="bot_cs">💬 Bot CS Layanan (Respon Cepat FAQ)</option>
+                        <option value="none">🚫 Tanpa Bot (Mode Broadcast Siaran Saja)</option>
+                      </select>
+                    </div>
+                    <div class="form-group mb-0" id="boxCampBotEngine">
+                      <label style="font-size:0.75rem; font-weight:700; color:#334155; margin-bottom:2px;">Engine Kecerdasan Apa?</label>
+                      <select id="campBotEngine" class="form-select wrap-text" onchange="updateModalLiveWaPreview();">
+                        <option value="gemini_rag" selected>🧠 Gemini 2.5 Flash (Paham Dokumen RAG)</option>
+                        <option value="gemini_strict">🛡️ Hybrid Gemini AI + Strict Whitelist</option>
+                        <option value="keyword_rules">⚡ Rule-Based Keyword Matcher (Cepat)</option>
+                      </select>
+                    </div>
+                    <div class="pillar-hint" id="hintBotEngineDesc">
+                      <span>Bot membaca dokumen add-on dan membalas chat secara cerdas.</span>
+                    </div>
+                  </div>
+
+                  <!-- MODUL 3: ADD-ON MATERI APA -->
+                  <div class="custom-config-card">
+                    <div class="pillar-header">
+                      <span class="pillar-number">3</span>
+                      <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                          <strong>Add-on Materi Apa?</strong>
+                          <button type="button" class="btn btn-outline btn-xs" onclick="openCreateKnowledgeBaseModal()" style="font-size:0.7rem; padding:2px 6px;">+ Baru</button>
+                        </div>
+                        <small>Knowledge Base / Dokumen Bot</small>
+                      </div>
+                    </div>
+                    <select id="campContentPreset" class="form-select wrap-text" onchange="updateModalLiveWaPreview();">
+                      <!-- Populated dynamically from Knowledge Base store -->
+                    </select>
+                    <div class="pillar-hint" id="hintKbAttached">
+                      <span>File Word, Excel, atau PDF yang dipelajari si Bot.</span>
+                    </div>
+                  </div>
+
+                  <!-- MODUL 4: KIRIM KE SIAPA & AKSES -->
+                  <div class="custom-config-card">
+                    <div class="pillar-header">
+                      <span class="pillar-number">4</span>
+                      <div>
+                        <strong>Kirim Ke Siapa &amp; Akses?</strong>
+                        <small>Target Sasaran &amp; Proteksi</small>
+                      </div>
+                    </div>
                     <select id="campTargetGroup" class="form-select wrap-text" onchange="handleTargetGroupChange(); updateModalLiveWaPreview();" title="Pilih target penerima broadcast">
+                      <option value="tandang" selected title="Grup ASN &amp; Staf Pengguna Aplikasi TANDANG">📋 Grup ASN &amp; Staf TANDANG</option>
                       <option value="keluarga" title="Grup Keluarga &amp; Kerabat Dekat (+62 851-2104-2025)">👨‍👩‍👧 Grup Keluarga &amp; Kerabat (+62 851-2104-2025)</option>
                       <option value="pimpinan" title="Grup Pimpinan &amp; Pejabat Struktural IKP">🏛️ Grup Pimpinan &amp; Pejabat Struktural IKP</option>
-                      <option value="tandang" selected title="Grup ASN &amp; Staf Pengguna Aplikasi TANDANG">📋 Grup ASN &amp; Staf Pengguna TANDANG</option>
-                      <option value="event_runners" title="Peserta Terdaftar Event Fun Run Diskominfo">🏃 Peserta Terdaftar Event Fun Run Diskominfo</option>
-                      <option value="manual" title="Ketik nomor WhatsApp secara bebas manual">📱 Ketik Nomor WhatsApp Bebas Manual...</option>
+                      <option value="event_runners" title="Peserta Terdaftar Event Fun Run Diskominfo">🏃 Peserta Fun Run 26 Des</option>
+                      <option value="manual" title="Ketik nomor WhatsApp secara bebas manual">📱 Nomor WhatsApp Bebas Manual...</option>
                     </select>
+                    <!-- Input nomor manual jika dipilih -->
+                    <div class="form-group hidden mt-2 mb-0" id="boxCampManualPhone">
+                      <input type="text" id="campManualPhone" placeholder="Contoh: 6285121042025" oninput="updateModalLiveWaPreview()" style="font-size:0.8rem; padding:6px 10px;">
+                    </div>
+                    <div style="margin-top:8px;">
+                      <label style="display:flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:700; color:#1E293B; cursor:pointer;">
+                        <input type="checkbox" id="campStrictGroupOnly" checked onchange="updateModalLiveWaPreview()">
+                        <span>🔒 Hanya jawab anggota grup (nomor luar diabaikan)</span>
+                      </label>
+                    </div>
+                    <div class="pillar-hint" id="hintTargetAudience">
+                      <span>Nomor di luar grup otomatis tidak dijawab bot.</span>
+                    </div>
                   </div>
 
-                  <div class="form-group" style="margin-bottom:0;">
-                    <label style="font-weight:700;">📱 Nomor Pengirim (Trio Nomor WAWAR):</label>
-                    <select id="campSenderNumber" class="form-select wrap-text" onchange="updateModalLiveWaPreview()" title="Pilih jalur nomor WhatsApp pengirim">
-                      <option value="Wawar-primary" selected title="Wawar-primary (+62 851-2104-2025) — Jalur Notifikasi Resmi Kedinasan">📱 Wawar-primary (+62 851-2104-2025) — Notifikasi Resmi Dinas</option>
-                      <option value="wawar-subuh" title="wawar-subuh (+62 851-2104-2025) — Jalur Khusus Pesan Fajar &amp; Keluarga">🌅 wawar-subuh (+62 851-2104-2025) — Khusus Fajar &amp; Keluarga</option>
-                      <option value="rayi-cs-official" title="rayi-cs-official — Khusus Chatbot Cerdas RAYI &amp; Helpdesk Event">🤖 rayi-cs-official — Chatbot Cerdas RAYI &amp; Helpdesk Event</option>
-                      <option value="wawar-blast-x" title="wawar-blast-x — Khusus Siaran Massal &amp; Pengumuman Bebas">📢 wawar-blast-x — Khusus Siaran Massal</option>
-                    </select>
-                  </div>
                 </div>
 
-                <!-- Input nomor manual jika dipilih -->
-                <div class="form-group hidden mb-2" id="boxCampManualPhone">
-                  <label style="font-weight:700;">Nomor WhatsApp Tujuan (Format Internasional: 628xxx):</label>
-                  <input type="text" id="campManualPhone" placeholder="Contoh: 6285121042025" oninput="updateModalLiveWaPreview()">
-                </div>
-
-                <!-- Bahan Materi / Add-on Knowledge Base -->
-                <div class="form-group mb-0">
-                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                    <label style="font-weight:700; margin:0;">📚 Bahan Materi / Knowledge Base (Add-on Bot):</label>
-                    <button type="button" class="btn btn-outline btn-xs" onclick="openCreateKnowledgeBaseModal()">+ Buat Materi Baru (Word/PDF)</button>
+                <!-- LIVE PIPELINE ROUTING PREVIEW (SUPER CLEAR & MODULAR!) -->
+                <div class="routing-pipeline-box mb-2" id="modalRoutingPipeline">
+                  <div class="routing-step">
+                    <span class="routing-label">📱 1. PAKE NOMOR:</span>
+                    <strong class="routing-value" id="valPipelineSender">Wawar-primary (+62 851-2104-2025)</strong>
                   </div>
-                  <select id="campContentPreset" class="form-select wrap-text">
-                    <!-- Populated dynamically from Knowledge Base store -->
-                  </select>
+                  <div class="routing-arrow">&rarr;</div>
+                  <div class="routing-step">
+                    <span class="routing-label">🤖 2. SELIPIN BOT &amp; ENGINE:</span>
+                    <strong class="routing-value" id="valPipelineBot" style="color:#2563EB;">Bot RAYI • Gemini 2.5 Flash</strong>
+                  </div>
+                  <div class="routing-arrow">&rarr;</div>
+                  <div class="routing-step">
+                    <span class="routing-label">📚 3. ADD-ON MATERI:</span>
+                    <strong class="routing-value" id="valPipelineAddon" style="color:#059669;">Bahan Materi Standard</strong>
+                  </div>
+                  <div class="routing-arrow">&rarr;</div>
+                  <div class="routing-step">
+                    <span class="routing-label">🎯 4. KE SIAPA &amp; AKSES:</span>
+                    <strong class="routing-value" id="valPipelineTarget">📋 Grup ASN (🔒 Khusus Anggota)</strong>
+                  </div>
                 </div>
               </div>
 
@@ -1195,53 +1870,96 @@
           </div>
         </div>
 
-        <!-- MODAL: ISI / EDIT PESAN PADA TANGGAL TERTENTU DI KALENDER -->
+        <!-- MODAL: POP-UP RINCIAN & JADWAL SIARAN TANGGAL DI KALENDER -->
         <div id="modalDateEntry" class="modal-overlay">
           <div class="modal-box glass-card max-w-xl">
             <button class="modal-close" onclick="closeDateEntryModal()">&times;</button>
-            <div class="panel-header mb-3">
+            <div class="panel-header mb-2">
               <div>
-                <h3 id="dateEntryTitle">Isian Pesan: 25 Oktober 2026</h3>
-                <p class="text-sm text-muted">Atur pesan khusus yang akan dikirim bot RAYI pada tanggal ini.</p>
+                <h3 id="dateEntryTitle" style="font-size:1.1rem; font-weight:800; color:#0F172A; display:flex; align-items:center; gap:8px;">
+                  🗓️ Rincian Siaran: 24 Oktober 2026
+                </h3>
+                <p class="text-sm text-muted" style="margin:0;">Informasi modularitas pengiriman dan pratinjau pesan WhatsApp terjadwal pada tanggal ini.</p>
               </div>
             </div>
 
+            <!-- MODULAR ROUTING PIPELINE BOX DI DALAM POP-UP -->
+            <div class="routing-pipeline-box mb-3" style="background:#F0FDF4; border:1px solid #86EFAC;">
+              <div class="routing-step">
+                <span class="routing-label">📱 1. PAKE NOMOR:</span>
+                <strong class="routing-value" id="entryPipelineSender">Wawar-primary</strong>
+              </div>
+              <div class="routing-arrow">&rarr;</div>
+              <div class="routing-step">
+                <span class="routing-label">🤖 2. SELIPIN BOT:</span>
+                <strong class="routing-value" id="entryPipelineBot" style="color:#2563EB;">Bot RAYI • Gemini AI</strong>
+              </div>
+              <div class="routing-arrow">&rarr;</div>
+              <div class="routing-step">
+                <span class="routing-label">📚 3. ADD-ON MATERI:</span>
+                <strong class="routing-value" id="entryPipelineAddon" style="color:#059669;">SOP Kedinasan TANDANG</strong>
+              </div>
+              <div class="routing-arrow">&rarr;</div>
+              <div class="routing-step">
+                <span class="routing-label">🎯 4. SASARAN:</span>
+                <strong class="routing-value" id="entryPipelineTarget">Grup ASN TANDANG</strong>
+              </div>
+            </div>
+
+            <!-- PRATINJAU BUBBLE CHAT WHATSAPP ASLI DI DALAM POP-UP -->
+            <div class="wa-chat-preview-wrap mb-3">
+              <div class="wa-chat-preview-header">
+                <span class="wa-dot"></span>
+                <span style="font-size:0.75rem; font-weight:700; color:#1E293B;">Pratinjau Pesan yang Diterima di WhatsApp:</span>
+              </div>
+              <div class="wa-bubble-mockup">
+                <p class="wa-bubble-text" id="entryPreviewBubbleText">Sampurasun rekan-rekan ASN! Pengingat kelengkapan berkas SPPD digital untuk perjalanan dinas...</p>
+                <div class="wa-bubble-meta">
+                  <span id="entryPreviewBubbleTime">07:00 WIB</span>
+                  <span class="wa-checks">✓✓</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- FORM EDIT CEPAT DI DALAM POP-UP -->
             <form onsubmit="handleSaveDateEntry(event)">
               <input type="hidden" id="entryDateKey">
               
               <div class="card-grid-2">
                 <div class="form-group">
-                  <label>Pilih Campaign</label>
+                  <label style="font-weight:700; font-size:0.8rem;">Pilih Program / Campaign:</label>
                   <select id="entryCampSelect" class="form-select" onchange="applyCampaignTemplateToEntry()">
-                    <option value="subuh">🌅 Sapa Subuh Anak &amp; Keluarga</option>
-                    <option value="dinas">📋 Agenda Kedinasan IKP</option>
-                    <option value="sppd">💼 Pengingat SPPD TANDANG</option>
+                    <!-- Populated dynamically -->
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>Jam Kirim</label>
-                  <input type="time" id="entryTime" value="04:30" required>
+                  <label style="font-weight:700; font-size:0.8rem;">Jam Kirim (WIB):</label>
+                  <input type="time" id="entryTime" value="07:00" onchange="updateDateEntryPreview()" required>
                 </div>
               </div>
 
               <div class="form-group">
-                <label>Target Penerima</label>
-                <input type="text" id="entryTargetRecipient" value="👨‍👩‍👧 Anak Tercinta (+62 851-2104-2025)" class="input-readonly" readonly>
+                <label style="font-weight:700; font-size:0.8rem;">Target Sasaran:</label>
+                <input type="text" id="entryTargetRecipient" value="🏛️ Grup ASN &amp; Staf TANDANG" class="input-readonly" readonly>
               </div>
 
               <div class="form-group">
-                <label>Apa Isinya? (Pesan Khusus Hari Ini)</label>
-                <textarea id="entryMessageText" rows="4" placeholder="Ketik pesan yang akan dikirim di tanggal ini..." required>Sampurasun! Selamat subuh anakku tercinta, mari sambut pagi dengan sholat subuh, doa, dan sarapan yang cukup. Semangat belajar hari ini!</textarea>
+                <label style="font-weight:700; font-size:0.8rem;">Isi Pesan Khusus Tanggal Ini:</label>
+                <textarea id="entryMessageText" rows="3" placeholder="Ketik pesan yang akan dikirim di tanggal ini..." oninput="updateDateEntryPreview()" required>Sampurasun rekan-rekan ASN! Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas.</textarea>
               </div>
 
-              <div class="form-group">
-                <label>Lampiran Dokumen PDF / Gambar (Opsional)</label>
-                <input type="text" id="entryMediaUrl" placeholder="URL file PDF / Gambar">
+              <div class="form-group mb-3">
+                <label style="font-weight:700; font-size:0.8rem;">Lampiran Dokumen PDF / Link (Opsional):</label>
+                <input type="text" id="entryMediaUrl" placeholder="Contoh: https://tandang.jabarprov.go.id/sppd/format_f4.pdf">
               </div>
 
-              <div class="form-actions" style="display:flex; gap:10px;">
-                <button type="submit" class="btn btn-primary" style="flex:1;">Simpan ke Tanggal Ini</button>
-                <button type="button" class="btn btn-secondary" onclick="testSendDateEntry()">Tes Kirim ke WA Sekarang</button>
+              <div class="form-actions" style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-secondary" onclick="testSendDateEntry()" style="flex:1;">
+                  📲 Tes Kirim ke WA Sekarang
+                </button>
+                <button type="submit" class="btn btn-primary" style="flex:1;">
+                  💾 Simpan ke Tanggal Ini
+                </button>
               </div>
             </form>
           </div>
@@ -1862,43 +2580,279 @@
           </div>
         </section>
 
-        <!-- DASH TAB 6: INTEGRASI & TANDANG -->
+        <!-- DASH TAB 6: INTEGRASI MULTI-APLIKASI KLIEN & API GATEWAY -->
         <section id="dashTab-integrasi" class="dash-tab">
           <div class="dash-header">
             <div>
-              <h2>Integrasi Klien: Aplikasi TANDANG</h2>
-              <p>Kunci API dan webhook untuk menghubungkan aplikasi Anda ke gateway WAWAR.</p>
+              <h2 style="display:flex; align-items:center; gap:8px;"><i data-lucide="plug-2" class="lucide-md"></i> Multi-Aplikasi Klien &amp; Integrasi API Gateway</h2>
+              <p>Pusat integrasi gateway WAWAR untuk melayani banyak aplikasi eksternal (TANDANG, Fun Run 2026, Portal Berita IKP, SIMPEG). Pantau program aktif, kemajuan progress bar, dan bot yang sedang bertugas.</p>
+            </div>
+            <div class="dash-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="openRegisterClientAppModal()">
+                <span>+ Daftarkan Aplikasi Klien Baru</span>
+              </button>
             </div>
           </div>
 
-          <div class="panel-card max-w-xl">
-            <div class="form-group">
-              <label>API Endpoint Resmi (VPS)</label>
-              <input type="text" value="http://srv2091882.hstgr.cloud:8085" readonly class="input-readonly">
-            </div>
-
-            <div class="form-group">
-              <label>Bearer API Token (Untuk TANDANG)</label>
-              <div class="input-inline">
-                <input type="password" value="WawarSecretMasterKey2026!" id="clientApiKeyVal" readonly class="input-readonly">
-                <button class="btn btn-outline btn-sm" onclick="copyApiKey()">Salin</button>
+          <!-- KARTU MULTI-APLIKASI KLIEN (SWITCHER APLIKASI) -->
+          <div class="cal-agenda-strip-header">
+            <h3 style="display:flex; align-items:center; gap:8px;"><i data-lucide="layout-grid" class="lucide-sm" style="color:#059669;"></i> Aplikasi Klien Terhubung <span style="font-weight:400; font-size:0.75rem; color:#64748B;">• Klik aplikasi untuk melihat program berjalan, bot, dan kredensial API</span></h3>
+          </div>
+          <div class="multi-app-cards-grid" id="multiAppCardsGrid">
+            
+            <!-- KLIEN 1: TANDANG -->
+            <div class="client-app-card selected" id="cardAppTandang" onclick="selectClientApp('tandang')">
+              <div>
+                <div class="client-app-card-top">
+                  <div class="client-app-card-icon"><i data-lucide="building" class="lucide-sm"></i></div>
+                  <span class="badge-status open">● Terhubung Aktif</span>
+                </div>
+                <div class="client-app-card-title">Aplikasi TANDANG</div>
+                <div class="client-app-card-desc">Sistem SPPD &amp; Perjalanan Dinas ASN Jawa Barat. Notifikasi Surat Tugas F4 &amp; Berkas digital.</div>
+              </div>
+              <div class="client-app-card-footer">
+                <span style="color:#059669; font-weight:700;">Program: SPPD Kedinasan</span>
+                <span style="color:#64748B;">Bot: RAYI (Gemini)</span>
               </div>
             </div>
 
-            <div class="form-group">
-              <label>Fungsi Siap Pakai di TANDANG (TypeScript):</label>
-              <pre class="code-content text-xs"><code>import { sendWawarNotification, sendWawarDocument } from '@/lib/wawar/client';
+            <!-- KLIEN 2: FUN RUN 2026 -->
+            <div class="client-app-card" id="cardAppFunRun" onclick="selectClientApp('funrun')">
+              <div>
+                <div class="client-app-card-top">
+                  <div class="client-app-card-icon"><i data-lucide="activity" class="lucide-sm"></i></div>
+                  <span class="badge-status open">● Terhubung Aktif</span>
+                </div>
+                <div class="client-app-card-title">Aplikasi Fun Run Jabar 2026</div>
+                <div class="client-app-card-desc">Portal Registrasi, Tiket QR, &amp; Panduan Rute 5K Gedung Sate untuk 500 pelari terdaftar.</div>
+              </div>
+              <div class="client-app-card-footer">
+                <span style="color:#2563EB; font-weight:700;">Program: Event Fun Run</span>
+                <span style="color:#64748B;">Bot: Helpdesk 2026</span>
+              </div>
+            </div>
 
-// Kirim notifikasi Surat Tugas F4 ke pegawai:
+            <!-- KLIEN 3: PORTAL BERITA IKP -->
+            <div class="client-app-card" id="cardAppPortalIkp" onclick="selectClientApp('portalikp')">
+              <div>
+                <div class="client-app-card-top">
+                  <div class="client-app-card-icon"><i data-lucide="newspaper" class="lucide-sm"></i></div>
+                  <span class="badge-status open">● Terhubung Aktif</span>
+                </div>
+                <div class="client-app-card-title">Portal Kehumasan &amp; Berita IKP</div>
+                <div class="client-app-card-desc">Kanal Publikasi Siaran Pers Diskominfo, Pengumuman Hari Libur, &amp; Siaran Darurat.</div>
+              </div>
+              <div class="client-app-card-footer">
+                <span style="color:#7C3AED; font-weight:700;">Program: Siaran Umum</span>
+                <span style="color:#64748B;">Bot: CS FAQ Otomatis</span>
+              </div>
+            </div>
+
+            <!-- KLIEN 4: SIMPEG ASN -->
+            <div class="client-app-card" id="cardAppSimpeg" onclick="selectClientApp('simpeg')">
+              <div>
+                <div class="client-app-card-top">
+                  <div class="client-app-card-icon"><i data-lucide="users" class="lucide-sm"></i></div>
+                  <span class="badge-status closed">● Siap Integrasi</span>
+                </div>
+                <div class="client-app-card-title">SIMPEG Presensi ASN</div>
+                <div class="client-app-card-desc">Sistem Informasi Manajemen Pegawai untuk notifikasi pengingat absen &amp; cuti online.</div>
+              </div>
+              <div class="client-app-card-footer">
+                <span style="color:#D97706; font-weight:700;">Program: Notifikasi Masuk</span>
+                <span style="color:#64748B;">Mode: Broadcast Only</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- PANEL RINCIAN APLIKASI TERPILIH (PROGRAM BERJALAN + BOT AKTIF + PROGRESS BAR + KREDENSIAL API) -->
+          <div class="panel-card mb-4" id="clientAppDetailPanel">
+            
+            <!-- BANNER PROGRAM YANG SEDANG BERJALAN & BOT AKTIF (REQUEST KHUSUS USER) -->
+            <div class="active-program-banner" id="clientActiveProgramBanner">
+              <div class="active-program-header">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span class="badge-status open" id="badgeClientAppStatus">● PROGRAM SEDANG BERJALAN AKTIF</span>
+                  <span class="badge-tag green" id="badgeClientAppTag">Kedinasan TANDANG</span>
+                </div>
+                <span style="font-size:0.78rem; font-weight:700; color:#059669;" id="clientActiveDuration">
+                  🟢 Sisa 12 Hari Lagi (Aktif s/d 15 Nov 2026)
+                </span>
+              </div>
+
+              <h3 id="clientActiveProgTitle">Sosialisasi SPPD &amp; Kedinasan TANDANG</h3>
+              <p id="clientActiveProgDesc" style="font-size:0.8rem; color:#475569; margin:4px 0 10px; line-height:1.4;">
+                Program terjadwal mingguan pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas ASN Diskominfo Jawa Barat.
+              </p>
+
+              <!-- BAR PROGRESS BERJALAN -->
+              <div class="program-progress-container mb-3">
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.76rem; margin-bottom:4px;">
+                  <span style="font-weight:700; color:#334155;">Progres Durasi Program Campaign:</span>
+                  <strong style="color:#059669;" id="clientActiveProgPercentText">50% Berjalan (Minggu ke-2 dari 4 Minggu)</strong>
+                </div>
+                <div class="progress-bar-track">
+                  <div class="progress-bar-fill green" id="clientActiveProgressBar" style="width: 50%;"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#64748B; margin-top:4px;">
+                  <span>Mulai: 15 Okt 2026</span>
+                  <span>Hari Ini: 24 Okt 2026</span>
+                  <span>Berakhir: 15 Nov 2026</span>
+                </div>
+              </div>
+
+              <!-- RINCIAN BOT & ENGINE YANG SEDANG AKTIF DI PROGRAM INI -->
+              <div class="active-bot-breakdown-card">
+                <div style="font-size:0.78rem; font-weight:800; color:#0F172A; margin-bottom:6px; display:flex; align-items:center; gap:6px;">
+                  🤖 BOT &amp; ENGINE YANG SEDANG AKTIF DI PROGRAM INI:
+                </div>
+                <div class="routing-pipeline-box card-variant" style="margin:0; background:#FFFFFF;">
+                  <div class="routing-step">
+                    <span class="routing-label">Bot Persona:</span>
+                    <strong class="routing-value" id="clientActiveBotName" style="color:#2563EB;">Bot RAYI Kedinasan</strong>
+                  </div>
+                  <div class="routing-arrow">&rarr;</div>
+                  <div class="routing-step">
+                    <span class="routing-label">Engine Kecerdasan:</span>
+                    <strong class="routing-value" id="clientActiveBotEngine">Gemini 2.5 Flash RAG</strong>
+                  </div>
+                  <div class="routing-arrow">&rarr;</div>
+                  <div class="routing-step">
+                    <span class="routing-label">Jalur Nomor WA:</span>
+                    <strong class="routing-value" id="clientActiveBotSender">Wawar-primary (+62 851-2104-2025)</strong>
+                  </div>
+                  <div class="routing-arrow">&rarr;</div>
+                  <div class="routing-step">
+                    <span class="routing-label">Proteksi Whitelist:</span>
+                    <strong class="routing-value" id="clientActiveBotSecurity" style="color:#059669;">🔒 Hanya Nomor di Grup TANDANG</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- TABEL KREDENSIAL API & KODE INTEGRASI APLIKASI -->
+            <div class="panel-header mb-3" style="border-top:1px solid #E2E8F0; padding-top:16px;">
+              <div>
+                <h3 style="font-size:0.95rem; font-weight:800; color:#0F172A;" id="clientCredentialsTitle">Kredensial API &amp; Webhook Aplikasi TANDANG</h3>
+                <p class="text-sm text-muted">Gunakan kredensial ini di backend aplikasi Anda untuk mengirim broadcast pesan dan dokumen WhatsApp.</p>
+              </div>
+              <button class="btn btn-secondary btn-sm" onclick="testSendWebhookNotification()">
+                📲 Tes Kirim Notifikasi Webhook
+              </button>
+            </div>
+
+            <div class="card-grid-2 mb-3">
+              <div class="form-group mb-0">
+                <label style="font-weight:700; font-size:0.8rem;">API Endpoint Resmi Gateway (VPS Hostinger):</label>
+                <input type="text" id="clientApiEndpointVal" value="http://srv2091882.hstgr.cloud:8085" readonly class="input-readonly">
+              </div>
+
+              <div class="form-group mb-0">
+                <label style="font-weight:700; font-size:0.8rem;">Bearer API Token Khusus Aplikasi Ini:</label>
+                <div class="input-inline">
+                  <input type="password" value="wawar_live_tandang_sec_994821a8" id="clientApiKeyVal" readonly class="input-readonly">
+                  <button type="button" class="btn btn-outline btn-sm" onclick="copyApiKey()">Salin Token</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group mb-0">
+              <label style="font-weight:700; font-size:0.8rem;">Contoh Pemanggilan dari Aplikasi (TypeScript / SDK Siap Pakai):</label>
+              <pre class="code-content text-xs" style="margin:0;"><code id="clientSdkCodeSnippet">import { sendWawarNotification, sendWawarDocument } from '@/lib/wawar/client';
+
+// Kirim notifikasi Surat Tugas F4 ke pegawai via Gateway WAWAR:
 await sendWawarDocument({
   phone: "6285121042025",
-  pdfUrl: "https://tandang.kitt.lt/api/pdf/st-090.pdf",
+  pdfUrl: "https://tandang.jabarprov.go.id/api/pdf/st-090.pdf",
   fileName: "Surat_Tugas_090.pdf",
-  caption: "Sampurasun! Surat Tugas No. 090 telah terbit."
+  caption: "Sampurasun! Surat Tugas No. 090 telah terbit dari Aplikasi TANDANG."
 });</code></pre>
             </div>
           </div>
         </section>
+
+        <!-- MODAL: DAFTARKAN APLIKASI KLIEN BARU -->
+        <div id="modalRegisterClientApp" class="modal-overlay">
+          <div class="modal-box glass-card max-w-lg">
+            <button class="modal-close" onclick="closeRegisterClientAppModal()">&times;</button>
+            <div class="panel-header mb-3">
+              <div>
+                <h3 style="font-size:1.05rem; font-weight:800; color:#0F172A;">🔌 Daftarkan Aplikasi Klien Baru</h3>
+                <p class="text-sm text-muted">Sambungkan aplikasi web atau mobile baru ke gateway pengiriman WAWAR.</p>
+              </div>
+            </div>
+
+            <form onsubmit="handleRegisterClientApp(event)">
+              <div class="form-group mb-2">
+                <label style="font-weight:700; font-size:0.8rem;">Nama Aplikasi Klien:</label>
+                <input type="text" id="regAppName" placeholder="Contoh: Portal PPID / SIMPEG / Antrian Faskes" required>
+              </div>
+
+              <div class="card-grid-2 mb-2">
+                <div class="form-group mb-0">
+                  <label style="font-weight:700; font-size:0.8rem;">Kategori Sektor:</label>
+                  <select id="regAppCategory" class="form-select">
+                    <option value="dinas">Kedinasan &amp; ASN Jabar</option>
+                    <option value="event">Event Publik &amp; Komunitas</option>
+                    <option value="layanan">Layanan Pengaduan &amp; CS</option>
+                    <option value="internal">Sistem Internal &amp; Presensi</option>
+                  </select>
+                </div>
+                <div class="form-group mb-0">
+                  <label style="font-weight:700; font-size:0.8rem;">Ikon Aplikasi:</label>
+                  <select id="regAppIcon" class="form-select">
+                    <option value="📱">📱 Aplikasi Mobile</option>
+                    <option value="💻">💻 Portal Web</option>
+                    <option value="🏛️">🏛️ Kantor / Instansi</option>
+                    <option value="🏥">🏥 Faskes &amp; Kesehatan</option>
+                    <option value="🏃">🏃 Olahraga / Event</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group mb-2">
+                <label style="font-weight:700; font-size:0.8rem;">Program Campaign Default yang Dihubungkan:</label>
+                <select id="regAppCampaign" class="form-select">
+                  <option value="camp_dinas_legacy">Sosialisasi SPPD &amp; Kedinasan TANDANG</option>
+                  <option value="camp_funrun_legacy">Event Fun Run 26 Des Jabar</option>
+                  <option value="camp_subuh_legacy">Sapa Subuh Anak &amp; Keluarga</option>
+                </select>
+              </div>
+
+              <div class="form-group mb-3">
+                <label style="font-weight:700; font-size:0.8rem;">Webhook Masuk (Opsional):</label>
+                <input type="url" id="regAppWebhook" placeholder="https://app-anda.jabarprov.go.id/api/wawar-webhook">
+              </div>
+
+              <div class="form-actions" style="display:flex; gap:10px;">
+                <button type="submit" class="btn btn-primary" style="flex:1;">
+                  🔌 Generate Token &amp; Sambungkan Aplikasi
+                </button>
+                <button type="button" class="btn btn-outline" onclick="closeRegisterClientAppModal()">
+                  Batal
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- DASHBOARD CONTENT FOOTER (BANGKIT Beruang Ecosystem) -->
+        <footer class="dash-footer" style="margin-top:48px; padding:20px 4px 12px; border-top:1px solid #E2E8F0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; font-size:0.75rem; color:#64748B;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-weight:700; color:#0F172A;">WAWAR Gateway &amp; Omnichannel Hub</span>
+            <span style="color:#CBD5E1;">•</span>
+            <span style="font-weight:600; color:#059669; display:inline-flex; align-items:center; gap:4px;">
+              <span style="width:6px; height:6px; border-radius:50%; background:#10B981; display:inline-block;"></span>
+              BANGKIT Beruang Ecosystem
+            </span>
+            <span style="color:#CBD5E1;">•</span>
+            <span>v2.3.7</span>
+          </div>
+          <div style="color:#94A3B8; font-size:0.72rem;">
+            Terintegrasi dengan TANDANG ASN, Layanan IKP &amp; Bot AI RAYI (WIB 24 Jam) • Rekayasa Digital Independen
+          </div>
+        </footer>
 
       </main>
     </div>

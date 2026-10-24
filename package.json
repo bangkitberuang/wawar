@@ -18,5 +18,8 @@
     "tandang"
   ],
   "author": "bangkitberuang",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "lucide": "^1.61.0"
+  }
 }

@@ -42,7 +42,7 @@
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
   --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
   --shadow-lg: 0 20px 35px -8px rgba(15, 23, 42, 0.08), 0 10px 15px -3px rgba(15, 23, 42, 0.03);
-  --shadow-glow: 0 8px 24px rgba(5, 150, 105, 0.15);
+  --shadow-glow: 0 12px 28px rgba(15, 23, 42, 0.08);
   
   --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -124,15 +124,15 @@ a {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+  background: var(--primary);
   color: #FFFFFF;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .btn-primary:hover {
-  background: linear-gradient(135deg, #059669 0%, #047857 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn-secondary {
@@ -267,14 +267,7 @@ a {
   height: 8px;
   background: #10B981;
   border-radius: 50%;
-  box-shadow: 0 0 10px #10B981;
-  animation: pulseAnimation 2s infinite;
-}
-
-@keyframes pulseAnimation {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  display: inline-block;
 }
 
 /* ================= Views Handler ================= */
@@ -494,8 +487,8 @@ a {
 
 .channel-card:hover {
   border-color: var(--primary);
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-glow);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .card-icon {
@@ -576,9 +569,7 @@ a {
 
 .highlight-text {
   color: var(--primary);
-  background: linear-gradient(120deg, #059669, #10B981);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-weight: 700;
 }
 
 .rayi-meaning {
@@ -1118,6 +1109,50 @@ a {
   width: 100%;
 }
 
+.dash-link i,
+.dash-link svg,
+.lucide {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.85;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.lucide-xs {
+  width: 13px;
+  height: 13px;
+  stroke-width: 2;
+}
+
+.lucide-sm {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.85;
+}
+
+.lucide-md {
+  width: 20px;
+  height: 20px;
+  stroke-width: 1.75;
+}
+
+.lucide-lg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 1.75;
+}
+
+.btn .lucide,
+.btn svg.lucide {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.85;
+}
+
 .dash-link:hover {
   background: #F1F5F9;
   color: var(--text-main);
@@ -1153,7 +1188,7 @@ a {
   height: 8px;
   background: #10B981;
   border-radius: 50%;
-  box-shadow: 0 0 8px #10B981;
+  display: inline-block;
 }
 
 .active-instance-pill small {
@@ -1170,9 +1205,11 @@ a {
 
 .dash-content {
   flex: 1;
-  padding: 36px 40px;
+  padding: 28px 36px;
   overflow-y: auto;
-  max-width: 1120px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .dash-header {
@@ -1639,8 +1676,8 @@ a {
 /* Grid Header (Days of week) */
 .calendar-grid-header {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
   text-align: center;
   font-size: 0.82rem;
   font-weight: 700;
@@ -1650,44 +1687,97 @@ a {
   padding-bottom: 12px;
   border-bottom: 2px solid #F1F5F9;
   margin-bottom: 12px;
+  width: 100%;
 }
 
 /* 35-Day Month Grid */
 .calendar-month-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 10px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
 }
 
 .calendar-day-cell {
-  background: #FAFAFA;
+  background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: var(--radius-md);
-  min-height: 125px;
-  padding: 10px;
+  min-height: 110px;
+  padding: 8px 10px;
   display: flex;
   flex-direction: column;
   transition: all 0.2s ease;
   position: relative;
   cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
-.calendar-day-cell:hover {
+.calendar-day-cell:hover:not(.other-month) {
   background: #FFFFFF;
   border-color: #059669;
-  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.12);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   transform: translateY(-2px);
 }
 
+/* Penegasan Visual Hari Luar Bulan (Bulan Lalu & Bulan Depan) */
 .calendar-day-cell.other-month {
-  background: #F8FAFC;
-  opacity: 0.45;
+  background-color: #F1F5F9;
+  border: 1px dashed #CBD5E1;
+  cursor: default;
+  opacity: 0.85;
+  box-shadow: none;
+}
+
+.calendar-day-cell.other-month:hover {
+  background-color: #E2E8F0;
+  border-color: #94A3B8;
+  box-shadow: none;
+  transform: none;
+}
+
+.calendar-day-cell.other-month .cal-day-number {
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+.cal-other-month-badge {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: #E2E8F0;
+  color: #64748B;
+  border: 1px solid #CBD5E1;
+}
+
+.other-month-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  min-height: 48px;
+}
+
+.other-month-text {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #94A3B8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(203, 213, 225, 0.7);
 }
 
 .calendar-day-cell.is-today {
-  border-color: #F59E0B;
-  background: #FFFDF7;
-  box-shadow: 0 0 0 1px #F59E0B;
+  border: 2px solid #059669;
+  background: #F0FDF4;
 }
 
 .day-header {
@@ -2185,17 +2275,17 @@ a {
 
 .campaign-hub-card.amber-glow:hover {
   border-color: #F59E0B;
-  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.16);
+  box-shadow: var(--shadow-md);
 }
 
 .campaign-hub-card.blue-glow:hover {
   border-color: #2563EB;
-  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.16);
+  box-shadow: var(--shadow-md);
 }
 
 .campaign-hub-card.green-glow:hover {
   border-color: #059669;
-  box-shadow: 0 8px 24px rgba(5, 150, 105, 0.16);
+  box-shadow: var(--shadow-md);
 }
 
 .camp-duration-strip {
@@ -2248,7 +2338,7 @@ a {
   height: 8px;
   border-radius: 50%;
   background: #25D366;
-  box-shadow: 0 0 6px #25D366;
+  display: inline-block;
 }
 
 .wa-bubble-mockup {
@@ -2748,4 +2838,1181 @@ a {
   font-weight: 600;
 }
 
+/* ================= 3 PILAR KUSTOMISASI PROGRAM (NOMOR, ADD-ON, KE SIAPA) ================= */
+
+.custom-config-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.custom-config-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: all 0.2s ease;
+}
+
+.custom-config-card:hover {
+  border-color: #059669;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.08);
+}
+
+.pillar-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.pillar-number {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ECFDF5;
+  color: #059669;
+  font-weight: 800;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #A7F3D0;
+  flex-shrink: 0;
+}
+
+.pillar-header strong {
+  font-size: 0.88rem;
+  color: #0F172A;
+  display: block;
+}
+
+.pillar-header small {
+  font-size: 0.72rem;
+  color: #64748B;
+  display: block;
+}
+
+.pillar-hint {
+  font-size: 0.72rem;
+  color: #64748B;
+  margin-top: 6px;
+  line-height: 1.3;
+}
+
+/* ================= LIVE PIPELINE ROUTING BOX (SUPER CLEAR) ================= */
+
+.routing-pipeline-box {
+  background: #F8FAFC;
+  border: 1.5px solid #CBD5E1;
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.routing-pipeline-box.card-variant {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  margin: 10px 0;
+  font-size: 0.75rem;
+}
+
+.routing-step {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.routing-label {
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #64748B;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+}
+
+.routing-value {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #0F172A;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.routing-pipeline-box.card-variant .routing-value {
+  font-size: 0.76rem;
+}
+
+.routing-arrow {
+  color: #059669;
+  font-size: 1.1rem;
+  font-weight: 800;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+
+/* ================= TANDANG-STYLE CALENDAR LAYOUT & POPUP ================= */
+
+/* Top Agenda Horizontal Cards Grid */
+.cal-agenda-strip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+  margin-bottom: 10px;
+}
+
+.cal-agenda-strip-header h4 {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+.cal-agenda-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.cal-agenda-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.cal-agenda-card:hover {
+  border-color: #059669;
+  box-shadow: 0 4px 12px rgba(5,150,105,0.08);
+  transform: translateY(-2px);
+}
+
+.cal-agenda-card.active-subuh { border-left: 4px solid #F59E0B; }
+.cal-agenda-card.active-dinas { border-left: 4px solid #10B981; }
+.cal-agenda-card.active-event { border-left: 4px solid #3B82F6; }
+
+.cal-agenda-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.cal-agenda-card-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.cal-agenda-card-meta {
+  font-size: 0.74rem;
+  color: #64748B;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 8px;
+}
+
+.cal-agenda-card-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.cal-agenda-card-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed #E2E8F0;
+  padding-top: 6px;
+  margin-top: 4px;
+}
+
+.cal-agenda-card-link {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #059669;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.cal-agenda-card-link:hover {
+  text-decoration: underline;
+}
+
+/* 2-Column Calendar Layout (Sidebar + Main Grid) */
+.cal-two-column-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+}
+
+.cal-two-column-layout > * {
+  min-width: 0;
+}
+
+@media (max-width: 1024px) {
+  .cal-two-column-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Sidebar Kalender (Mini Cal + Filters + Agenda Hari Ini) */
+.cal-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mini-cal-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.mini-cal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.mini-cal-header strong {
+  font-size: 0.84rem;
+  color: #1E293B;
+}
+
+.mini-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  text-align: center;
+}
+
+.mini-cal-day-name {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94A3B8;
+  padding: 2px 0;
+}
+
+.mini-cal-day-cell {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 2px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #334155;
+  transition: all 0.15s;
+}
+
+.mini-cal-day-cell:hover {
+  background: #E2E8F0;
+}
+
+.mini-cal-day-cell.other {
+  color: #94A3B8;
+  background: #F8FAFC;
+  cursor: default;
+  opacity: 0.6;
+}
+
+.mini-cal-day-cell.today {
+  background: #0F172A;
+  color: #FFFFFF;
+  font-weight: 800;
+}
+
+.mini-cal-day-cell.selected {
+  background: #059669;
+  color: #FFFFFF;
+  font-weight: 800;
+}
+
+.mini-cal-day-cell.has-event {
+  position: relative;
+}
+
+.mini-cal-day-cell.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #059669;
+}
+
+.cal-sidebar-filter {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.cal-sidebar-filter-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.cal-sidebar-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cal-sidebar-checkbox-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: #334155;
+  cursor: pointer;
+}
+
+.cal-day-agenda-box {
+  background: #F8FAFC;
+  border: 1.5px dashed #CBD5E1;
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.cal-day-agenda-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.cal-day-agenda-header strong {
+  font-size: 0.78rem;
+  color: #1E293B;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cal-day-agenda-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.cal-day-agenda-item {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 0.74rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cal-day-agenda-item:hover {
+  border-color: #059669;
+  background: #F0FDF4;
+}
+
+/* Kalender Header Days & Badges */
+.cal-header-sat {
+  color: #E11D48 !important;
+}
+
+.cal-header-sun {
+  color: #E11D48 !important;
+}
+
+.badge-hari-ini {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.pill-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.pill-status-dot.green { background: #10B981; }
+.pill-status-dot.amber { background: #F59E0B; }
+.pill-status-dot.blue { background: #3B82F6; }
+
+/* ================= MULTI-APLIKASI KLIEN GATEWAY & PROGRAM PROGRESS ================= */
+
+.multi-app-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.client-app-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  position: relative;
+}
+
+.client-app-card:hover {
+  border-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(5,150,105,0.08);
+}
+
+.client-app-card.selected {
+  border-color: #059669;
+  background: #F0FDF4;
+  box-shadow: 0 0 0 2px #10B981;
+}
+
+.client-app-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+
+.client-app-card-icon {
+  font-size: 1.6rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+}
+
+.client-app-card.selected .client-app-card-icon {
+  background: #ECFDF5;
+  border-color: #A7F3D0;
+}
+
+.client-app-card-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin-bottom: 3px;
+}
+
+.client-app-card-desc {
+  font-size: 0.75rem;
+  color: #64748B;
+  margin-bottom: 10px;
+  line-height: 1.35;
+}
+
+.client-app-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #E2E8F0;
+  padding-top: 8px;
+  font-size: 0.72rem;
+}
+
+/* Banner Program yang Sedang Berjalan */
+.active-program-banner {
+  background: #F8FAFC;
+  border: 1.5px solid #CBD5E1;
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  margin-bottom: 18px;
+  position: relative;
+}
+
+.active-program-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.active-program-banner h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 4px;
+}
+
+.program-progress-container {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-top: 10px;
+}
+
+.progress-bar-track {
+  width: 100%;
+  height: 9px;
+  background: #E2E8F0;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.progress-bar-fill.green { background: #10B981; }
+.progress-bar-fill.blue { background: #3B82F6; }
+.progress-bar-fill.amber { background: #F59E0B; }
+.progress-bar-fill.purple { background: #8B5CF6; }
+
+.active-bot-breakdown-card {
+  margin-top: 12px;
+}
+
+/* ================= HERO BANNER PROGRAM CAMPAIGN SEDANG BERJALAN ================= */
+.active-running-campaign-hub-banner {
+  background: #FFFFFF;
+  border: 1px solid #BBF7D0;
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+.active-running-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #DCFCE7;
+  padding-bottom: 12px;
+}
+
+.active-running-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.active-running-timing-box {
+  background: #FFFFFF;
+  border: 1px solid #BBF7D0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.timing-badge {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #059669;
+}
+
+/* Hero Progress Section */
+.hero-progress-section {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+}
+
+.hero-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hero-track {
+  height: 12px;
+  background: #E2E8F0;
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #10B981;
+}
+
+.hero-progress-ticks {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  color: #64748B;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+.tick-today {
+  color: #059669;
+  background: #DCFCE7;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  border: 1px solid #86EFAC;
+}
+
+/* Bot Pipeline in Hero Banner */
+.hero-bot-status-card {
+  background: #F8FAFC;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.hero-bot-status-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.hero-bot-pipeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.bot-pip-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.bot-pip-step:hover {
+  border-color: #3B82F6;
+  transform: translateY(-1px);
+}
+
+.pip-icon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.pip-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.pip-lbl {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.pip-val {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #1E293B;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Overview Pill Widget */
+.active-prog-overview-pill {
+  background: #F0FDF4;
+  border: 1.5px solid #86EFAC;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  transition: all 0.2s ease;
+}
+
+.active-prog-overview-pill:hover {
+  background: #DCFCE7;
+  border-color: #059669;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+}
+
+/* Modular Pipeline on Campaign Cards */
+.camp-card-modular-pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 10px 0;
+}
+
+.pip-card-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.74rem;
+  gap: 8px;
+}
+
+.pip-card-row .lbl {
+  color: #64748B;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pip-card-row .val {
+  font-weight: 700;
+  color: #1E293B;
+  text-align: right;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ================= LAPORAN & RIWAYAT KINERJA 2-ARAH (REPORTS) ================= */
+.report-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.report-kpi-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.report-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+
+.report-kpi-card.green { border-left: 5px solid #10B981; }
+.report-kpi-card.blue { border-left: 5px solid #3B82F6; }
+.report-kpi-card.amber { border-left: 5px solid #F59E0B; }
+.report-kpi-card.purple { border-left: 5px solid #8B5CF6; }
+
+.report-kpi-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.report-kpi-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.report-kpi-number {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 4px;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.report-kpi-percent {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.report-kpi-foot {
+  font-size: 0.72rem;
+  color: #64748B;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  border-top: 1px dashed #F1F5F9;
+  padding-top: 6px;
+}
+
+/* Report Sub-filter Bar */
+.report-filter-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+}
+
+.report-pill-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.report-filter-pill {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.report-filter-pill:hover {
+  border-color: #3B82F6;
+  color: #2563EB;
+  background: #EFF6FF;
+}
+
+.report-filter-pill.active {
+  background: #0F172A;
+  color: #FFFFFF;
+  border-color: #0F172A;
+}
+
+.report-filter-pill.active.pill-delivered {
+  background: #059669;
+  border-color: #059669;
+}
+
+.report-filter-pill.active.pill-pending {
+  background: #D97706;
+  border-color: #D97706;
+}
+
+.report-filter-pill.active.pill-replied {
+  background: #2563EB;
+  border-color: #2563EB;
+}
+
+.pill-count {
+  background: rgba(0,0,0,0.08);
+  padding: 1px 6px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+}
+
+.report-filter-pill.active .pill-count {
+  background: rgba(255,255,255,0.25);
+}
+
+.report-search-wrap {
+  display: flex;
+  align-items: center;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  padding: 4px 10px;
+  width: 260px;
+}
+
+.report-search-wrap input {
+  border: none;
+  outline: none;
+  font-size: 0.78rem;
+  width: 100%;
+  background: transparent;
+}
+
+/* Status Badges for Delivery Report */
+.badge-del-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-del-status.read {
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #86EFAC;
+}
+
+.badge-del-status.delivered {
+  background: #E0F2FE;
+  color: #0369A1;
+  border: 1px solid #BAE6FD;
+}
+
+.badge-del-status.pending {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FDE68A;
+}
+
+.badge-del-status.failed {
+  background: #FEE2E2;
+  color: #B91C1C;
+  border: 1px solid #FECACA;
+}
+
+/* Inbound Reply Snippet in Table */
+.reply-bubble-preview {
+  background: #F1F5F9;
+  border-radius: 6px;
+  padding: 6px 9px;
+  font-size: 0.75rem;
+  color: #1E293B;
+  border: 1px solid #E2E8F0;
+  max-width: 280px;
+  line-height: 1.35;
+}
+
+.reply-meta {
+  font-size: 0.68rem;
+  color: #64748B;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3px;
+}
+
+.bot-handled-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1D4ED8;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+/* Conversation Thread Modal (WhatsApp Style) */
+.modal-chat-thread-box {
+  background: #EFEAE2;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 580px;
+  max-width: 620px;
+  width: 95%;
+  margin: 0 auto;
+  box-shadow: 0 12px 36px rgba(0,0,0,0.2);
+}
+
+.chat-thread-header {
+  background: #075E54;
+  color: #FFFFFF;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-thread-contact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chat-thread-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #128C7E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.chat-thread-meta h4 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin: 0;
+  color: #FFFFFF;
+}
+
+.chat-thread-meta small {
+  font-size: 0.72rem;
+  color: #A7F3D0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chat-thread-body {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-image: radial-gradient(#CBD5E1 0.75px, transparent 0.75px);
+  background-size: 12px 12px;
+}
+
+.chat-msg {
+  max-width: 82%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  position: relative;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+}
+
+.chat-msg.outbound {
+  background: #E1FFC7;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
+  border: 1px solid #C7EEAF;
+}
+
+.chat-msg.inbound {
+  background: #FFFFFF;
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+  border: 1px solid #E2E8F0;
+}
+
+.chat-msg-sender {
+  font-size: 0.68rem;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.chat-msg.outbound .chat-msg-sender { color: #065F46; }
+.chat-msg.inbound .chat-msg-sender { color: #1E40AF; }
+
+.chat-msg-time {
+  font-size: 0.66rem;
+  color: #64748B;
+  text-align: right;
+  margin-top: 3px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+}
+
+.chat-thread-footer {
+  background: #F0F2F5;
+  padding: 10px 14px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border-top: 1px solid #E2E8F0;
+}
+
+.chat-thread-input {
+  flex: 1;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.chat-thread-input:focus {
+  border-color: #075E54;
+}
 
