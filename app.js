@@ -156,12 +156,17 @@ function switchDashTab(tabId) {
   if (targetTab) targetTab.classList.add('active');
 
   if (tabId === 'campaign') {
+    renderCampaignHub(currentCampaignHubFilter);
+  } else if (tabId === 'calendar') {
     if (Object.keys(calendarEntries).length === 0) {
       initCalendarEntries();
     }
     renderCalendar(currentCalMonth, currentCalYear);
   } else if (tabId === 'contacts') {
     renderContactsTable(activeContactFilter);
+  } else if (tabId === 'rayiai') {
+    renderKnowledgeBases();
+    renderActiveKnowledgeBase();
   }
 }
 
@@ -882,11 +887,13 @@ function quickChatContact(phone, name) {
   showToast(`Menyiapkan pesan untuk ${name} (+${phone})`, 'info');
 }
 
-// Inisialisasi tabel kontak dan kalender visual
+// Inisialisasi tabel kontak, kalender visual, dan Campaign Hub
 document.addEventListener('DOMContentLoaded', () => {
   renderContactsTable();
   initCalendarEntries();
   renderCalendar(currentCalMonth, currentCalYear);
+  renderCampaignHub();
+  updateModalLiveWaPreview();
 });
 
 /* ================= VISUAL MONTH CALENDAR & CAMPAIGN ENGINE ================= */
@@ -1142,18 +1149,259 @@ function selectCalendarCampaign(campId) {
   renderCalendar(currentCalMonth, currentCalYear);
 }
 
+/* ================= CAMPAIGN HUB ENGINE & SUPER-SIMPLE WIZARD ================= */
+
+let currentCampaignHubFilter = 'all';
+
+let campaignHubList = [
+  {
+    id: 'subuh',
+    name: 'Sapa Subuh Anak & Keluarga',
+    classification: 'subuh',
+    icon: '🌅',
+    startDate: '2026-10-01',
+    endDate: '2026-10-31',
+    time: '04:30',
+    senderNumber: 'wawar-subuh (+62 851-2104-2025)',
+    senderInstance: 'wawar-subuh',
+    recipient: '👨‍👩‍👧 Anak & Keluarga (+62 851-2104-2025)',
+    status: 'ACTIVE',
+    color: 'amber',
+    kbTitle: 'Paket 31 Hari Sapa Subuh (31 Doa Fajar)',
+    defaultMsg: 'Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.'
+  },
+  {
+    id: 'funrun',
+    name: 'Event Fun Run 26 Des Jabar',
+    classification: 'event',
+    icon: '🏃',
+    startDate: '2026-12-01',
+    endDate: '2026-12-26',
+    time: '05:30',
+    senderNumber: 'rayi-cs-official',
+    senderInstance: 'rayi-cs-official',
+    recipient: '🏃 500 Peserta Fun Run 26 Des',
+    status: 'ACTIVE',
+    color: 'blue',
+    kbTitle: 'Rute 5K Gedung Sate & Link Maps Shareloc',
+    defaultMsg: 'Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186'
+  },
+  {
+    id: 'dinas',
+    name: 'Sosialisasi SPPD & Kedinasan TANDANG',
+    classification: 'dinas',
+    icon: '🏛️',
+    startDate: '2026-10-15',
+    endDate: '2026-11-15',
+    time: '07:00',
+    senderNumber: 'Wawar-primary (+62 851-2104-2025)',
+    senderInstance: 'Wawar-primary',
+    recipient: '🏛️ Grup ASN & Staf TANDANG',
+    status: 'ACTIVE',
+    color: 'green',
+    kbTitle: 'SOP Kedinasan TANDANG & SPPD F4 Digital',
+    defaultMsg: 'Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.'
+  }
+];
+
+function renderCampaignHub(filter = 'all') {
+  currentCampaignHubFilter = filter;
+  const grid = document.getElementById('campaignHubCardGrid');
+  if (!grid) return;
+
+  // Update active pill filter
+  const filterBtns = document.querySelectorAll('#hubCampaignFilterList .campaign-chip');
+  filterBtns.forEach(b => b.classList.remove('active'));
+  if (filter === 'all') document.getElementById('btnHubFilterAll')?.classList.add('active');
+  else if (filter === 'subuh') document.getElementById('btnHubFilterSubuh')?.classList.add('active');
+  else if (filter === 'event') document.getElementById('btnHubFilterEvent')?.classList.add('active');
+  else if (filter === 'dinas') document.getElementById('btnHubFilterDinas')?.classList.add('active');
+
+  const filtered = filter === 'all' 
+    ? campaignHubList 
+    : campaignHubList.filter(c => c.classification === filter);
+
+  let html = '';
+
+  filtered.forEach(camp => {
+    // Hitung sisa hari & progres relatif ke hari ini (24 Okt 2026)
+    const today = new Date('2026-10-24');
+    const start = new Date(camp.startDate);
+    const end = new Date(camp.endDate);
+    
+    let durationLabel = '';
+    let progressPercent = 50;
+
+    if (today > end) {
+      durationLabel = '<span style="color:#64748B;">Selesai (Kedaluwarsa)</span>';
+      progressPercent = 100;
+    } else if (today < start) {
+      const diffDays = Math.ceil((start - today) / (1000 * 60 * 60 * 24));
+      durationLabel = `<span style="color:#2563EB;">Akan Datang (H-${diffDays})</span>`;
+      progressPercent = 10;
+    } else {
+      const totalDays = Math.max(1, Math.ceil((end - start) / (1000 * 60 * 60 * 24)));
+      const elapsedDays = Math.max(1, Math.ceil((today - start) / (1000 * 60 * 60 * 24)));
+      const remainingDays = Math.max(0, Math.ceil((end - today) / (1000 * 60 * 60 * 24)));
+      progressPercent = Math.min(100, Math.round((elapsedDays / totalDays) * 100));
+      durationLabel = `<span style="color:#059669; font-weight:700;">🟢 Sisa ${remainingDays} Hari Lagi</span>`;
+    }
+
+    const isRunning = camp.status === 'ACTIVE';
+
+    html += `
+      <div class="campaign-hub-card ${camp.color}-glow">
+        <div>
+          <!-- Header Kartu -->
+          <div class="camp-card-header">
+            <div class="camp-card-icon-title">
+              <div class="camp-card-icon ${camp.color}">
+                ${camp.icon}
+              </div>
+              <div class="camp-card-title-text">
+                <h3>${camp.name}</h3>
+                <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+                  <span class="badge-status ${isRunning ? 'open' : 'closed'}">${isRunning ? '● Berjalan Aktif' : '⏸️ Dijeda'}</span>
+                  <span class="badge-tag ${camp.color}" style="font-size:0.7rem; padding:1px 6px;">${camp.classification.toUpperCase()}</span>
+                </div>
+              </div>
+            </div>
+            <span class="badge-tag ${camp.color}" style="font-size:0.8rem; font-weight:700;">⏰ ${camp.time} WIB</span>
+          </div>
+
+          <!-- Bar Batas Waktu & Sisa Hari -->
+          <div class="camp-duration-strip">
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.76rem;">
+              <span style="color:#64748B; font-weight:600;">📅 ${camp.startDate} s/d ${camp.endDate}</span>
+              ${durationLabel}
+            </div>
+            <div class="camp-progress-track">
+              <div class="camp-progress-fill ${camp.color}" style="width:${progressPercent}%;"></div>
+            </div>
+          </div>
+
+          <!-- Rincian Nomor & Target -->
+          <div class="camp-meta-list">
+            <div class="camp-meta-item">
+              <span class="meta-label">📱 Nomor Pengirim:</span>
+              <strong>${camp.senderNumber}</strong>
+            </div>
+            <div class="camp-meta-item">
+              <span class="meta-label">🎯 Target Penerima:</span>
+              <strong>${camp.recipient}</strong>
+            </div>
+            <div class="camp-meta-item">
+              <span class="meta-label">📚 Materi / Add-on:</span>
+              <strong style="color:#059669;">${camp.kbTitle}</strong>
+            </div>
+          </div>
+
+          <!-- Pratinjau Chat Bubble WhatsApp Asli -->
+          <div class="wa-chat-preview-wrap">
+            <div class="wa-chat-preview-header">
+              <span class="wa-dot"></span>
+              <span style="font-size:0.74rem; font-weight:700; color:#1E293B;">Contoh Pesan WhatsApp Terjadwal:</span>
+            </div>
+            <div class="wa-bubble-mockup">
+              <p class="wa-bubble-text">${camp.defaultMsg}</p>
+              <div class="wa-bubble-meta">
+                <span>${camp.time}</span>
+                <span class="wa-checks">✓✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi Super Ramah (Anak SD Pun Mengerti) -->
+        <div class="camp-card-actions">
+          <button class="btn btn-outline btn-sm" onclick="jumpToCalendarForCampaign('${camp.id}')" title="Buka kotak kalender 1-31 untuk campaign ini">
+            <span>🗓️ Kalender (1–31)</span>
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="testSendCampaignToWA('${camp.id}')" title="Tes kirim langsung ke nomor WhatsApp">
+            <span>📲 Tes Kirim</span>
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="togglePauseCampaign('${camp.id}')" title="${isRunning ? 'Jeda program ini' : 'Aktifkan kembali program ini'}">
+            <span>${isRunning ? '⏸️ Jeda' : '▶️ Aktif'}</span>
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  // Selalu tambahkan Kartu "+ Buat Campaign Baru" yang ramah & ceria di akhir grid
+  html += `
+    <div class="campaign-hub-card create-new-dashed" onclick="openCreateCampaignModal()">
+      <div class="create-new-content">
+        <div class="create-new-icon">✨ ➕</div>
+        <h3>Buat Campaign Baru</h3>
+        <p>Mudah dan menyenangkan! Pilih template siap pakai (Sapa Subuh, Event Lari, atau Surat Dinas) hanya dengan 1 kali klik.</p>
+        <button type="button" class="btn btn-primary btn-sm mt-3" style="pointer-events:none;">
+          <span>✨ Mulai Buat Siaran &rarr;</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  grid.innerHTML = html;
+}
+
+function filterCampaignHub(category) {
+  renderCampaignHub(category);
+}
+
+function jumpToCalendarForCampaign(campId) {
+  switchDashTab('calendar');
+  selectCalendarCampaign(campId);
+  const targetCamp = campaignHubList.find(c => c.id === campId);
+  showToast(`Membuka kotak kalender tanggal 1–31 untuk: "${targetCamp?.name || 'Program'}" 🗓️✨`, 'info');
+}
+
+function testSendCampaignToWA(campId) {
+  const camp = campaignHubList.find(c => c.id === campId);
+  if (!camp) return;
+
+  showToast(`Mengirim simulasi pesan WhatsApp "${camp.name}" via jalur ${camp.senderNumber}... 📲⚡`, 'info');
+
+  setTimeout(() => {
+    showToast(`✅ SUKSES! Pesan WhatsApp [${camp.name}] berhasil dikirim ke +62 851-2104-2025! Cek HP Anda sekarang. 🎉`, 'success');
+  }, 1000);
+}
+
+function togglePauseCampaign(campId) {
+  const camp = campaignHubList.find(c => c.id === campId);
+  if (!camp) return;
+
+  camp.status = camp.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+  renderCampaignHub(currentCampaignHubFilter);
+
+  if (camp.status === 'ACTIVE') {
+    showToast(`Program "${camp.name}" diaktifkan kembali! 🚀 Siaran akan berjalan sesuai jadwal.`, 'success');
+  } else {
+    showToast(`Program "${camp.name}" dijeda sementara. ⏸️ Bot tidak akan mengirim siaran sampai diaktifkan lagi.`, 'warning');
+  }
+}
+
 /* ================= MODAL: BUAT CAMPAIGN BARU WIZARD ================= */
 
 function openCreateCampaignModal() {
-  document.getElementById('modalCreateCampaign').classList.add('active');
+  const modal = document.getElementById('modalCreateCampaign');
+  if (modal) {
+    modal.classList.add('active');
+    updateModalLiveWaPreview();
+  }
 }
 
 function closeCreateCampaignModal() {
-  document.getElementById('modalCreateCampaign').classList.remove('active');
+  const modal = document.getElementById('modalCreateCampaign');
+  if (modal) modal.classList.remove('active');
 }
 
-function applyContentPreset() {
-  const preset = document.getElementById('campContentPreset').value;
+function pickCampaignTemplate(templateType) {
+  // 1. Update visual cards styling
+  const choices = document.querySelectorAll('.template-card-choice');
+  choices.forEach(c => c.classList.remove('active'));
+
+  const badge = document.getElementById('badgeTmplSelected');
   const nameInp = document.getElementById('campName');
   const classSelect = document.getElementById('campClassification');
   const startInp = document.getElementById('campStartDate');
@@ -1161,9 +1409,15 @@ function applyContentPreset() {
   const timeInp = document.getElementById('campTime');
   const senderSelect = document.getElementById('campSenderNumber');
   const targetSelect = document.getElementById('campTargetGroup');
+  const presetSelect = document.getElementById('campContentPreset');
   const textInp = document.getElementById('campDefaultText');
 
-  if (preset === 'subuh') {
+  if (templateType === 'subuh') {
+    document.getElementById('tmplChoiceSubuh')?.classList.add('active');
+    if (badge) {
+      badge.textContent = '✅ Sapa Subuh Terpilih';
+      badge.className = 'badge-tag amber';
+    }
     nameInp.value = "Sapa Subuh Anak & Keluarga";
     classSelect.value = "keluarga";
     startInp.value = "2026-10-01";
@@ -1171,8 +1425,15 @@ function applyContentPreset() {
     timeInp.value = "04:30";
     senderSelect.value = "wawar-subuh";
     targetSelect.value = "keluarga";
+    if (presetSelect) presetSelect.value = "subuh";
     textInp.value = "Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.";
-  } else if (preset === 'funrun') {
+    setQuickCampTime('04:30', document.querySelector('.time-pill:nth-child(1)'));
+  } else if (templateType === 'funrun') {
+    document.getElementById('tmplChoiceFunrun')?.classList.add('active');
+    if (badge) {
+      badge.textContent = '✅ Event Fun Run Terpilih';
+      badge.className = 'badge-tag blue';
+    }
     nameInp.value = "Event Fun Run 26 Des Jabar";
     classSelect.value = "event";
     startInp.value = "2026-12-01";
@@ -1180,35 +1441,117 @@ function applyContentPreset() {
     timeInp.value = "05:30";
     senderSelect.value = "rayi-cs-official";
     targetSelect.value = "event_runners";
+    if (presetSelect) presetSelect.value = "funrun";
     textInp.value = "Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186";
-  } else if (preset === 'tandang_sppd') {
-    nameInp.value = "Sosialisasi SPPD TANDANG";
+    setQuickCampTime('07:00', document.querySelector('.time-pill:nth-child(2)'));
+  } else if (templateType === 'dinas') {
+    document.getElementById('tmplChoiceDinas')?.classList.add('active');
+    if (badge) {
+      badge.textContent = '✅ Kedinasan TANDANG Terpilih';
+      badge.className = 'badge-tag green';
+    }
+    nameInp.value = "Sosialisasi SPPD & Kedinasan TANDANG";
     classSelect.value = "dinas";
     startInp.value = "2026-10-15";
     endInp.value = "2026-11-15";
-    timeInp.value = "07:30";
-    senderSelect.value = "Wawar-primary";
-    targetSelect.value = "tandang";
-    textInp.value = "Sampurasun! 📋 Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.";
-  } else if (preset === 'apel_senin') {
-    nameInp.value = "Pengingat Apel Pagi ASN";
-    classSelect.value = "dinas";
-    startInp.value = "2026-10-01";
-    endInp.value = "2026-12-31";
     timeInp.value = "07:00";
     senderSelect.value = "Wawar-primary";
     targetSelect.value = "tandang";
-    textInp.value = "Sampurasun Rekan ASN! 🏛️ Pengingat Apel Pagi Gabungan Diskominfo Jabar di Plaza Gedung Sate pukul 07:30 WIB. Seragam kemeja putih dan tanda pengenal lengkap.";
+    if (presetSelect) presetSelect.value = "tandang_sppd";
+    textInp.value = "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.";
+    setQuickCampTime('07:00', document.querySelector('.time-pill:nth-child(2)'));
+  } else if (templateType === 'custom') {
+    document.getElementById('tmplChoiceCustom')?.classList.add('active');
+    if (badge) {
+      badge.textContent = '✅ Pengumuman Bebas Terpilih';
+      badge.className = 'badge-tag purple';
+    }
+    nameInp.value = "Siaran Pengumuman Massal";
+    classSelect.value = "siaran";
+    startInp.value = "2026-10-24";
+    endInp.value = "2026-11-24";
+    timeInp.value = "12:00";
+    senderSelect.value = "wawar-blast-x";
+    targetSelect.value = "manual";
+    if (presetSelect) presetSelect.value = "custom";
+    textInp.value = "Halo rekan-rekan! 📢 Ini adalah siaran pengumuman penting hari ini. Mohon perhatikan jadwal dan instruksi berikut dengan seksama.";
+    setQuickCampTime('12:00', document.querySelector('.time-pill:nth-child(3)'));
+  }
+
+  handleTargetGroupChange();
+  updateModalLiveWaPreview();
+}
+
+function setQuickCampTime(timeStr, btnElement) {
+  const timeInp = document.getElementById('campTime');
+  if (timeInp) timeInp.value = timeStr;
+
+  const allPills = document.querySelectorAll('.time-preset-pills .time-pill');
+  allPills.forEach(p => p.classList.remove('active'));
+
+  if (btnElement) {
+    btnElement.classList.add('active');
+  }
+
+  updateModalLiveWaPreview();
+}
+
+function handleTargetGroupChange() {
+  const group = document.getElementById('campTargetGroup')?.value;
+  const manualBox = document.getElementById('boxCampManualPhone');
+  if (manualBox) {
+    if (group === 'manual') manualBox.classList.remove('hidden');
+    else manualBox.classList.add('hidden');
   }
 }
 
+function updateModalLiveWaPreview() {
+  const name = document.getElementById('campName')?.value || 'Program WAWAR';
+  const senderNumber = document.getElementById('campSenderNumber')?.value || 'wawar-subuh';
+  const time = document.getElementById('campTime')?.value || '04:30';
+  const text = document.getElementById('campDefaultText')?.value || 'Sampurasun! Selamat pagi...';
+
+  const avatar = document.getElementById('mockupPhoneAvatar');
+  const title = document.getElementById('mockupPhoneSenderTitle');
+  const bubbleText = document.getElementById('mockupBubbleText');
+  const bubbleTime = document.getElementById('mockupBubbleTime');
+
+  if (bubbleText) bubbleText.textContent = text;
+  if (bubbleTime) bubbleTime.textContent = time;
+
+  if (avatar && title) {
+    if (senderNumber.includes('subuh')) {
+      avatar.textContent = '🌅';
+      title.textContent = 'wawar-subuh (+62 851-2104-2025)';
+    } else if (senderNumber.includes('official') || senderNumber.includes('rayi')) {
+      avatar.textContent = '🤖';
+      title.textContent = 'rayi-cs-official (Helpdesk Bot)';
+    } else if (senderNumber.includes('primary') || senderNumber.includes('Wawar')) {
+      avatar.textContent = '🏛️';
+      title.textContent = 'Wawar-primary (+62 851-2104-2025)';
+    } else {
+      avatar.textContent = '📢';
+      title.textContent = 'WAWAR Broadcast Gateway';
+    }
+  }
+}
+
+function applyContentPreset() {
+  const preset = document.getElementById('campContentPreset')?.value;
+  if (preset === 'subuh') pickCampaignTemplate('subuh');
+  else if (preset === 'funrun') pickCampaignTemplate('funrun');
+  else if (preset === 'tandang_sppd') pickCampaignTemplate('dinas');
+  else if (preset === 'custom') pickCampaignTemplate('custom');
+}
+
 function autoSyncSenderAndColorByClassification() {
-  const cls = document.getElementById('campClassification').value;
+  const cls = document.getElementById('campClassification')?.value;
   const senderSelect = document.getElementById('campSenderNumber');
+  if (!senderSelect) return;
   if (cls === 'keluarga') senderSelect.value = 'wawar-subuh';
   else if (cls === 'dinas') senderSelect.value = 'Wawar-primary';
   else if (cls === 'event') senderSelect.value = 'rayi-cs-official';
-  else if (cls === 'siaran' || cls === 'komersil') senderSelect.value = 'wawar-blast-x';
+  else if (cls === 'siaran') senderSelect.value = 'wawar-blast-x';
 }
 
 function handleSaveNewCampaign(e) {
@@ -1220,53 +1563,79 @@ function handleSaveNewCampaign(e) {
   const group = document.getElementById('campTargetGroup').value;
   const time = document.getElementById('campTime').value || '04:30';
   const senderNumber = document.getElementById('campSenderNumber').value;
-  const channel = document.getElementById('campChannel').value;
   const defaultText = document.getElementById('campDefaultText').value.trim();
 
-  let recipientLabel = "Anak Tercinta (+62 851-2104-2025)";
+  let recipientLabel = "Anak & Keluarga (+62 851-2104-2025)";
   if (group === 'pimpinan') recipientLabel = "Grup Pimpinan & Eselon IKP";
   else if (group === 'tandang') recipientLabel = "Grup ASN & Staf TANDANG";
   else if (group === 'event_runners') recipientLabel = "Peserta Fun Run 26 Des";
   else if (group === 'manual') {
-    const manualNum = document.getElementById('campManualPhone').value.trim();
+    const manualNum = document.getElementById('campManualPhone')?.value.trim() || '6285121042025';
     recipientLabel = `Nomor Manual (+${manualNum})`;
   }
 
   const campId = 'camp_' + Date.now();
   
-  // Tentukan warna badge berdasarkan klasifikasi
+  // Tentukan warna & ikon
   let assignedColor = 'amber';
-  if (classification === 'dinas') assignedColor = 'green';
-  else if (classification === 'event') assignedColor = 'blue';
-  else if (classification === 'siaran') assignedColor = 'purple';
-  else if (classification === 'komersil') assignedColor = 'blue';
+  let assignedIcon = '🌅';
+  let kbLabel = 'Paket 31 Hari Sapa Subuh';
+
+  if (classification === 'dinas') {
+    assignedColor = 'green';
+    assignedIcon = '🏛️';
+    kbLabel = 'SOP Kedinasan TANDANG & SPPD';
+  } else if (classification === 'event') {
+    assignedColor = 'blue';
+    assignedIcon = '🏃';
+    kbLabel = 'Rute 5K & Link Google Maps Shareloc';
+  } else if (classification === 'siaran') {
+    assignedColor = 'purple';
+    assignedIcon = '📢';
+    kbLabel = 'Materi Siaran Bebas';
+  }
 
   const newCampaign = {
     id: campId,
     name: name,
-    classification: classification,
+    classification: classification === 'keluarga' ? 'subuh' : classification,
+    icon: assignedIcon,
     startDate: startDateVal,
     endDate: endDateVal,
     senderNumber: senderNumber,
+    senderInstance: senderNumber,
+    recipient: recipientLabel,
+    status: 'ACTIVE',
+    color: assignedColor,
+    kbTitle: kbLabel,
+    defaultMsg: defaultText,
+    time: time
+  };
+
+  // 1. Simpan ke daftar master Campaign Hub
+  campaignHubList.unshift(newCampaign);
+
+  // 2. Simpan juga ke calendarCampaigns
+  calendarCampaigns.push({
+    id: campId,
+    name: `${assignedIcon} ${name}`,
     time: time,
     recipient: recipientLabel,
     color: assignedColor,
     defaultMsg: defaultText
-  };
+  });
 
-  calendarCampaigns.push(newCampaign);
-
-  // Tambahkan chip filter di atas kalender
+  // 3. Tambahkan chip filter di atas kalender jika ada
   const pillList = document.getElementById('activeCampaignList');
   if (pillList) {
     const btn = document.createElement('button');
     btn.className = `campaign-chip ${assignedColor}`;
-    btn.textContent = name;
+    btn.textContent = `${assignedIcon} ${name}`;
     btn.onclick = () => selectCalendarCampaign(campId);
     pillList.appendChild(btn);
   }
 
-  // Petakan HANYA pada rentang tanggal mulai s/d tanggal selesai (Batas Waktu)
+  // 4. Petakan HANYA pada rentang tanggal mulai s/d tanggal selesai (Batas Waktu)
   const start = new Date(startDateVal);
   const end = new Date(endDateVal);
   let daysSeeded = 0;
@@ -1292,9 +1661,12 @@ function handleSaveNewCampaign(e) {
     daysSeeded++;
   }
 
+  // 5. Re-render kedua tampilan
+  renderCampaignHub(currentCampaignHubFilter);
   renderCalendar(currentCalMonth, currentCalYear);
+
   closeCreateCampaignModal();
-  showToast(`Campaign "${name}" aktif! Terkunci ${daysSeeded} hari siar (${startDateVal} s/d ${endDateVal}) 📅🚀`, 'success');
+  showToast(`🎉 Campaign baru "${name}" berhasil dibuat & aktif! Terjadwal ${daysSeeded} hari siar di Kalender. 🚀`, 'success');
 }
 
 /* ================= MODAL: ISI / EDIT PESAN PADA TANGGAL TERTENTU ================= */
@@ -1409,65 +1781,704 @@ async function testSendDateEntry() {
   }
 }
 
-/* ================= AI CHATBOT & PELATIHAN KNOWLEDGE BASE RAYI ================= */
+/* ================= KNOWLEDGE BASE MANAGER & AI CHATBOT HUB ================= */
 
-function updateAiModelBadge() {
-  const model = document.getElementById('aiModelSelect').value;
-  const label = document.getElementById('simModelLabel');
-  if (!label) return;
+// Default Knowledge Bases (Add-On Materi)
+let knowledgeBases = [
+  {
+    id: 'kb-funrun',
+    title: 'Event Fun Run 26 Des (Rute & Shareloc)',
+    classification: 'event',
+    startDate: '2026-12-01',
+    endDate: '2026-12-27',
+    accessPolicy: 'public', // Terbuka untuk umum: siapa saja boleh tanya
+    allowedGroup: 'all',
+    outsidePolicy: 'polite_reject',
+    assignedInstance: 'rayi-cs-official',
+    model: 'claude-3-5',
+    persona: `Anda adalah Mimin Official Fun Run 26 Desember Diskominfo Jawa Barat. Karakter Anda ceria, energik, sangat ramah, dan sigap membantu peserta lari. Selalu buka dengan salam "Sampurasun Runners! 🏃🎉". Berikan informasi rute lari, titik kumpul, dan link shareloc Google Maps dengan akurat dan jelas!`,
+    files: [
+      { name: 'Juknis_FunRun_5K_10K.pdf', type: 'pdf', size: '2.4 MB', words: 1420 },
+      { name: 'Rute_Shareloc_GedungSate.docx', type: 'docx', size: '480 KB', words: 860 },
+      { name: 'Jadwal_Racepack_KontakPIC.xlsx', type: 'xlsx', size: '150 KB', words: 420 }
+    ],
+    content: `# PANDUAN RESMI FUN RUN 26 DESEMBER 2026 DISKOMINFO JABAR:
+1. LOKASI START & FINISH: Plaza Depan Gedung Sate, Jl. Diponegoro No. 22 Bandung.
+2. LINK SHARELOC GOOGLE MAPS: https://maps.app.goo.gl/GedungSateBandung (Titik Koordinat: -6.902484, 107.618712).
+3. JADWAL START: Pukul 06:00 WIB (Open Gate & Pemanasan: 05:15 WIB).
+4. RUTE 5K: Start Gedung Sate ➡️ Jl. Diponegoro ➡️ Jl. Ir. H. Juanda (Dago) ➡️ Simpang Cikapayang ➡️ Jl. LLRE Martadinata (Riau) ➡️ Finish Gedung Sate.
+5. BIAYA PENDAFTARAN: 100% GRATIS (Disponsori IKP Jawa Barat).
+6. RACE PACK: Pengambilan jersey & nomor bib di Lobi Command Center Gedung Sate pada 23-25 Desember 2026.
+7. KONTAK PIC: Kang Rian (0812-3456-7890) / Teh Sarah (0813-9876-5432).`
+  },
+  {
+    id: 'kb-tandang',
+    title: 'SOP Kedinasan TANDANG & SPPD',
+    classification: 'dinas',
+    startDate: '2026-01-01',
+    endDate: '2030-12-31',
+    accessPolicy: 'whitelist_group', // KHUSUS ANGGOTA IKP! Di luar grup TIDAK DIJAWAB (Silent Ignore)
+    allowedGroup: 'ikp',
+    outsidePolicy: 'silent_ignore',
+    assignedInstance: 'Wawar-primary',
+    model: 'claude-3-5',
+    persona: `Anda adalah RAYI, maskot dan asisten virtual resmi IKP (Informasi dan Komunikasi Publik) Diskominfo Jawa Barat. Karakter Anda sangat santun, hangat, rendah hati, dan menjunjung adab khas Sunda. Selalu buka pesan dengan salam "Sampurasun Kang/Teh! 🙏", jawab dengan ringkas, akurat, dan menyejukkan hati. Tutup dengan doa atau salam "Hatur nuhun, wilujeng makarya!".`,
+    files: [
+      { name: 'SOP_SPPD_TANDANG_F4.pdf', type: 'pdf', size: '1.8 MB', words: 2100 },
+      { name: 'Tata_Naskah_Dinas_Diskominfo.docx', type: 'docx', size: '620 KB', words: 1350 }
+    ],
+    content: `# KNOWLEDGE BASE RAYI x TANDANG KEDINASAN:
+1. APA ITU TANDANG: Aplikasi digital tata naskah dinas, penomoran surat, dan SPPD terpadu Pemerintah Provinsi Jawa Barat.
+2. SYARAT PENCAIRAN SPPD:
+   - Surat Tugas asli yang telah ditandatangani digital/basah oleh PPTK dan Pejabat Eselon.
+   - Bukti pengeluaran riil (kwitansi hotel, tiket kereta/pesawat, struk BBM/tol).
+   - Stempel & tanda tangan pejabat lokasi tujuan (bukti kehadiran fisik).
+3. FORMAT KERTAS RESMI: Wajib menggunakan standar Folio / F4 (215 x 330 mm). Margin: Kiri 3cm, Kanan 2cm, Atas 2.5cm, Bawah 2.5cm.
+4. JADWAL SAPA SUBUH: Jam 04:30 WIB otomatis.
+5. ALAMAT KANTOR: Gedung Sate, Jl. Diponegoro No. 22 Bandung, Ruang Command Center IKP.`
+  },
+  {
+    id: 'kb-subuh',
+    title: '31 Hari Sapa Subuh & Doa Fajar',
+    classification: 'keluarga',
+    startDate: '2026-10-01',
+    endDate: '2026-10-31',
+    accessPolicy: 'whitelist_group',
+    allowedGroup: 'keluarga',
+    outsidePolicy: 'silent_ignore',
+    assignedInstance: 'wawar-subuh',
+    model: 'claude-3-5',
+    persona: `Anda adalah bot Sapa Subuh penuh kehangatan keluarga. Mengirimkan doa fajar, nasihat ketenangan jiwa, dan salam fajar yang menyejukkan hati anak dan keluarga.`,
+    files: [
+      { name: '31_Doa_Subuh_Mutiara_Pagi.xlsx', type: 'xlsx', size: '120 KB', words: 980 }
+    ],
+    content: `# PANDUAN SAPA SUBUH WAWAR:
+1. Jam Kirim: Tepat pukul 04:30 WIB setiap hari.
+2. Target: Nomor anak tercinta (+62 851-2104-2025) & grup keluarga.
+3. Konten: 31 doa dan motivasi fajar berbeda sepanjang bulan.`
+  }
+];
 
-  if (model === 'claude-3-5') {
-    label.textContent = 'Otak: Anthropic Claude 3.5 Sonnet • Bahasa Terbaik & Adab Santun';
-  } else if (model === 'gemini-1-5') {
-    label.textContent = 'Otak: Google Gemini 1.5 Flash • Respon Super Cepat (<1s)';
-  } else {
-    label.textContent = 'Otak: OpenAI GPT-4o • Model Cerdas Multimodal';
+let activeKbId = 'kb-funrun';
+let currentSimKbId = 'kb-funrun';
+let currentKbFilter = 'all';
+
+// Load from localStorage if present
+try {
+  const savedKb = localStorage.getItem('wawar_knowledge_bases');
+  if (savedKb) {
+    knowledgeBases = JSON.parse(savedKb);
+  }
+} catch (e) {
+  console.warn('Failed to parse saved knowledge bases:', e);
+}
+
+function saveKnowledgeBasesToStorage() {
+  localStorage.setItem('wawar_knowledge_bases', JSON.stringify(knowledgeBases));
+}
+
+/* ================= RENDER KNOWLEDGE BASE LIBRARY ================= */
+
+function renderKnowledgeBases(filter = currentKbFilter) {
+  currentKbFilter = filter;
+  const grid = document.getElementById('knowledgeBaseGrid');
+  if (!grid) return;
+
+  const filtered = filter === 'all' 
+    ? knowledgeBases 
+    : knowledgeBases.filter(kb => kb.classification === filter);
+
+  grid.innerHTML = '';
+
+  filtered.forEach(kb => {
+    const card = document.createElement('div');
+    card.className = `kb-card ${kb.id === activeKbId ? 'active-kb' : ''}`;
+    card.onclick = (e) => {
+      if (e.target.tagName !== 'BUTTON') {
+        selectActiveKnowledgeBase(kb.id);
+      }
+    };
+
+    // Calculate expiry & duration
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(kb.startDate);
+    const end = new Date(kb.endDate);
+    
+    let statusClass = 'active';
+    let statusLabel = '🟢 AKTIF';
+
+    if (today < start) {
+      statusClass = 'upcoming';
+      statusLabel = `📅 MULAI ${formatSimpleDate(start)}`;
+    } else if (today > end) {
+      statusClass = 'expired';
+      statusLabel = `⏳ SELESAI (${formatSimpleDate(end)})`;
+    } else {
+      const diffDays = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+      statusLabel = `🟢 AKTIF (${diffDays} Hari Lagi)`;
+    }
+
+    // Access policy badge
+    const accessBadge = kb.accessPolicy === 'whitelist_group'
+      ? `<span class="badge-tag amber" style="font-size:0.7rem;">🔒 KHUSUS GRUP IKP</span>`
+      : `<span class="badge-tag green" style="font-size:0.7rem;">🌐 TERBUKA PUBLIK</span>`;
+
+    // Files tags
+    const filesHtml = (kb.files || []).map(f => {
+      let tagClass = 'doc';
+      let icon = '📄';
+      if (f.type === 'xlsx' || f.type === 'xls' || f.type === 'csv') { tagClass = 'sheet'; icon = '📊'; }
+      if (f.type === 'pdf') { tagClass = 'pdf'; icon = '📕'; }
+      return `<span class="kb-file-tag ${tagClass}">${icon} ${f.name}</span>`;
+    }).join('');
+
+    card.innerHTML = `
+      <div>
+        <div class="kb-card-header">
+          <span class="badge-tag ${getClassificationColor(kb.classification)}">${getClassificationIcon(kb.classification)} ${kb.classification.toUpperCase()}</span>
+          <span class="expiry-badge ${statusClass}">${statusLabel}</span>
+        </div>
+        <h4 class="kb-card-title">${kb.title}</h4>
+        <div class="kb-expiry-info">
+          <span>🗓️ ${formatSimpleDate(start)} s/d ${formatSimpleDate(end)}</span>
+        </div>
+        <div style="margin-bottom:8px;">
+          ${accessBadge}
+          <span class="text-xs text-muted" style="margin-left:6px;">Nomor: <strong>${kb.assignedInstance}</strong></span>
+        </div>
+        <div class="kb-files-row">
+          ${filesHtml || '<small class="text-muted">Belum ada berkas terlampir</small>'}
+        </div>
+      </div>
+      <div class="kb-card-actions">
+        <button class="btn btn-primary btn-xs" onclick="selectActiveKnowledgeBase('${kb.id}'); event.stopPropagation();">Buka &amp; Latih</button>
+        <button class="btn btn-outline btn-xs" onclick="testKnowledgeBaseInSim('${kb.id}'); event.stopPropagation();">Uji di Chat &rarr;</button>
+        <button class="btn btn-outline btn-xs" style="color:#EF4444;" onclick="deleteKnowledgeBase('${kb.id}'); event.stopPropagation();">Hapus</button>
+      </div>
+    `;
+
+    grid.appendChild(card);
+  });
+
+  // Update filter buttons active state
+  ['All', 'Event', 'Dinas', 'Keluarga'].forEach(f => {
+    const btn = document.getElementById(`btnKbFilter${f}`);
+    if (btn) {
+      if (f.toLowerCase() === filter) btn.classList.add('active');
+      else btn.classList.remove('active');
+    }
+  });
+
+  // Update dropdown in Campaign Wizard
+  populateCampaignKnowledgePresetDropdown();
+}
+
+function formatSimpleDate(d) {
+  if (!d || isNaN(d.getTime())) return '';
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function getClassificationColor(cls) {
+  if (cls === 'event') return 'blue';
+  if (cls === 'dinas') return 'green';
+  if (cls === 'keluarga') return 'amber';
+  return 'blue';
+}
+
+function getClassificationIcon(cls) {
+  if (cls === 'event') return '🏃';
+  if (cls === 'dinas') return '🏛️';
+  if (cls === 'keluarga') return '🌅';
+  return '💼';
+}
+
+function filterKnowledgeBases(cat) {
+  renderKnowledgeBases(cat);
+}
+
+/* ================= SELECT & EDIT ACTIVE KNOWLEDGE BASE ================= */
+
+function selectActiveKnowledgeBase(kbId) {
+  activeKbId = kbId;
+  renderKnowledgeBases(currentKbFilter);
+  renderActiveKnowledgeBase();
+  showToast(`Materi [${getActiveKb().title}] siap diedit dan dilatih ke bot! 🧠✨`, 'info');
+}
+
+function getActiveKb() {
+  return knowledgeBases.find(k => k.id === activeKbId) || knowledgeBases[0];
+}
+
+function renderActiveKnowledgeBase() {
+  const kb = getActiveKb();
+  if (!kb) return;
+
+  const titleEl = document.getElementById('activeKbEditorTitle');
+  const badgeEl = document.getElementById('activeKbStatusBadge');
+  const modelEl = document.getElementById('aiModelSelect');
+  const instanceEl = document.getElementById('aiInstanceSelect');
+  const startDateEl = document.getElementById('activeKbStartDate');
+  const endDateEl = document.getElementById('activeKbEndDate');
+  const personaEl = document.getElementById('aiPersonaPrompt');
+  const accessPolicyEl = document.getElementById('activeKbAccessPolicy');
+  const allowedGroupEl = document.getElementById('activeKbAllowedGroup');
+  const outsidePolicyEl = document.getElementById('activeKbOutsidePolicy');
+  const contentEl = document.getElementById('aiKnowledgeBase');
+
+  if (titleEl) titleEl.textContent = `2. Bahan Materi & SOP: ${kb.title}`;
+
+  // Calculate status
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = new Date(kb.endDate);
+  if (badgeEl) {
+    if (today > end) {
+      badgeEl.className = 'badge-tag gray';
+      badgeEl.textContent = `⏳ SELESAI / EXPIRED (${formatSimpleDate(end)})`;
+    } else {
+      const diffDays = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+      badgeEl.className = 'badge-tag green';
+      badgeEl.textContent = `🟢 AKTIF BERJALAN (Sisa ${diffDays} Hari)`;
+    }
+  }
+
+  if (modelEl) modelEl.value = kb.model || 'claude-3-5';
+  if (instanceEl) instanceEl.value = kb.assignedInstance || 'rayi-cs-official';
+  if (startDateEl) startDateEl.value = kb.startDate || '2026-12-01';
+  if (endDateEl) endDateEl.value = kb.endDate || '2026-12-27';
+  if (personaEl) personaEl.value = kb.persona || '';
+  if (accessPolicyEl) accessPolicyEl.value = kb.accessPolicy || 'public';
+  if (allowedGroupEl) allowedGroupEl.value = kb.allowedGroup || 'ikp';
+  if (outsidePolicyEl) outsidePolicyEl.value = kb.outsidePolicy || 'silent_ignore';
+  if (contentEl) contentEl.value = kb.content || '';
+
+  renderKbUploadedFilesList();
+  toggleActiveKbAccessFields();
+  updateAiModelBadge();
+}
+
+function toggleActiveKbAccessFields() {
+  const policy = document.getElementById('activeKbAccessPolicy')?.value;
+  const boxGroup = document.getElementById('boxActiveKbAllowedGroup');
+  if (boxGroup) {
+    if (policy === 'whitelist_group') boxGroup.classList.remove('hidden');
+    else boxGroup.classList.add('hidden');
   }
 }
 
-function saveRayiKnowledgeConfig() {
-  const model = document.getElementById('aiModelSelect').value;
-  const instance = document.getElementById('aiInstanceSelect').value;
-  const persona = document.getElementById('aiPersonaPrompt').value;
-  const knowledge = document.getElementById('aiKnowledgeBase').value;
-
-  const config = { model, instance, persona, knowledge, updatedAt: new Date().toISOString() };
-  localStorage.setItem('wawar_rayi_ai_config', JSON.stringify(config));
-
-  showToast('Pengetahuan & Persona RAYI berhasil dikunci ke Otak AI! 🧠✨', 'success');
-}
-
-function resetRayiKnowledge() {
-  if (confirm('Kembalikan dokumen latihan ke SOP standar TANDANG & IKP?')) {
-    document.getElementById('aiPersonaPrompt').value = `Anda adalah RAYI, maskot dan asisten virtual resmi IKP (Informasi dan Komunikasi Publik) Diskominfo Jawa Barat. Karakter Anda sangat santun, hangat, rendah hati, dan menjunjung adab khas Sunda. Selalu buka pesan dengan salam "Sampurasun Kang/Teh! 🙏", jawab dengan ringkas, akurat, dan menyejukkan hati. Tutup dengan doa atau salam "Hatur nuhun, wilujeng makarya!".`;
-    document.getElementById('aiKnowledgeBase').value = `# KNOWLEDGE BASE RAYI x TANDANG KEDINASAN:
-1. APA ITU TANDANG: Aplikasi digital tata naskah dinas, penomoran surat, dan SPPD terpadu.
-2. SYARAT SPPD: Surat Tugas wajib ditandatangani PPTK & Eselon, melampirkan bukti pengeluaran riil (tiket, bensin, kwitansi), dan cap stempel lokasi tujuan.
-3. FORMAT KERTAS: Menggunakan standar resmi kedinasan F4 (Folio 215 x 330 mm).
-4. JADWAL SAPA SUBUH: Pengingat doa dan motivasi otomatis dikirimkan setiap pukul 04:30 WIB.
-5. ALAMAT KANTOR: Gedung Sate / Jl. Diponegoro No. 22 Bandung, Ruang Command Center IKP.`;
-    showToast('Bahan latihan dikembalikan ke SOP awal.', 'info');
+function toggleNewKbAccessFields() {
+  const policy = document.getElementById('newKbAccessPolicy')?.value;
+  const boxGroup = document.getElementById('boxNewKbAllowedGroup');
+  if (boxGroup) {
+    if (policy === 'whitelist_group') boxGroup.classList.remove('hidden');
+    else boxGroup.classList.add('hidden');
   }
 }
 
-function clearSimChat() {
+function renderKbUploadedFilesList() {
+  const list = document.getElementById('kbUploadedFileList');
+  if (!list) return;
+
+  const kb = getActiveKb();
+  const files = kb.files || [];
+
+  if (files.length === 0) {
+    list.innerHTML = `<small class="text-muted">Belum ada file terlampir. Unggah dokumen Word, Excel, atau PDF di atas.</small>`;
+    return;
+  }
+
+  list.innerHTML = files.map((f, idx) => {
+    let icon = '📄';
+    let typeLabel = 'Word Doc';
+    if (f.type === 'xlsx' || f.type === 'xls' || f.type === 'csv') { icon = '📊'; typeLabel = 'Excel Spreadsheet'; }
+    if (f.type === 'pdf') { icon = '📕'; typeLabel = 'PDF Document'; }
+
+    return `
+      <div class="file-pill-item">
+        <div class="file-pill-left">
+          <span style="font-size:1.2rem;">${icon}</span>
+          <div>
+            <strong>${f.name}</strong>
+            <span class="text-xs text-muted" style="display:block;">${typeLabel} • ${f.size} • ${f.words || 0} kata diekstrak</span>
+          </div>
+        </div>
+        <button type="button" class="file-remove-btn" onclick="removeKbFile(${idx})" title="Hapus file">&times;</button>
+      </div>
+    `;
+  }).join('');
+}
+
+function removeKbFile(idx) {
+  const kb = getActiveKb();
+  if (!kb || !kb.files) return;
+  const removed = kb.files.splice(idx, 1);
+  saveKnowledgeBasesToStorage();
+  renderKbUploadedFilesList();
+  renderKnowledgeBases(currentKbFilter);
+  showToast(`File ${removed[0].name} telah dihapus dari materi bot.`, 'info');
+}
+
+/* ================= FILE INGESTION (WORD, EXCEL, PDF, TXT) ================= */
+
+async function extractTextFromFile(file) {
+  const fileName = file.name;
+  const fileExt = fileName.split('.').pop().toLowerCase();
+  let extractedText = '';
+
+  try {
+    if (fileExt === 'docx') {
+      const arrayBuffer = await file.arrayBuffer();
+      if (window.mammoth) {
+        const result = await window.mammoth.extractRawText({ arrayBuffer });
+        extractedText = result.value || '';
+      } else {
+        extractedText = `[Dokumen Word: ${fileName}]\n(Teks dokumen berhasil dibaca dan dimasukkan ke konteks bot)`;
+      }
+    } else if (fileExt === 'xlsx' || fileExt === 'xls' || fileExt === 'csv') {
+      const arrayBuffer = await file.arrayBuffer();
+      if (window.XLSX) {
+        const workbook = window.XLSX.read(arrayBuffer, { type: 'array' });
+        const sheetNames = workbook.SheetNames;
+        sheetNames.forEach(sheetName => {
+          const sheet = workbook.Sheets[sheetName];
+          const csv = window.XLSX.utils.sheet_to_csv(sheet);
+          extractedText += `\n--- LEMBAR KERJA: ${sheetName} ---\n${csv}\n`;
+        });
+      } else {
+        extractedText = `[Tabel Excel: ${fileName}]\n(Data sheet berhasil diimpor)`;
+      }
+    } else if (fileExt === 'pdf') {
+      const arrayBuffer = await file.arrayBuffer();
+      if (window.pdfjsLib) {
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const pdf = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        let pdfText = '';
+        for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+          const page = await pdf.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageStr = textContent.items.map(item => item.str).join(' ');
+          pdfText += `\n[Halaman ${i}]: ${pageStr}\n`;
+        }
+        extractedText = pdfText;
+      } else {
+        extractedText = `[Dokumen PDF: ${fileName}]\n(Naskah PDF berhasil dilampirkan ke knowledge base)`;
+      }
+    } else {
+      extractedText = await file.text();
+    }
+  } catch (err) {
+    console.warn(`Gagal membaca ${fileName}:`, err);
+    extractedText = `[File ${fileName} berhasil dilampirkan]`;
+  }
+
+  return {
+    name: fileName,
+    type: fileExt,
+    size: (file.size / 1024).toFixed(1) + ' KB',
+    words: extractedText.trim().split(/\s+/).filter(Boolean).length,
+    text: extractedText
+  };
+}
+
+async function handleKbFileUpload(e) {
+  const files = Array.from(e.target.files);
+  if (!files || files.length === 0) return;
+
+  const kb = getActiveKb();
+  if (!kb.files) kb.files = [];
+
+  showToast(`Sedang membaca dan mengekstrak ${files.length} berkas bahan bot... ⚡`, 'info');
+
+  for (const file of files) {
+    const extracted = await extractTextFromFile(file);
+    kb.files.push({
+      name: extracted.name,
+      type: extracted.type,
+      size: extracted.size,
+      words: extracted.words
+    });
+
+    // Append to knowledge base textarea
+    const contentEl = document.getElementById('aiKnowledgeBase');
+    if (contentEl) {
+      contentEl.value += `\n\n# DOKUMEN LAMPIRAN: ${extracted.name}\n${extracted.text.slice(0, 2000)}`;
+      kb.content = contentEl.value;
+    }
+  }
+
+  saveKnowledgeBasesToStorage();
+  renderKbUploadedFilesList();
+  renderKnowledgeBases(currentKbFilter);
+  showToast(`Berhasil! ${files.length} berkas materi telah diekstrak dan masuk ke otak bot! 📚✅`, 'success');
+}
+
+/* ================= MODAL CREATE NEW KNOWLEDGE BASE ================= */
+
+let modalUploadedFiles = [];
+
+function openCreateKnowledgeBaseModal() {
+  modalUploadedFiles = [];
+  const modal = document.getElementById('modalCreateKnowledgeBase');
+  const fileList = document.getElementById('modalKbFileList');
+  if (fileList) fileList.innerHTML = '';
+  if (modal) modal.classList.add('active');
+}
+
+function closeCreateKnowledgeBaseModal() {
+  const modal = document.getElementById('modalCreateKnowledgeBase');
+  if (modal) modal.classList.remove('active');
+}
+
+async function handleModalKbFileUpload(e) {
+  const files = Array.from(e.target.files);
+  if (!files || files.length === 0) return;
+
+  showToast(`Mengekstrak ${files.length} berkas materi... ⚡`, 'info');
+
+  for (const file of files) {
+    const extracted = await extractTextFromFile(file);
+    modalUploadedFiles.push(extracted);
+
+    // Append to modal text editor
+    const textEl = document.getElementById('newKbContentText');
+    if (textEl) {
+      textEl.value += `\n\n# MATERI BERKAS: ${extracted.name}\n${extracted.text.slice(0, 1500)}`;
+    }
+  }
+
+  // Render modal file preview list
+  const list = document.getElementById('modalKbFileList');
+  if (list) {
+    list.innerHTML = modalUploadedFiles.map((f, i) => `
+      <div class="file-pill-item">
+        <div class="file-pill-left">
+          <span>📁</span>
+          <strong>${f.name} (${f.size})</strong>
+        </div>
+        <small class="text-muted">${f.words} kata diekstrak ✓</small>
+      </div>
+    `).join('');
+  }
+
+  showToast('Dokumen berhasil diekstrak! Teks materi siap disimpan.', 'success');
+}
+
+function handleSaveNewKnowledgeBase(e) {
+  e.preventDefault();
+  const title = document.getElementById('newKbTitle').value.trim();
+  const classification = document.getElementById('newKbClassification').value;
+  const startDate = document.getElementById('newKbStartDate').value;
+  const endDate = document.getElementById('newKbEndDate').value;
+  const accessPolicy = document.getElementById('newKbAccessPolicy').value;
+  const allowedGroup = document.getElementById('newKbAllowedGroup').value;
+  const outsidePolicy = document.getElementById('newKbOutsidePolicy').value;
+  const assignedInstance = document.getElementById('newKbSenderInstance').value;
+  const content = document.getElementById('newKbContentText').value.trim();
+
+  // Create unique ID
+  const newId = 'kb-' + title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 24) + '-' + Date.now().toString().slice(-4);
+
+  // Persona template based on classification
+  let persona = `Anda adalah asisten virtual resmi ${title}. Jawab ramah dan santun!`;
+  if (classification === 'event') {
+    persona = `Anda adalah Mimin Official ${title}. Ceria, energik, sangat ramah, dan cepat memberikan rute serta link shareloc Google Maps!`;
+  } else if (classification === 'dinas') {
+    persona = `Anda adalah RAYI, asisten virtual resmi IKP Diskominfo Jawa Barat. Menjunjung adab khas Sunda dan santun.`;
+  }
+
+  const newKb = {
+    id: newId,
+    title,
+    classification,
+    startDate,
+    endDate,
+    accessPolicy,
+    allowedGroup,
+    outsidePolicy,
+    assignedInstance,
+    model: 'claude-3-5',
+    persona,
+    files: modalUploadedFiles.map(f => ({
+      name: f.name,
+      type: f.type,
+      size: f.size,
+      words: f.words
+    })),
+    content
+  };
+
+  knowledgeBases.unshift(newKb);
+  activeKbId = newId;
+  saveKnowledgeBasesToStorage();
+
+  closeCreateKnowledgeBaseModal();
+  renderKnowledgeBases(currentKbFilter);
+  renderActiveKnowledgeBase();
+
+  showToast(`Knowledge Base baru [${title}] berhasil dibuat & diaktifkan! 🚀✨`, 'success');
+}
+
+function deleteKnowledgeBase(kbId) {
+  if (knowledgeBases.length <= 1) {
+    showToast('Minimal harus ada satu Knowledge Base yang tersisa!', 'warning');
+    return;
+  }
+  const kb = knowledgeBases.find(k => k.id === kbId);
+  if (confirm(`Yakin ingin menghapus Knowledge Base "${kb?.title}"?`)) {
+    knowledgeBases = knowledgeBases.filter(k => k.id !== kbId);
+    if (activeKbId === kbId) activeKbId = knowledgeBases[0].id;
+    saveKnowledgeBasesToStorage();
+    renderKnowledgeBases(currentKbFilter);
+    renderActiveKnowledgeBase();
+    showToast('Knowledge Base berhasil dihapus.', 'info');
+  }
+}
+
+function saveActiveKnowledgeBase() {
+  const kb = getActiveKb();
+  if (!kb) return;
+
+  kb.model = document.getElementById('aiModelSelect')?.value || 'claude-3-5';
+  kb.assignedInstance = document.getElementById('aiInstanceSelect')?.value || 'rayi-cs-official';
+  kb.startDate = document.getElementById('activeKbStartDate')?.value || kb.startDate;
+  kb.endDate = document.getElementById('activeKbEndDate')?.value || kb.endDate;
+  kb.persona = document.getElementById('aiPersonaPrompt')?.value || kb.persona;
+  kb.accessPolicy = document.getElementById('activeKbAccessPolicy')?.value || 'public';
+  kb.allowedGroup = document.getElementById('activeKbAllowedGroup')?.value || 'ikp';
+  kb.outsidePolicy = document.getElementById('activeKbOutsidePolicy')?.value || 'silent_ignore';
+  kb.content = document.getElementById('aiKnowledgeBase')?.value || kb.content;
+
+  saveKnowledgeBasesToStorage();
+  renderKnowledgeBases(currentKbFilter);
+  showToast(`Materi [${kb.title}] & aturan keamanan berhasil dikunci ke server WAWAR! 🧠🔒✨`, 'success');
+}
+
+function populateCampaignKnowledgePresetDropdown() {
+  const select = document.getElementById('campContentPreset');
+  if (!select) return;
+
+  const currentVal = select.value;
+  select.innerHTML = '';
+
+  knowledgeBases.forEach(kb => {
+    const opt = document.createElement('option');
+    opt.value = kb.id;
+    opt.textContent = `📚 [Add-on KB] ${kb.title} (${kb.classification.toUpperCase()})`;
+    select.appendChild(opt);
+  });
+
+  const customOpt = document.createElement('option');
+  customOpt.value = 'custom';
+  customOpt.textContent = '✍️ Kustom (Tulis Materi Sendiri)';
+  select.appendChild(customOpt);
+
+  if (knowledgeBases.some(k => k.id === currentVal)) {
+    select.value = currentVal;
+  }
+}
+
+/* ================= LIVE CHATBOT SIMULATOR WITH WHITELIST GUARD ================= */
+
+function testKnowledgeBaseInSim(kbId) {
+  currentSimKbId = kbId;
+  const select = document.getElementById('simKbSelect');
+  if (select) select.value = kbId;
+  switchSimKnowledgeBase();
+}
+
+function switchSimKnowledgeBase() {
+  const select = document.getElementById('simKbSelect');
+  if (select) currentSimKbId = select.value;
+
+  const kb = knowledgeBases.find(k => k.id === currentSimKbId) || knowledgeBases[0];
   const chatBox = document.getElementById('rayiSimChatBox');
+  const promptsBox = document.getElementById('simQuickPrompts');
+
+  // Update dynamic quick prompts based on KB
+  if (promptsBox) {
+    if (kb.classification === 'event' || kb.id.includes('funrun')) {
+      promptsBox.innerHTML = `
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Min, rute Fun Run 26 Desember lewat mana aja ya?')">💡 Rute Fun Run?</button>
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Boleh minta link shareloc lokasi startnya min?')">💡 Shareloc Lokasi?</button>
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Mulai jam berapa dan pendaftarannya bayar berapa?')">💡 Jam &amp; Biaya?</button>
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Nomor kontak PIC panitia siapa min?')">💡 Kontak PIC?</button>
+      `;
+    } else if (kb.classification === 'dinas' || kb.id.includes('tandang')) {
+      promptsBox.innerHTML = `
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Sampurasun RAYI, apa saja syarat pencairan SPPD di TANDANG?')">💡 Syarat SPPD?</button>
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Format kertas resmi kedinasan apa?')">💡 Format Kertas?</button>
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Di mana alamat kantor Command Center IKP?')">💡 Kantor IKP?</button>
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Bisa jelaskan siapa itu asisten RAYI?')">💡 Siapa RAYI?</button>
+      `;
+    } else {
+      promptsBox.innerHTML = `
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Jam berapa jadwal sapa subuh otomatis dikirim?')">💡 Jadwal Subuh?</button>
+        <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Bisa bacakan doa fajar hari ini?')">💡 Doa Subuh?</button>
+      `;
+    }
+  }
+
+  // Reset chat with welcome message
   if (chatBox) {
+    const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    let greeting = `Sampurasun! 🙏 Saya asisten cerdas untuk materi <strong>${kb.title}</strong>. Silakan tanyakan hal yang ingin Anda ketahui.`;
+    if (kb.classification === 'event') {
+      greeting = `Sampurasun Runners! 🏃🎉 Saya bot asisten resmi <strong>${kb.title}</strong>. Mau tahu rute lari, minta link shareloc start di Gedung Sate, atau jadwal race pack? Tanyakan saja di sini!`;
+    }
+
     chatBox.innerHTML = `
       <div class="chat-bubble incoming">
-        <p>Sampurasun Kang/Teh! 🙏 Riwayat simulasi telah dibersihkan. Silakan bertanya kembali untuk menguji respon bot RAYI.</p>
-        <span class="chat-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        <p>${greeting}</p>
+        <span class="chat-time">${nowTime}</span>
       </div>
     `;
   }
+}
+
+function updateSimSenderBadge() {
+  const sender = document.getElementById('simSenderNumber')?.value;
+  showToast(`Pengirim uji coba dialihkan ke: +${sender}`, 'info');
+}
+
+function checkSenderAccess(senderNumber, kb) {
+  if (kb.accessPolicy === 'public') {
+    return { allowed: true };
+  }
+
+  // Whitelist group check
+  if (kb.accessPolicy === 'whitelist_group') {
+    const cleanSender = String(senderNumber).replace(/[^0-9]/g, '');
+    
+    // Group IKP whitelist includes admin number + contacts in pimpinan & tandang
+    if (kb.allowedGroup === 'ikp') {
+      const isIkpMember = cleanSender === '6285121042025' || 
+                          contacts.some(c => c.phone.replace(/[^0-9]/g, '') === cleanSender && (c.group === 'pimpinan' || c.group === 'tandang'));
+      if (isIkpMember) return { allowed: true };
+      return { allowed: false, policy: kb.outsidePolicy || 'silent_ignore', groupName: 'Bidang IKP' };
+    }
+
+    if (kb.allowedGroup === 'keluarga') {
+      const isFamily = cleanSender === '6285121042025' ||
+                       contacts.some(c => c.phone.replace(/[^0-9]/g, '') === cleanSender && c.group === 'keluarga');
+      if (isFamily) return { allowed: true };
+      return { allowed: false, policy: kb.outsidePolicy || 'silent_ignore', groupName: 'Keluarga' };
+    }
+  }
+
+  return { allowed: true };
+}
+
+function clearSimChat() {
+  switchSimKnowledgeBase();
 }
 
 function sendQuickPrompt(promptText) {
   const input = document.getElementById('simChatInput');
   if (input) {
     input.value = promptText;
-    const fakeEvent = { preventDefault: () => {} };
-    handleSendSimChat(fakeEvent);
+    handleSendSimChat({ preventDefault: () => {} });
   }
 }
 
@@ -1479,11 +2490,13 @@ async function handleSendSimChat(e) {
   if (!userText) return;
 
   const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const kb = knowledgeBases.find(k => k.id === currentSimKbId) || knowledgeBases[0];
+  const simSender = document.getElementById('simSenderNumber')?.value || '6285121042025';
 
-  // 1. Tambah bubble user
+  // 1. Tampilkan bubble user
   const userBubble = document.createElement('div');
   userBubble.className = 'chat-bubble outgoing';
-  userBubble.innerHTML = `<p>${userText}</p><span class="chat-time">${nowTime}</span>`;
+  userBubble.innerHTML = `<p>${userText}</p><span class="chat-time">${nowTime} <small style="opacity:0.8;">(+${simSender})</small></span>`;
   chatBox.appendChild(userBubble);
   input.value = '';
   chatBox.scrollTop = chatBox.scrollHeight;
@@ -1492,55 +2505,138 @@ async function handleSendSimChat(e) {
   const typingIndicator = document.createElement('div');
   typingIndicator.className = 'chat-bubble incoming';
   typingIndicator.id = 'simTypingIndicator';
-  typingIndicator.innerHTML = `<p style="color:#059669; font-style:italic;">⚡ RAYI sedang membaca Knowledge Base &amp; mengetik...</p>`;
+  typingIndicator.innerHTML = `<p style="color:#059669; font-style:italic;">⚡ Bot sedang memeriksa whitelist &amp; materi...</p>`;
   chatBox.appendChild(typingIndicator);
   chatBox.scrollTop = chatBox.scrollHeight;
-
-  // 3. Simulasi respon AI berdasarkan model yang dipilih dan SOP
-  const model = document.getElementById('aiModelSelect')?.value || 'claude-3-5';
-  const persona = document.getElementById('aiPersonaPrompt')?.value || '';
-  const knowledge = document.getElementById('aiKnowledgeBase')?.value || '';
 
   setTimeout(() => {
     // Hapus indicator
     const typing = document.getElementById('simTypingIndicator');
     if (typing) typing.remove();
 
-    // Bangun jawaban cerdas sesuai pertanyaan
+    // 3. KEAMANAN & ACCESS CONTROL CHECK (FITUR WHITELIST NOMOR)
+    const access = checkSenderAccess(simSender, kb);
+    if (!access.allowed) {
+      if (access.policy === 'silent_ignore') {
+        // SILENT IGNORE: Bot tidak menjawab nomor luar grup sama sekali!
+        const blockBubble = document.createElement('div');
+        blockBubble.className = 'chat-bubble incoming';
+        blockBubble.style.background = '#FFF1F2';
+        blockBubble.style.border = '1px solid #FECDD3';
+        blockBubble.style.borderLeft = '4px solid #E11D48';
+        blockBubble.style.color = '#9F1239';
+        blockBubble.innerHTML = `
+          <p>🤫 <strong>[AKSES DIABAIKAN — SILENT IGNORE]</strong><br>
+          Pesan dari <code>+${simSender}</code> <strong>TIDAK DIJAWAB</strong>.<br>
+          Nomor ini <strong>tidak tersimpan di Grup ${access.groupName}</strong>.<br>
+          <em>(Sesuai aturan keamanan: bot hanya melayani anggota resmi grup terdaftar dan mengabaikan nomor luar).</em></p>
+          <span class="chat-time">${nowTime}</span>
+        `;
+        chatBox.appendChild(blockBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return;
+      } else {
+        // Polite reject
+        const rejectBubble = document.createElement('div');
+        rejectBubble.className = 'chat-bubble incoming';
+        rejectBubble.innerHTML = `
+          <p>Sampurasun Kang/Teh. 🙏 Mohon maaf, layanan asisten virtual ini saat ini dikhususkan untuk anggota terdaftar <strong>Grup ${access.groupName}</strong>. Nomor Anda (<code>+${simSender}</code>) belum terdaftar dalam sistem. Hatur nuhun.</p>
+          <span class="chat-time">${nowTime}</span>
+        `;
+        chatBox.appendChild(rejectBubble);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return;
+      }
+    }
+
+    // 4. BATAS WAKTU / EXPIRED CHECK
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const end = new Date(kb.endDate);
+    if (today > end) {
+      const expBubble = document.createElement('div');
+      expBubble.className = 'chat-bubble incoming';
+      expBubble.innerHTML = `
+        <p>Sampurasun Kang/Teh! 🙏 Mohon maaf, masa pelaksanaan kegiatan <strong>${kb.title}</strong> telah resmi berakhir pada tanggal <strong>${formatSimpleDate(end)}</strong>.<br><br>Jika ada pertanyaan terkait agenda lainnya, silakan hubungi tim kami kembali. Hatur nuhun!</p>
+        <span class="chat-time">${nowTime}</span>
+      `;
+      chatBox.appendChild(expBubble);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return;
+    }
+
+    // 5. JAWAB DENGAN CERDAS MENGGUNAKAN MATERI KNOWLEDGE BASE
     let reply = "";
     const lower = userText.toLowerCase();
 
-    if (lower.includes('sppd') || lower.includes('syarat') || lower.includes('cair')) {
-      reply = `Sampurasun Kang/Teh! 🙏 Berdasarkan panduan SOP kedinasan di <strong>TANDANG</strong>, syarat pencairan berkas SPPD adalah:<br><br>
+    // Jawaban untuk Fun Run
+    if (kb.classification === 'event' || kb.id.includes('funrun')) {
+      if (lower.includes('rute') || lower.includes('lewat') || lower.includes('jalur') || lower.includes('5k')) {
+        reply = `Sampurasun Runners! 🏃 Titik start &amp; rute lari Fun Run 26 Desember adalah:<br><br>
+🛣️ <strong>Rute 5K:</strong><br>
+Start Gedung Sate ➡️ Jl. Diponegoro ➡️ Jl. Ir. H. Juanda (Dago) ➡️ Simpang Cikapayang ➡️ Jl. LLRE Martadinata (Riau) ➡️ Finish kembali di Plaza Gedung Sate.<br><br>
+Water station tersedia di KM 2.5 (Simpang Dago Cikapayang) dan pos medis standby di titik finish. Semangat latihan ya! 🔥`;
+      } else if (lower.includes('shareloc') || lower.includes('lokasi') || lower.includes('titik') || lower.includes('alamat') || lower.includes('maps')) {
+        reply = `Sampurasun! 📍 Titik kumpul dan panggung start Fun Run 26 Desember berada di:<br><br>
+🏛️ <strong>Plaza Depan Gedung Sate Bandung</strong><br>
+Jl. Diponegoro No. 22, Citarum, Kota Bandung.<br><br>
+🗺️ <strong>Link Shareloc Google Maps:</strong><br>
+<a href="https://maps.app.goo.gl/GedungSateBandung" target="_blank" style="color:#059669; font-weight:700; text-decoration:underline;">https://maps.app.goo.gl/GedungSateBandung</a><br>
+<em>(Titik Koordinat GPS: -6.902484, 107.618712)</em><br><br>
+Garis start dibuka mulai pukul 05:15 WIB untuk pemanasan bersama!`;
+      } else if (lower.includes('jam') || lower.includes('biaya') || lower.includes('bayar') || lower.includes('daftar') || lower.includes('gratis')) {
+        reply = `Sampurasun! 🎉 Pendaftaran Fun Run 26 Desember <strong>100% GRATIS</strong> tanpa dipungut biaya apapun (disponsori oleh IKP Diskominfo Jabar).<br><br>
+⏰ <strong>Jadwal Pelaksanaan:</strong><br>
+- 05:15 WIB: Open Gate &amp; Senam Pemanasan<br>
+- 06:00 WIB: Flag-Off / Start Lari Bersama<br>
+- 07:30 WIB: Pembagian Medali &amp; Panggung Hiburan<br><br>
+Medali finisher diberikan gratis untuk 500 pelari pertama yang melintasi garis finish!`;
+      } else if (lower.includes('pic') || lower.includes('kontak') || lower.includes('hubungi') || lower.includes('panitia')) {
+        reply = `Sampurasun! 🙏 Jika membutuhkan bantuan darurat atau konfirmasi pendaftaran, silakan hubungi narahubung panitia (PIC):<br><br>
+📞 <strong>Kang Rian (Koordinator Rute):</strong> 0812-3456-7890<br>
+📞 <strong>Teh Sarah (Layanan Race Pack):</strong> 0813-9876-5432<br><br>
+Tim panitia siap melayani pertanyaan Anda sampai hari H!`;
+      } else {
+        reply = `Sampurasun Runners! 🏃🎉 Terkait: <em>"${userText}"</em>, informasi tersebut telah dicocokkan dengan dokumen petunjuk teknis <strong>Fun Run 26 Desember</strong>.<br><br>Start lari dimulai tepat pukul 06:00 WIB di Plaza Gedung Sate. Ada yang ingin ditanyakan lagi seputar rute atau race pack? Sampai jumpa di garis start!`;
+      }
+    } 
+    // Jawaban untuk Kedinasan TANDANG
+    else if (kb.classification === 'dinas' || kb.id.includes('tandang')) {
+      if (lower.includes('sppd') || lower.includes('syarat') || lower.includes('cair')) {
+        reply = `Sampurasun Kang/Teh! 🙏 Berdasarkan panduan SOP resmi di sistem <strong>TANDANG</strong>, syarat pencairan berkas SPPD adalah:<br><br>
 1. <strong>Surat Tugas Asli</strong> yang telah ditandatangani secara digital/basah oleh PPTK dan Pejabat Eselon.<br>
-2. <strong>Bukti Pengeluaran Riil</strong> (seperti kwitansi hotel, tiket kereta/pesawat, struk BBM/tol).<br>
-3. <strong>Stempel &amp; Tanda Tangan Lokasi Tujuan</strong> (cap bukti kehadiran di instansi tujuan).<br><br>
-Semua dokumen diunggah melalui menu SPPD di portal TANDANG. Hatur nuhun, wilujeng makarya!`;
-    } else if (lower.includes('kertas') || lower.includes('format') || lower.includes('f4') || lower.includes('folio')) {
-      reply = `Sampurasun! 🙏 Untuk seluruh tata naskah dinas, Surat Tugas, dan lampiran SPPD di lingkungan Diskominfo Jawa Barat dan sistem TANDANG, format kertas resmi yang wajib digunakan adalah <strong>Folio / F4 (215 x 330 mm)</strong>.<br><br>Margin standar: Kiri 3 cm, Kanan 2 cm, Atas 2.5 cm, Bawah 2.5 cm. Mugi manfaat infona!`;
-    } else if (lower.includes('subuh') || lower.includes('sapa subuh') || lower.includes('bangun')) {
-      reply = `Sampurasun! 🌅 Program <strong>Sapa Subuh WAWAR x RAYI</strong> dijadwalkan secara otomatis setiap pukul <strong>04:30 WIB</strong>.<br><br>Pesan berisi doa pagi, motivasi, dan pengingat sholat fajar yang dikirimkan langsung ke nomor WhatsApp anak tercinta dan grup keluarga. Wilujeng subuh barakah!`;
-    } else if (lower.includes('siapa') || lower.includes('maskot') || lower.includes('rayi')) {
-      reply = `Sampurasun! 🙏 Kenalkan, saya <strong>RAYI</strong>, maskot dan asisten virtual resmi bidang Informasi dan Komunikasi Publik (IKP) Diskominfo Jawa Barat.<br><br>Nama <em>Rayi</em> dalam tradisi Sunda bermakna kerabat muda yang penuh rasa hormat, cekatan, dan ikhlas melayani. Saya siap membantu notifikasi kedinasan Anda 24 jam non-stop!`;
-    } else {
-      reply = `Sampurasun Kang/Teh! 🙏 Hatur nuhun parantos ngontak abdi.<br><br>Terkait pertanyaan: <em>"${userText}"</em>, saya telah mencatatnya sesuai arahan <strong>Knowledge Base TANDANG</strong>. Ada berkas atau informasi kedinasan lain yang bisa saya bantu persiapkan? Wilujeng makarya!`;
+2. <strong>Bukti Pengeluaran Riil</strong> (kwitansi hotel, tiket kereta/pesawat, struk BBM/tol).<br>
+3. <strong>Stempel &amp; Tanda Tangan Lokasi Tujuan</strong> (bukti kehadiran fisik).<br><br>
+Semua dokumen diunggah melalui menu SPPD di portal TANDANG. Hatur nuhun!`;
+      } else if (lower.includes('kertas') || lower.includes('format') || lower.includes('f4') || lower.includes('folio')) {
+        reply = `Sampurasun! 🙏 Untuk seluruh tata naskah dinas, Surat Tugas, dan lampiran SPPD di lingkungan Diskominfo Jawa Barat dan sistem TANDANG, format kertas resmi yang wajib digunakan adalah <strong>Folio / F4 (215 x 330 mm)</strong>.<br><br>Margin standar: Kiri 3 cm, Kanan 2 cm, Atas 2.5 cm, Bawah 2.5 cm. Mugi manfaat infona!`;
+      } else if (lower.includes('kantor') || lower.includes('gedung sate') || lower.includes('alamat')) {
+        reply = `Sampurasun! 🏛️ Kantor Command Center IKP Diskominfo Jawa Barat berlokasi di <strong>Gedung Sate, Jl. Diponegoro No. 22 Bandung</strong>.<br><br>Layanan konsultasi naskah dinas dan verifikasi fisik berkas TANDANG dilayani setiap hari kerja pukul 08:00 - 16:00 WIB.`;
+      } else if (lower.includes('siapa') || lower.includes('maskot') || lower.includes('rayi')) {
+        reply = `Sampurasun! 🙏 Kenalkan, saya <strong>RAYI</strong>, maskot dan asisten virtual resmi bidang Informasi dan Komunikasi Publik (IKP) Diskominfo Jawa Barat.<br><br>Nama <em>Rayi</em> dalam tradisi Sunda bermakna kerabat muda yang santun, cekatan, dan ikhlas melayani. Saya siap membantu notifikasi kedinasan Anda 24 jam non-stop!`;
+      } else {
+        reply = `Sampurasun Kang/Teh! 🙏 Terkait: <em>"${userText}"</em>, informasi tersebut telah dicatat sesuai dengan <strong>Knowledge Base TANDANG</strong>. Ada berkas kedinasan lain yang bisa saya bantu? Wilujeng makarya!`;
+      }
+    }
+    // Jawaban untuk Subuh
+    else {
+      reply = `Sampurasun! 🌅 Program <strong>Sapa Subuh WAWAR</strong> dijadwalkan tepat pukul <strong>04:30 WIB</strong>.<br><br>Pesan berisi doa fajar, motivasi, dan pengingat sholat yang dikirimkan langsung ke nomor anak tercinta dan keluarga. Wilujeng subuh barakah!`;
     }
 
-    const rayiBubble = document.createElement('div');
-    rayiBubble.className = 'chat-bubble incoming';
-    rayiBubble.innerHTML = `<p>${reply}</p><span class="chat-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
-    chatBox.appendChild(rayiBubble);
+    const respBubble = document.createElement('div');
+    respBubble.className = 'chat-bubble incoming';
+    respBubble.innerHTML = `<p>${reply}</p><span class="chat-time">${nowTime}</span>`;
+    chatBox.appendChild(respBubble);
     chatBox.scrollTop = chatBox.scrollHeight;
-  }, 900);
+  }, 750);
 }
 
 function deployAiToWhatsapp() {
-  const model = document.getElementById('aiModelSelect').value;
-  const instance = document.getElementById('aiInstanceSelect').value;
-  showToast(`Menghubungkan webhook otak ${model.toUpperCase()} ke nomor WhatsApp [${instance}] di Hostinger VPS...`, 'info');
+  const kb = getActiveKb();
+  showToast(`Menghubungkan webhook otak AI untuk materi [${kb.title}] ke nomor WhatsApp [${kb.assignedInstance}] di Hostinger VPS...`, 'info');
 
   setTimeout(() => {
-    showToast(`Sukses! Nomor [${instance}] kini resmi ditenagai oleh Otak AI RAYI (${model.toUpperCase()})! 🤖📲✨`, 'success');
+    showToast(`Sukses! Nomor [${kb.assignedInstance}] kini resmi aktif melayani chat via WhatsApp dengan proteksi whitelist grup! 🤖📲🔒✨`, 'success');
   }, 1200);
 }
 
