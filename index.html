@@ -664,7 +664,19 @@
               </div>
 
               <div class="form-group">
-                <label>5. Template / Default Isi Pesan (Bisa Diedit per Tanggal di Kalender)</label>
+                <label>5. Alokasi Nomor Pengirim (Sender Number Pool)</label>
+                <select id="campSenderNumber" class="form-select">
+                  <option value="Wawar-primary">📱 Wawar-primary (+62 851-2104-2025) • Notifikasi Utama Dinas</option>
+                  <option value="rayi-cs-official">🤖 rayi-cs-official • Khusus Chatbot RAYI &amp; CS</option>
+                  <option value="wawar-subuh" selected>🌅 wawar-subuh • Khusus Sapa Subuh Anak &amp; Keluarga</option>
+                  <option value="wawar-blast-x">📢 wawar-blast-x (Nomor X) • Khusus Blast Campaign D, F, dll</option>
+                  <option value="pool-rotator">🔄 Multi-Number Pooling (Bagi Rata Beban Kirim)</option>
+                </select>
+                <small class="hint-text">Tentukan nomor WhatsApp khusus mana yang mengeksekusi program ini (misal Campaign D &amp; F pakai Nomor X).</small>
+              </div>
+
+              <div class="form-group">
+                <label>6. Template / Default Isi Pesan (Bisa Diedit per Tanggal di Kalender)</label>
                 <textarea id="campDefaultText" rows="3" placeholder="Ketik draf pesan default...">Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur.</textarea>
               </div>
 
@@ -852,95 +864,193 @@
         <section id="dashTab-whatsapp" class="dash-tab">
           <div class="dash-header">
             <div>
-              <h2>Pengelolaan WhatsApp &amp; Asisten RAYI</h2>
-              <p>Atur nomor pengirim aktif, ganti nomor baru, atau kelola multi-instance.</p>
+              <h2>Multi-Number Pooling &amp; Alokasi Nomor Pengirim</h2>
+              <p>Kelola kumpulan nomor SIM / WhatsApp untuk pembagian tugas: Bot RAYI, Notifikasi Dinas, Sapa Subuh, dan Blast Massal (Campaign D &amp; F).</p>
+            </div>
+            <div class="dash-header-actions">
+              <button class="btn btn-primary btn-sm" onclick="openAddInstanceModal()">+ Tambah Nomor Baru (Scan QR)</button>
+            </div>
+          </div>
+
+          <!-- Pool Cards Grid -->
+          <div class="metrics-grid mb-4" id="senderNumberPoolGrid">
+            <!-- Pool 1: Primary / Notif Dinas -->
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Pool 1 • Notifikasi Resmi</span>
+                <span class="badge-status open">CONNECTED</span>
+              </div>
+              <h3>Wawar-primary</h3>
+              <p class="phone-number text-sm">+62 851-2104-2025</p>
+              <div class="tech-specs mt-2">
+                <span class="badge-tag green">Peran: Surat Tugas SPPD &amp; OTP</span>
+              </div>
+              <small class="metric-foot mt-2">7.290 Pesan • Anti-Banned Jitter Aktif</small>
+            </div>
+
+            <!-- Pool 2: Chatbot RAYI -->
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Pool 2 • Asisten Virtual</span>
+                <span class="badge-status green">SIAP DIPASANG</span>
+              </div>
+              <h3>rayi-cs-official</h3>
+              <p class="phone-number text-sm">+62 812-xxxx-xxxx</p>
+              <div class="tech-specs mt-2">
+                <span class="badge-tag amber">Peran: Chatbot Tanya Jawab Pegawai</span>
+              </div>
+              <small class="metric-foot mt-2">Respon otomatis 24/7 non-stop</small>
+            </div>
+
+            <!-- Pool 3: Sapa Subuh -->
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Pool 3 • Program Khusus</span>
+                <span class="badge-status open">TERJADWAL</span>
+              </div>
+              <h3>wawar-subuh</h3>
+              <p class="phone-number text-sm">Dedicated Subuh Line</p>
+              <div class="tech-specs mt-2">
+                <span class="badge-tag amber">Peran: Sapa Subuh Anak (04:30 WIB)</span>
+              </div>
+              <small class="metric-foot mt-2">31 Hari Terkunci di Kalender</small>
+            </div>
+
+            <!-- Pool 4: Nomor X (Blast Massal D & F) -->
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Pool 4 • Blast Massal</span>
+                <span class="badge-status blue">NOMOR X POOL</span>
+              </div>
+              <h3>wawar-blast-x</h3>
+              <p class="phone-number text-sm">Nomor Cadangan / Diseminasi</p>
+              <div class="tech-specs mt-2">
+                <span class="badge-tag blue">Peran: Campaign D &amp; Campaign F</span>
+              </div>
+              <small class="metric-foot mt-2">Multi-Tenant / Blast Tanpa Bebani Dinas</small>
+            </div>
+          </div>
+
+          <!-- Add / Pair New Number Modal Box (Inline) -->
+          <div class="panel-card max-w-xl">
+            <div class="panel-header">
+              <h3>Tambah &amp; Pasangkan Nomor WhatsApp Baru</h3>
+            </div>
+            <p class="text-sm">Beli nomor SIM baru untuk kantor atau bot RAYI? Masukkan nama instance dan pilih peran kerjanya. Sistem akan membuat koneksi mandiri tanpa mengganggu nomor dinas yang sudah ada.</p>
+            
+            <div class="card-grid-2 mt-3">
+              <div class="form-group">
+                <label>Nama Instance Baru</label>
+                <input type="text" id="newInstanceName" placeholder="Contoh: rayi-official / wawar-blast-2" value="rayi-official">
+              </div>
+              <div class="form-group">
+                <label>Alokasi Peran Nomor</label>
+                <select id="newInstanceRole" class="form-select">
+                  <option value="cs">🤖 Khusus Chatbot RAYI / CS</option>
+                  <option value="notif">📋 Khusus Notifikasi &amp; Surat Tugas TANDANG</option>
+                  <option value="subuh">🌅 Khusus Campaign Sapa Subuh</option>
+                  <option value="blast">📢 Khusus Blast Massal (Campaign D, F, dll)</option>
+                </select>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="createNewInstance()">Buat Instance &amp; Tampilkan QR Scan &rarr;</button>
+          </div>
+        </section>
+
+        <!-- DASH TAB 3: QUICK SEND & POLLING INTERAKTIF -->
+        <section id="dashTab-quicksend" class="dash-tab">
+          <div class="dash-header">
+            <div>
+              <h2>Kirim Pesan Langsung &amp; Polling Interaktif</h2>
+              <p>Kirim pesan instan atau buat Jajak Pendapat (Polling WhatsApp) resmi dengan pilihan nomor pengirim.</p>
             </div>
           </div>
 
           <div class="card-grid-2">
-            <!-- Active Number Card -->
+            <!-- Form 1: Kirim Pesan & PDF -->
             <div class="panel-card">
               <div class="panel-header">
-                <h3>Nomor Pengirim Aktif Saat Ini</h3>
-                <span class="badge-status open">CONNECTED</span>
+                <h3>Kirim Pesan WhatsApp &amp; PDF</h3>
               </div>
-              <div class="instance-details-box">
-                <div class="avatar-large">
-                  <img src="assets/logo-wawar.jpg" alt="Avatar">
+              <form onsubmit="handleQuickSend(event)">
+                <div class="form-group">
+                  <label>Pilih Nomor Pengirim (Sender Pool)</label>
+                  <select id="sendSelectInstance" class="form-select">
+                    <option value="Wawar-primary" selected>📱 Wawar-primary (+62 851-2104-2025) [Notif Dinas]</option>
+                    <option value="rayi-cs-official">🤖 rayi-cs-official [Bot RAYI]</option>
+                    <option value="wawar-subuh">🌅 wawar-subuh [Sapa Subuh]</option>
+                    <option value="wawar-blast-x">📢 wawar-blast-x (Nomor X) [Blast D &amp; F]</option>
+                  </select>
                 </div>
-                <div class="details-content">
-                  <h4 id="detailInstanceName">Wawar-primary</h4>
-                  <p class="phone-number" id="detailPhoneNumber">+62 851-2104-2025</p>
-                  <div class="tech-specs">
-                    <span>Integration: Baileys</span> • <span>Client: evolution_v2</span> • <span>Engine: v2.3.7</span>
+
+                <div class="form-group">
+                  <label>Nomor WhatsApp Tujuan</label>
+                  <input type="text" id="sendTargetNumber" value="6285121042025" placeholder="628xxxxxxxxxx" required>
+                </div>
+
+                <div class="form-group">
+                  <label>Isi Pesan Teks</label>
+                  <div class="variable-pills mb-2" style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-outline btn-xs" onclick="insertVariableToMessage('{nama}')">+ {nama}</button>
+                    <button type="button" class="btn btn-outline btn-xs" onclick="insertVariableToMessage('{sapaan}')">+ {sapaan}</button>
+                    <button type="button" class="btn btn-outline btn-xs" onclick="insertVariableToMessage('{tanggal}')">+ {tanggal}</button>
+                  </div>
+                  <textarea id="sendTextContent" rows="4" placeholder="Ketik pesan Anda di sini...">Sampurasun! Surat Tugas SPPD Anda telah selesai diproses oleh TANDANG.</textarea>
+                </div>
+
+                <div class="form-group">
+                  <label>Lampiran Dokumen PDF (Opsional)</label>
+                  <input type="text" id="sendDocUrl" placeholder="URL PDF Dokumen (misal: https://tandang.kitt.lt/sample.pdf)">
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary btn-block" id="btnSubmitSend">
+                    <span>Kirim Pesan Sekarang</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Form 2: Kirim Polling WhatsApp (Native WA Poll) -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3>📊 Buat Polling WhatsApp (Voting / Jajak Pendapat)</h3>
+              </div>
+              <form onsubmit="handleSendPoll(event)">
+                <div class="form-group">
+                  <label>Nomor / Grup Tujuan Polling</label>
+                  <input type="text" id="pollTargetNumber" value="6285121042025" placeholder="Nomor WA atau ID Grup (xxxx@g.us)" required>
+                </div>
+
+                <div class="form-group">
+                  <label>Pertanyaan Polling</label>
+                  <input type="text" id="pollQuestion" placeholder="Contoh: Konfirmasi Kehadiran Rapat IKP" value="Konfirmasi Kehadiran Apel &amp; Koordinasi IKP" required>
+                </div>
+
+                <div class="form-group">
+                  <label>Pilihan Opsi Voting (Minimal 2)</label>
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <input type="text" class="poll-option-input" value="1. Hadir Offline (Gedung Sate)" required>
+                    <input type="text" class="poll-option-input" value="2. Hadir Online (Zoom Meeting)" required>
+                    <input type="text" class="poll-option-input" value="3. Izin / Sedang Tugas Lapangan">
                   </div>
                 </div>
-              </div>
-              <div class="instance-action-bar">
-                <button class="btn btn-outline btn-sm" onclick="testPingInstance()">Cek Status Koneksi</button>
-                <button class="btn btn-secondary btn-sm" onclick="alert('Untuk switch nomor, cukup daftarkan nomor baru pada tombol Tambah Nomor Baru di sebelah!')">Ganti Pengirim Utama</button>
-              </div>
+
+                <div class="form-group">
+                  <label>Jumlah Pilihan yang Boleh Dipilih</label>
+                  <select id="pollSelectableCount" class="form-select">
+                    <option value="1" selected>Pilihan Tunggal (Pilih 1 saja)</option>
+                    <option value="2">Boleh Pilih 2 Pilihan</option>
+                  </select>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-secondary btn-block">
+                    <span>Kirim Polling WhatsApp &rarr;</span>
+                  </button>
+                </div>
+              </form>
             </div>
-
-            <!-- Add/Switch Instance Card -->
-            <div class="panel-card">
-              <div class="panel-header">
-                <h3>Tambah Nomor Khusus Baru (Masa Depan)</h3>
-              </div>
-              <p class="text-sm">Saat Anda membeli nomor SIM khusus untuk bot <strong>RAYI</strong>, Anda cukup klik tombol di bawah untuk membuat instance baru dan scan QR tanpa perlu menghapus nomor lama.</p>
-              
-              <div class="form-group mt-3">
-                <label>Nama Instance Baru</label>
-                <input type="text" id="newInstanceName" placeholder="Contoh: rayi-official" value="rayi-official">
-              </div>
-              <button class="btn btn-primary" onclick="createNewInstance()">Buat Instance &amp; Tampilkan QR &rarr;</button>
-            </div>
-          </div>
-        </section>
-
-        <!-- DASH TAB 3: QUICK SEND & PDF -->
-        <section id="dashTab-quicksend" class="dash-tab">
-          <div class="dash-header">
-            <div>
-              <h2>Kirim Pesan WhatsApp &amp; Dokumen PDF</h2>
-              <p>Kirim langsung pesan teks terformat atau lampirkan berkas PDF Surat Tugas secara manual.</p>
-            </div>
-          </div>
-
-          <div class="panel-card max-w-xl">
-            <form onsubmit="handleQuickSend(event)">
-              <div class="form-group">
-                <label>Pilih Instance Pengirim</label>
-                <select id="sendSelectInstance" class="form-select">
-                  <option value="Wawar-primary" selected>Wawar-primary (+62 851-2104-2025)</option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label>Nomor WhatsApp Tujuan</label>
-                <input type="text" id="sendTargetNumber" value="6285121042025" placeholder="628xxxxxxxxxx" required>
-                <small class="hint-text">Gunakan format internasional tanpa spasi dan tanda plus (contoh: 6285121042025).</small>
-              </div>
-
-              <div class="form-group">
-                <label>Isi Pesan Teks</label>
-                <textarea id="sendTextContent" rows="4" placeholder="Ketik pesan Anda di sini... Mendukung format *tebal*, _miring_, ~coret~.">*Pemberitahuan dari WAWAR:*
-Surat Perjalanan Dinas Anda telah siap diambil di subbagian kepegawaian. Hatur nuhun!</textarea>
-              </div>
-
-              <div class="form-group">
-                <label>Lampiran Dokumen PDF (Opsional)</label>
-                <input type="text" id="sendDocUrl" placeholder="URL PDF Dokumen (misal: https://tandang.kitt.lt/sample.pdf)">
-                <small class="hint-text">Bisa gunakan link file Surat Tugas atau SPPD dari TANDANG.</small>
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary" id="btnSubmitSend">
-                  <span>Kirim Sekarang</span>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                </button>
-              </div>
-            </form>
           </div>
         </section>
 

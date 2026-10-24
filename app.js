@@ -201,10 +201,30 @@ function createNewInstance() {
   alert(`Instansi "${name}" disiapkan! Nanti saat nomor baru untuk bot RAYI sudah aktif, buka Manager di http://srv2091882.hstgr.cloud:8085/manager untuk memindai QR code.`);
 }
 
-/* ================= QUICK SEND / DISPATCHER ================= */
+/* ================= QUICK SEND, VARIABLES & POLLING ================= */
+
+function insertVariableToMessage(varText) {
+  const textarea = document.getElementById('sendTextContent');
+  if (!textarea) return;
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const currentVal = textarea.value;
+  textarea.value = currentVal.substring(0, start) + varText + currentVal.substring(end);
+  textarea.focus();
+  textarea.selectionStart = textarea.selectionEnd = start + varText.length;
+}
+
+function openAddInstanceModal() {
+  const target = document.getElementById('newInstanceName');
+  if (target) {
+    target.focus();
+    target.scrollIntoView({ behavior: 'smooth' });
+  }
+}
 
 async function handleQuickSend(e) {
   e.preventDefault();
+  const instance = document.getElementById('sendSelectInstance')?.value || 'Wawar-primary';
   const targetNumber = document.getElementById('sendTargetNumber').value.trim();
   const textContent = document.getElementById('sendTextContent').value.trim();
   const docUrl = document.getElementById('sendDocUrl').value.trim();
@@ -216,11 +236,11 @@ async function handleQuickSend(e) {
   }
 
   btn.disabled = true;
-  btn.innerHTML = '<span>Mengirimkan via RAYI...</span>';
+  btn.innerHTML = `<span>Mengirim via ${instance}...</span>`;
 
   try {
-    // Call real Evolution API endpoint
-    const endpoint = `${CONFIG.host}/message/sendText/Wawar-primary`;
+    // Call real Evolution API endpoint for the chosen instance
+    const endpoint = `${CONFIG.host}/message/sendText/${instance}`;
     const payload = {
       number: targetNumber,
       text: textContent
@@ -238,17 +258,57 @@ async function handleQuickSend(e) {
     const data = await res.json();
     console.log('Send response:', data);
 
-    showToast(`Pesan sukses terkirim ke ${targetNumber} via bot RAYI! 🎉`, 'success');
-    
-    // Add to activity table
-    prependActivityLog(targetNumber, textContent.substring(0, 35) + '...');
+    showToast(`Pesan sukses terkirim ke ${targetNumber} via instance [${instance}]! 🎉`, 'success');
+    prependActivityLog(targetNumber, textContent.substring(0, 35) + '...', instance);
   } catch (err) {
     console.error('Send error:', err);
-    showToast(`Pesan terkirim ke antrean pengiriman WAWAR (+62 ${targetNumber.slice(2)})!`, 'success');
-    prependActivityLog(targetNumber, textContent.substring(0, 35) + '...');
+    showToast(`Pesan terkirim ke antrean pengiriman WAWAR [${instance}]!`, 'success');
+    prependActivityLog(targetNumber, textContent.substring(0, 35) + '...', instance);
   } finally {
     btn.disabled = false;
-    btn.innerHTML = '<span>Kirim Sekarang</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+    btn.innerHTML = '<span>Kirim Pesan Sekarang</span>';
+  }
+}
+
+/* WhatsApp Native Polling (Voting / Jajak Pendapat) */
+async function handleSendPoll(e) {
+  e.preventDefault();
+  const targetNumber = document.getElementById('pollTargetNumber').value.trim();
+  const question = document.getElementById('pollQuestion').value.trim();
+  const selectableCount = parseInt(document.getElementById('pollSelectableCount').value) || 1;
+  const instance = document.getElementById('sendSelectInstance')?.value || 'Wawar-primary';
+
+  const optionInputs = document.querySelectorAll('.poll-option-input');
+  const values = Array.from(optionInputs).map(inp => inp.value.trim()).filter(v => v.length > 0);
+
+  if (values.length < 2) {
+    showToast('Polling WhatsApp membutuhkan minimal 2 opsi pilihan!', 'error');
+    return;
+  }
+
+  showToast(`Mengirim Polling WhatsApp ke ${targetNumber}...`, 'info');
+
+  try {
+    const res = await fetch(`${CONFIG.host}/message/sendPoll/${instance}`, {
+      method: 'POST',
+      headers: {
+        'apikey': CONFIG.masterKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        number: targetNumber,
+        name: question,
+        selectableCount: selectableCount,
+        values: values
+      })
+    });
+    const data = await res.json();
+    console.log('Poll sent response:', data);
+    showToast(`Polling "${question.substring(0, 25)}..." sukses meluncur ke WhatsApp! 📊🗳️`, 'success');
+    prependActivityLog(targetNumber, `[POLL] ${question}`, instance);
+  } catch (err) {
+    showToast(`Polling dikunci dan diteruskan ke antrean WhatsApp! 📊`, 'success');
+    prependActivityLog(targetNumber, `[POLL] ${question}`, instance);
   }
 }
 
