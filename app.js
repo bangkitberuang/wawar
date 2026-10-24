@@ -984,7 +984,35 @@ function initCalendarEntries() {
         color: 'blue'
       });
     }
+
+    // Tambah Teaser Event Fun Run 26 Des pada 26 Okt
+    if (day === 26) {
+      calendarEntries[dateKey].push({
+        id: `funrun-${dateKey}`,
+        campId: 'event',
+        campName: 'Fun Run 26 Des',
+        time: '05:30',
+        recipient: 'Peserta Fun Run 26 Des',
+        message: 'Halo Runners! 🏃 Hitung mundur 2 bulan menuju Fun Run 26 Des di Gedung Sate. Rute 5K & info shareloc siap diakses!',
+        status: 'SCHEDULED',
+        color: 'blue'
+      });
+    }
   }
+
+  // Seed hari-H Fun Run pada 26 Desember 2026
+  calendarEntries['2026-12-26'] = [
+    {
+      id: 'funrun-d-day',
+      campId: 'event',
+      campName: 'Hari-H Fun Run 26 Des',
+      time: '05:30',
+      recipient: 'Seluruh Peserta Fun Run 2026',
+      message: 'HARI-H FUN RUN! 🏃💨 Titik Kumpul di Halaman Gedung Sate jam 05:30 WIB. Flag-off start jam 06:00 tepat. Shareloc: https://maps.google.com/?q=-6.9025,107.6186',
+      status: 'SCHEDULED',
+      color: 'blue'
+    }
+  ];
 }
 
 const MONTH_NAMES = [
@@ -1124,29 +1152,102 @@ function closeCreateCampaignModal() {
   document.getElementById('modalCreateCampaign').classList.remove('active');
 }
 
+function applyContentPreset() {
+  const preset = document.getElementById('campContentPreset').value;
+  const nameInp = document.getElementById('campName');
+  const classSelect = document.getElementById('campClassification');
+  const startInp = document.getElementById('campStartDate');
+  const endInp = document.getElementById('campEndDate');
+  const timeInp = document.getElementById('campTime');
+  const senderSelect = document.getElementById('campSenderNumber');
+  const targetSelect = document.getElementById('campTargetGroup');
+  const textInp = document.getElementById('campDefaultText');
+
+  if (preset === 'subuh') {
+    nameInp.value = "Sapa Subuh Anak & Keluarga";
+    classSelect.value = "keluarga";
+    startInp.value = "2026-10-01";
+    endInp.value = "2026-10-31";
+    timeInp.value = "04:30";
+    senderSelect.value = "wawar-subuh";
+    targetSelect.value = "keluarga";
+    textInp.value = "Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.";
+  } else if (preset === 'funrun') {
+    nameInp.value = "Event Fun Run 26 Des Jabar";
+    classSelect.value = "event";
+    startInp.value = "2026-12-01";
+    endInp.value = "2026-12-26";
+    timeInp.value = "05:30";
+    senderSelect.value = "rayi-cs-official";
+    targetSelect.value = "event_runners";
+    textInp.value = "Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186";
+  } else if (preset === 'tandang_sppd') {
+    nameInp.value = "Sosialisasi SPPD TANDANG";
+    classSelect.value = "dinas";
+    startInp.value = "2026-10-15";
+    endInp.value = "2026-11-15";
+    timeInp.value = "07:30";
+    senderSelect.value = "Wawar-primary";
+    targetSelect.value = "tandang";
+    textInp.value = "Sampurasun! 📋 Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.";
+  } else if (preset === 'apel_senin') {
+    nameInp.value = "Pengingat Apel Pagi ASN";
+    classSelect.value = "dinas";
+    startInp.value = "2026-10-01";
+    endInp.value = "2026-12-31";
+    timeInp.value = "07:00";
+    senderSelect.value = "Wawar-primary";
+    targetSelect.value = "tandang";
+    textInp.value = "Sampurasun Rekan ASN! 🏛️ Pengingat Apel Pagi Gabungan Diskominfo Jabar di Plaza Gedung Sate pukul 07:30 WIB. Seragam kemeja putih dan tanda pengenal lengkap.";
+  }
+}
+
+function autoSyncSenderAndColorByClassification() {
+  const cls = document.getElementById('campClassification').value;
+  const senderSelect = document.getElementById('campSenderNumber');
+  if (cls === 'keluarga') senderSelect.value = 'wawar-subuh';
+  else if (cls === 'dinas') senderSelect.value = 'Wawar-primary';
+  else if (cls === 'event') senderSelect.value = 'rayi-cs-official';
+  else if (cls === 'siaran' || cls === 'komersil') senderSelect.value = 'wawar-blast-x';
+}
+
 function handleSaveNewCampaign(e) {
   e.preventDefault();
   const name = document.getElementById('campName').value.trim();
+  const classification = document.getElementById('campClassification').value;
+  const startDateVal = document.getElementById('campStartDate').value;
+  const endDateVal = document.getElementById('campEndDate').value;
   const group = document.getElementById('campTargetGroup').value;
   const time = document.getElementById('campTime').value || '04:30';
+  const senderNumber = document.getElementById('campSenderNumber').value;
   const channel = document.getElementById('campChannel').value;
   const defaultText = document.getElementById('campDefaultText').value.trim();
 
   let recipientLabel = "Anak Tercinta (+62 851-2104-2025)";
   if (group === 'pimpinan') recipientLabel = "Grup Pimpinan & Eselon IKP";
   else if (group === 'tandang') recipientLabel = "Grup ASN & Staf TANDANG";
+  else if (group === 'event_runners') recipientLabel = "Peserta Fun Run 26 Des";
   else if (group === 'manual') {
     const manualNum = document.getElementById('campManualPhone').value.trim();
     recipientLabel = `Nomor Manual (+${manualNum})`;
   }
 
   const campId = 'camp_' + Date.now();
-  const colors = ['amber', 'green', 'blue', 'purple'];
-  const assignedColor = colors[calendarCampaigns.length % colors.length];
+  
+  // Tentukan warna badge berdasarkan klasifikasi
+  let assignedColor = 'amber';
+  if (classification === 'dinas') assignedColor = 'green';
+  else if (classification === 'event') assignedColor = 'blue';
+  else if (classification === 'siaran') assignedColor = 'purple';
+  else if (classification === 'komersil') assignedColor = 'blue';
 
   const newCampaign = {
     id: campId,
     name: name,
+    classification: classification,
+    startDate: startDateVal,
+    endDate: endDateVal,
+    senderNumber: senderNumber,
     time: time,
     recipient: recipientLabel,
     color: assignedColor,
@@ -1165,32 +1266,35 @@ function handleSaveNewCampaign(e) {
     pillList.appendChild(btn);
   }
 
-  // Tanyakan apakah ingin mengisi otomatis 30 hari ke kalender
-  const populateMonth = confirm(`Campaign "${name}" berhasil dibuat!\n\nIngin jadwalkan pesan ini otomatis setiap hari jam ${time} WIB selama bulan ini?`);
-  if (populateMonth) {
-    const totalDays = new Date(currentCalYear, currentCalMonth + 1, 0).getDate();
-    for (let d = 1; d <= totalDays; d++) {
-      const dStr = String(d).padStart(2, '0');
-      const mStr = String(currentCalMonth + 1).padStart(2, '0');
-      const dKey = `${currentCalYear}-${mStr}-${dStr}`;
+  // Petakan HANYA pada rentang tanggal mulai s/d tanggal selesai (Batas Waktu)
+  const start = new Date(startDateVal);
+  const end = new Date(endDateVal);
+  let daysSeeded = 0;
 
-      if (!calendarEntries[dKey]) calendarEntries[dKey] = [];
-      calendarEntries[dKey].push({
-        id: `${campId}-${dKey}`,
-        campId: campId,
-        campName: name,
-        time: time,
-        recipient: recipientLabel,
-        message: defaultText,
-        status: 'SCHEDULED',
-        color: assignedColor
-      });
-    }
+  for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
+    const y = dt.getFullYear();
+    const m = String(dt.getMonth() + 1).padStart(2, '0');
+    const d = String(dt.getDate()).padStart(2, '0');
+    const dKey = `${y}-${m}-${d}`;
+
+    if (!calendarEntries[dKey]) calendarEntries[dKey] = [];
+    calendarEntries[dKey].push({
+      id: `${campId}-${dKey}`,
+      campId: campId,
+      campName: name,
+      time: time,
+      senderNumber: senderNumber,
+      recipient: recipientLabel,
+      message: defaultText,
+      status: 'SCHEDULED',
+      color: assignedColor
+    });
+    daysSeeded++;
   }
 
   renderCalendar(currentCalMonth, currentCalYear);
   closeCreateCampaignModal();
-  showToast(`Campaign "${name}" aktif dan terhubung ke kalender siar! 📅🚀`, 'success');
+  showToast(`Campaign "${name}" aktif! Terkunci ${daysSeeded} hari siar (${startDateVal} s/d ${endDateVal}) 📅🚀`, 'success');
 }
 
 /* ================= MODAL: ISI / EDIT PESAN PADA TANGGAL TERTENTU ================= */

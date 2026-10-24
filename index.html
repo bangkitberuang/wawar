@@ -547,11 +547,12 @@
 
           <!-- Active Campaigns Pill Filter -->
           <div class="campaign-selector-bar">
-            <span class="label">Pilih Campaign:</span>
+            <span class="label">Klasifikasi Campaign:</span>
             <div class="campaign-pill-list" id="activeCampaignList">
-              <button class="campaign-chip active" onclick="selectCalendarCampaign('all')">Semua Campaign (3)</button>
+              <button class="campaign-chip active" onclick="selectCalendarCampaign('all')">Semua (4)</button>
               <button class="campaign-chip amber" onclick="selectCalendarCampaign('subuh')">🌅 Sapa Subuh Anak &amp; Keluarga</button>
-              <button class="campaign-chip green" onclick="selectCalendarCampaign('dinas')">📋 Agenda Kedinasan IKP</button>
+              <button class="campaign-chip green" onclick="selectCalendarCampaign('dinas')">🏛️ Agenda Kedinasan IKP</button>
+              <button class="campaign-chip blue" onclick="selectCalendarCampaign('event')">🏃 Event Fun Run 26 Des</button>
               <button class="campaign-chip blue" onclick="selectCalendarCampaign('sppd')">💼 Pengingat SPPD TANDANG</button>
             </div>
           </div>
@@ -565,9 +566,9 @@
                 <button class="cal-nav-btn" onclick="nextMonth()">Bulan Berikutnya &rarr;</button>
               </div>
               <div class="calendar-legend">
-                <span class="legend-item"><span class="dot-amber"></span> Subuh (04:30)</span>
-                <span class="legend-item"><span class="dot-green"></span> Agenda Dinas</span>
-                <span class="legend-item"><span class="dot-blue"></span> SPPD / TANDANG</span>
+                <span class="legend-item"><span class="dot-amber"></span> Keluarga / Subuh</span>
+                <span class="legend-item"><span class="dot-green"></span> Kedinasan IKP</span>
+                <span class="legend-item"><span class="dot-blue"></span> Event Fun Run / SPPD</span>
               </div>
             </div>
 
@@ -631,19 +632,66 @@
             </div>
 
             <form onsubmit="handleSaveNewCampaign(event)">
-              <div class="form-group">
-                <label>1. Nama Campaign / Program</label>
-                <input type="text" id="campName" placeholder="Contoh: Sapa Subuh Anak Tercinta / Pengingat Apel Pagi" required>
+              <div class="card-grid-2">
+                <div class="form-group">
+                  <label>1. Nama Campaign / Program</label>
+                  <input type="text" id="campName" placeholder="Contoh: Sapa Subuh Anak / Fun Run 26 Des / Apel Dinas" value="Sapa Subuh Anak &amp; Keluarga" required>
+                </div>
+
+                <div class="form-group">
+                  <label>2. Klasifikasi / Kategori</label>
+                  <select id="campClassification" class="form-select" onchange="autoSyncSenderAndColorByClassification()">
+                    <option value="keluarga" selected>🌅 Keluarga &amp; Nurturing (Sapa Subuh, Doa Pagi)</option>
+                    <option value="dinas">🏛️ Kedinasan &amp; Pemerintahan (IKP, SPPD, TANDANG)</option>
+                    <option value="event">🏃 Event &amp; Publik (Fun Run 26 Des, Acara)</option>
+                    <option value="siaran">📢 Siaran Pengumuman Massal</option>
+                    <option value="komersil">💼 Komersial &amp; Mitra Luar</option>
+                  </select>
+                </div>
               </div>
 
+              <!-- Batas Waktu Campaign (Start & End Date) -->
+              <div class="card-grid-2">
+                <div class="form-group">
+                  <label>3. Tanggal Mulai Siar</label>
+                  <input type="date" id="campStartDate" value="2026-10-01" required>
+                </div>
+                <div class="form-group">
+                  <label>4. Tanggal Berakhir (Batas Waktu Selesai)</label>
+                  <input type="date" id="campEndDate" value="2026-10-31" required>
+                  <small class="hint-text">Setelah tanggal ini, campaign otomatis berhenti &amp; berstatus Selesai.</small>
+                </div>
+              </div>
+
+              <!-- Paket Materi Konten Siap Pakai -->
               <div class="form-group">
-                <label>2. Ke Siapa? (Target Audience / Grup)</label>
-                <select id="campTargetGroup" class="form-select">
-                  <option value="keluarga">👨‍👩‍👧 Grup Keluarga &amp; Anak (+62 851-2104-2025)</option>
-                  <option value="pimpinan">🏛️ Grup Pimpinan &amp; Eselon IKP</option>
-                  <option value="tandang">📋 Grup ASN &amp; Staf TANDANG</option>
-                  <option value="manual">Ketik Nomor HP Manual...</option>
+                <label>5. Pilih Materi Konten Siap Pakai (Add-on Library)</label>
+                <select id="campContentPreset" class="form-select" onchange="applyContentPreset()">
+                  <option value="subuh" selected>🌅 Paket 31 Hari Sapa Subuh (31 Doa Fajar &amp; Motivasi Berbeda Tiap Hari)</option>
+                  <option value="funrun">🏃 Paket Event Fun Run 26 Des (Rute 5K, Shareloc Gedung Sate, Race Pack)</option>
+                  <option value="tandang_sppd">🏛️ Paket Kedinasan TANDANG (Surat Tugas, SPPD F4 &amp; Disposisi)</option>
+                  <option value="apel_senin">📋 Paket Pengingat Apel Pagi ASN (Setiap Senin 07:00 WIB)</option>
+                  <option value="custom">✍️ Kustom (Tulis Materi Sendiri)</option>
                 </select>
+                <small class="hint-text">Tinggal pilih materi yang sudah disiapkan, tidak perlu mengetik dari nol.</small>
+              </div>
+
+              <div class="card-grid-2">
+                <div class="form-group">
+                  <label>6. Ke Siapa? (Target Penerima)</label>
+                  <select id="campTargetGroup" class="form-select">
+                    <option value="keluarga" selected>👨‍👩‍👧 Grup Keluarga &amp; Anak (+62 851-2104-2025)</option>
+                    <option value="pimpinan">🏛️ Grup Pimpinan &amp; Eselon IKP</option>
+                    <option value="tandang">📋 Grup ASN &amp; Staf TANDANG</option>
+                    <option value="event_runners">🏃 Peserta Fun Run 26 Desember</option>
+                    <option value="manual">Ketik Nomor HP / ID Grup Manual...</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label>7. Jam Kirim Rutin</label>
+                  <input type="time" id="campTime" value="04:30" required>
+                </div>
               </div>
 
               <div class="form-group hidden" id="boxCampManualPhone">
@@ -653,12 +701,18 @@
 
               <div class="card-grid-2">
                 <div class="form-group">
-                  <label>3. Jam Kirim Rutin</label>
-                  <input type="time" id="campTime" value="04:30" required>
-                  <small class="hint-text">Contoh: 04:30 WIB untuk waktu subuh.</small>
+                  <label>8. Alokasi Nomor Pengirim (Sender Pool)</label>
+                  <select id="campSenderNumber" class="form-select">
+                    <option value="wawar-subuh" selected>🌅 wawar-subuh • Khusus Sapa Subuh Anak &amp; Keluarga</option>
+                    <option value="Wawar-primary">📱 Wawar-primary (+62 851-2104-2025) • Notifikasi Utama Dinas</option>
+                    <option value="rayi-cs-official">🤖 rayi-cs-official • Khusus Chatbot RAYI &amp; CS Event</option>
+                    <option value="wawar-blast-x">📢 wawar-blast-x (Nomor X) • Khusus Blast Massal</option>
+                    <option value="pool-rotator">🔄 Multi-Number Pooling (Bagi Rata Beban Kirim)</option>
+                  </select>
                 </div>
+
                 <div class="form-group">
-                  <label>4. Saluran Pengiriman</label>
+                  <label>9. Saluran Pengiriman</label>
                   <select id="campChannel" class="form-select">
                     <option value="whatsapp" selected>📱 WhatsApp (via bot RAYI)</option>
                     <option value="telegram">✈️ Telegram Official Bot</option>
@@ -668,24 +722,12 @@
               </div>
 
               <div class="form-group">
-                <label>5. Alokasi Nomor Pengirim (Sender Number Pool)</label>
-                <select id="campSenderNumber" class="form-select">
-                  <option value="Wawar-primary">📱 Wawar-primary (+62 851-2104-2025) • Notifikasi Utama Dinas</option>
-                  <option value="rayi-cs-official">🤖 rayi-cs-official • Khusus Chatbot RAYI &amp; CS</option>
-                  <option value="wawar-subuh" selected>🌅 wawar-subuh • Khusus Sapa Subuh Anak &amp; Keluarga</option>
-                  <option value="wawar-blast-x">📢 wawar-blast-x (Nomor X) • Khusus Blast Campaign D, F, dll</option>
-                  <option value="pool-rotator">🔄 Multi-Number Pooling (Bagi Rata Beban Kirim)</option>
-                </select>
-                <small class="hint-text">Tentukan nomor WhatsApp khusus mana yang mengeksekusi program ini (misal Campaign D &amp; F pakai Nomor X).</small>
-              </div>
-
-              <div class="form-group">
-                <label>6. Template / Default Isi Pesan (Bisa Diedit per Tanggal di Kalender)</label>
-                <textarea id="campDefaultText" rows="3" placeholder="Ketik draf pesan default...">Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur.</textarea>
+                <label>10. Pratinjau Isi Materi Pesan (Bisa Diedit per Tanggal di Kalender)</label>
+                <textarea id="campDefaultText" rows="4" placeholder="Ketik draf pesan default...">Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur.</textarea>
               </div>
 
               <div class="form-actions mt-3">
-                <button type="submit" class="btn btn-primary btn-block">Simpan Campaign &amp; Buka Kalender &rarr;</button>
+                <button type="submit" class="btn btn-primary btn-block">Simpan Campaign &amp; Kunci ke Kalender &rarr;</button>
               </div>
             </form>
           </div>
