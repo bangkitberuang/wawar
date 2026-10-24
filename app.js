@@ -20,6 +20,11 @@ let otpCountdownTimer = null;
 document.addEventListener('DOMContentLoaded', () => {
   console.log('WAWAR Web Application Initialized.');
   initLiveHealth();
+  loadCampaignsFromDb();
+  loadCampaignTemplatesFromDb();
+  initCalendarEntries();
+  populateCampaignContentPresetOptions();
+  calculateSeriesEndDate();
 });
 
 /* ================= NAVIGATION & ROUTING ================= */
@@ -1151,58 +1156,169 @@ function selectCalendarCampaign(campId) {
 
 /* ================= CAMPAIGN HUB ENGINE & SUPER-SIMPLE WIZARD ================= */
 
-let currentCampaignHubFilter = 'all';
+/**
+ * Fixed Enum for Campaign Types:
+ * - one_time: satu pesan pada satu waktu
+ * - recurring: berulang (harian/mingguan/bulanan) pada jam tertentu
+ * - series: paket berseri, N pesan berbeda berurutan per hari
+ * - event_reminder: pesan relatif terhadap tanggal acara (H-7, H-1, hari H)
+ * - auto_reply: bot membalas berdasarkan kata kunci
+ */
+const CampaignType = Object.freeze({
+  ONE_TIME: 'one_time',
+  RECURRING: 'recurring',
+  SERIES: 'series',
+  EVENT_REMINDER: 'event_reminder',
+  AUTO_REPLY: 'auto_reply'
+});
 
-let campaignHubList = [
-  {
-    id: 'subuh',
-    name: 'Sapa Subuh Anak & Keluarga',
-    classification: 'subuh',
-    icon: '🌅',
-    startDate: '2026-10-01',
-    endDate: '2026-10-31',
-    time: '04:30',
-    senderNumber: 'wawar-subuh (+62 851-2104-2025)',
-    senderInstance: 'wawar-subuh',
-    recipient: '👨‍👩‍👧 Anak & Keluarga (+62 851-2104-2025)',
-    status: 'ACTIVE',
-    color: 'amber',
-    kbTitle: 'Paket 31 Hari Sapa Subuh (31 Doa Fajar)',
-    defaultMsg: 'Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.'
-  },
-  {
-    id: 'funrun',
-    name: 'Event Fun Run 26 Des Jabar',
-    classification: 'event',
-    icon: '🏃',
-    startDate: '2026-12-01',
-    endDate: '2026-12-26',
-    time: '05:30',
-    senderNumber: 'rayi-cs-official',
-    senderInstance: 'rayi-cs-official',
-    recipient: '🏃 500 Peserta Fun Run 26 Des',
-    status: 'ACTIVE',
-    color: 'blue',
-    kbTitle: 'Rute 5K Gedung Sate & Link Maps Shareloc',
-    defaultMsg: 'Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186'
-  },
-  {
-    id: 'dinas',
-    name: 'Sosialisasi SPPD & Kedinasan TANDANG',
-    classification: 'dinas',
-    icon: '🏛️',
-    startDate: '2026-10-15',
-    endDate: '2026-11-15',
-    time: '07:00',
-    senderNumber: 'Wawar-primary (+62 851-2104-2025)',
-    senderInstance: 'Wawar-primary',
-    recipient: '🏛️ Grup ASN & Staf TANDANG',
-    status: 'ACTIVE',
-    color: 'green',
-    kbTitle: 'SOP Kedinasan TANDANG & SPPD F4 Digital',
-    defaultMsg: 'Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.'
-  }
+const INDO_MONTHS = [
+  "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+  "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
 ];
+
+function formatDateIndo(input) {
+  if (!input) return '-';
+  if (typeof input === 'string') {
+    const match = input.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (match) {
+      const y = match[1];
+      const m = parseInt(match[2], 10) - 1;
+      const d = parseInt(match[3], 10);
+      return `${d} ${INDO_MONTHS[m] || match[2]} ${y}`;
+    }
+  }
+  const dateObj = new Date(input);
+  if (!isNaN(dateObj.getTime())) {
+    const d = dateObj.getDate();
+    const m = dateObj.getMonth();
+    const y = dateObj.getFullYear();
+    return `${d} ${INDO_MONTHS[m]} ${y}`;
+  }
+  return String(input);
+}
+
+function getTypeLabel(type) {
+  switch (type) {
+    case CampaignType.ONE_TIME: return 'Satu Waktu';
+    case CampaignType.RECURRING: return 'Berulang Rutin';
+    case CampaignType.SERIES: return 'Paket Berseri';
+    case CampaignType.EVENT_REMINDER: return 'Pengingat Acara';
+    case CampaignType.AUTO_REPLY: return 'Balas Otomatis';
+    default: return 'Campaign';
+  }
+}
+
+function getTypeBadgeClass(type) {
+  switch (type) {
+    case CampaignType.ONE_TIME: return 'green';
+    case CampaignType.RECURRING: return 'blue';
+    case CampaignType.SERIES: return 'amber';
+    case CampaignType.EVENT_REMINDER: return 'purple';
+    case CampaignType.AUTO_REPLY: return 'teal';
+    default: return 'blue';
+  }
+}
+
+let currentCampaignHubFilter = 'all';
+// All campaigns loaded dynamically from database (no hardcoded presets in code)
+let campaignHubList = [];
+// User-owned campaign templates loaded dynamically from database (no system presets)
+let userCampaignTemplates = [];
+
+/**
+ * Load Campaigns from Database API
+ */
+async function loadCampaignsFromDb() {
+  try {
+    const res = await fetch('/api/campaigns');
+    if (res.ok) {
+      const result = await res.json();
+      if (result.success && Array.isArray(result.data)) {
+        campaignHubList = result.data.map(item => ({
+          id: item.id,
+          user_id: item.user_id || 'usr_admin',
+          name: item.name,
+          type: item.type || CampaignType.ONE_TIME,
+          category: item.category || item.classification || 'siaran',
+          classification: item.category || item.classification || 'siaran',
+          senderNumber: item.sender_number || item.senderNumber || 'Wawar-primary',
+          sender_number: item.sender_number || item.senderNumber || 'Wawar-primary',
+          senderInstance: item.sender_number || item.senderNumber || 'Wawar-primary',
+          recipient: item.recipient || 'Grup Penerima',
+          target_group: item.target_group || 'tandang',
+          knowledge_base_id: item.knowledge_base_id || '',
+          kbTitle: item.knowledge_base_id ? getKbTitleById(item.knowledge_base_id) : 'Bahan Materi Standard',
+          defaultMsg: item.message || item.defaultMsg || '',
+          message: item.message || item.defaultMsg || '',
+          status: item.status || 'ACTIVE',
+          color: item.color || 'blue',
+          icon: item.icon || '📱',
+          time: item.time || (item.config?.series_time || item.config?.recurring_time || item.config?.event_time || item.config?.time || '07:00'),
+          startDate: item.startDate || (item.config?.start_date || item.config?.date || '2026-10-24'),
+          endDate: item.endDate || (item.config?.end_date || item.config?.event_date || '2026-10-24'),
+          config: item.config || {}
+        }));
+        localStorage.setItem('wawar_campaigns', JSON.stringify(campaignHubList));
+      }
+    }
+  } catch (err) {
+    console.warn('Gagal memuat campaign dari server API, menggunakan fallback localStorage:', err);
+    const cached = localStorage.getItem('wawar_campaigns');
+    if (cached) {
+      try { campaignHubList = JSON.parse(cached); } catch(e) {}
+    }
+  }
+
+  // Synchronize into calendar
+  campaignHubList.forEach(c => seedCampaignRecordToCalendar(c));
+  renderCampaignHub(currentCampaignHubFilter);
+  renderCalendar(currentCalMonth, currentCalYear);
+}
+
+/**
+ * Load User Templates from Database API
+ */
+async function loadCampaignTemplatesFromDb() {
+  try {
+    const res = await fetch('/api/campaign-templates?user_id=usr_admin');
+    if (res.ok) {
+      const result = await res.json();
+      if (result.success && Array.isArray(result.data)) {
+        userCampaignTemplates = result.data;
+        localStorage.setItem('wawar_campaign_templates', JSON.stringify(userCampaignTemplates));
+      }
+    }
+  } catch (err) {
+    console.warn('Gagal memuat template dari server API, menggunakan fallback localStorage:', err);
+    const cached = localStorage.getItem('wawar_campaign_templates');
+    if (cached) {
+      try { userCampaignTemplates = JSON.parse(cached); } catch(e) {}
+    }
+  }
+  renderUserTemplatesList();
+}
+
+function getKbTitleById(kbId) {
+  if (typeof knowledgeBases !== 'undefined' && Array.isArray(knowledgeBases)) {
+    const found = knowledgeBases.find(k => k.id === kbId);
+    if (found) return found.title;
+  }
+  return kbId;
+}
+
+function populateCampaignContentPresetOptions() {
+  const select = document.getElementById('campContentPreset');
+  if (!select) return;
+
+  let optionsHtml = `<option value="">✍️ Kustom (Tulis Materi Sendiri Tanpa Add-on)</option>`;
+  if (typeof knowledgeBases !== 'undefined' && Array.isArray(knowledgeBases)) {
+    knowledgeBases.forEach(kb => {
+      optionsHtml += `<option value="${kb.id}">📚 ${kb.title} (${(kb.classification || 'dinas').toUpperCase()})</option>`;
+    });
+  }
+  select.innerHTML = optionsHtml;
+}
 
 function renderCampaignHub(filter = 'all') {
   currentCampaignHubFilter = filter;
@@ -1213,26 +1329,30 @@ function renderCampaignHub(filter = 'all') {
   const filterBtns = document.querySelectorAll('#hubCampaignFilterList .campaign-chip');
   filterBtns.forEach(b => b.classList.remove('active'));
   if (filter === 'all') document.getElementById('btnHubFilterAll')?.classList.add('active');
-  else if (filter === 'subuh') document.getElementById('btnHubFilterSubuh')?.classList.add('active');
+  else if (filter === 'subuh' || filter === 'keluarga') document.getElementById('btnHubFilterSubuh')?.classList.add('active');
   else if (filter === 'event') document.getElementById('btnHubFilterEvent')?.classList.add('active');
   else if (filter === 'dinas') document.getElementById('btnHubFilterDinas')?.classList.add('active');
 
   const filtered = filter === 'all' 
     ? campaignHubList 
-    : campaignHubList.filter(c => c.classification === filter);
+    : campaignHubList.filter(c => (c.category === filter || c.classification === filter));
 
   let html = '';
 
   filtered.forEach(camp => {
-    // Hitung sisa hari & progres relatif ke hari ini (24 Okt 2026)
-    const today = new Date('2026-10-24');
-    const start = new Date(camp.startDate);
-    const end = new Date(camp.endDate);
+    const today = new Date('2026-10-24T00:00:00');
+    const startStr = camp.startDate || (camp.config && (camp.config.start_date || camp.config.date)) || '2026-10-24';
+    const endStr = camp.endDate || (camp.config && (camp.config.end_date || camp.config.event_date)) || startStr;
+    const start = new Date(startStr + 'T00:00:00');
+    const end = new Date(endStr + 'T00:00:00');
     
     let durationLabel = '';
     let progressPercent = 50;
 
-    if (today > end) {
+    if (camp.type === CampaignType.AUTO_REPLY) {
+      durationLabel = `<span style="color:#059669; font-weight:700;">🟢 Siaga 24/7 (Non-stop)</span>`;
+      progressPercent = 100;
+    } else if (today > end) {
       durationLabel = '<span style="color:#64748B;">Selesai (Kedaluwarsa)</span>';
       progressPercent = 100;
     } else if (today < start) {
@@ -1248,6 +1368,26 @@ function renderCampaignHub(filter = 'all') {
     }
 
     const isRunning = camp.status === 'ACTIVE';
+    const typeLabel = getTypeLabel(camp.type);
+    const typeBadge = getTypeBadgeClass(camp.type);
+    const categoryName = (camp.category || camp.classification || 'siaran').toUpperCase();
+
+    // Deskripsi Jadwal Spesifik Mekanisme Pengiriman
+    let scheduleDetailHtml = '';
+    if (camp.type === CampaignType.SERIES) {
+      scheduleDetailHtml = `Paket Berseri • <strong>${camp.config?.total_messages || 31} Pesan Harian</strong> (04:30 WIB)`;
+    } else if (camp.type === CampaignType.EVENT_REMINDER) {
+      const eventDateFormatted = formatDateIndo(camp.config?.event_date || '2026-12-26');
+      const offsetsStr = (camp.config?.offsets || ['H-7', 'H-1', 'H']).join(', ');
+      scheduleDetailHtml = `Acara: <strong>${eventDateFormatted}</strong> • Offset Pengingat: <strong>${offsetsStr}</strong>`;
+    } else if (camp.type === CampaignType.RECURRING) {
+      const pat = (camp.config?.recurring_pattern || 'weekly').toUpperCase();
+      scheduleDetailHtml = `Pola: <strong>${pat}</strong> • Jam: <strong>${camp.time || '07:00'} WIB</strong>`;
+    } else if (camp.type === CampaignType.AUTO_REPLY) {
+      scheduleDetailHtml = `Trigger Kata Kunci: <strong>"${camp.config?.keywords || 'info'}"</strong> (Mode: ${camp.config?.match_mode || 'contains'})`;
+    } else {
+      scheduleDetailHtml = `Satu Waktu • <strong>${formatDateIndo(camp.startDate)}</strong> pukul <strong>${camp.time || '09:00'} WIB</strong>`;
+    }
 
     html += `
       <div class="campaign-hub-card ${camp.color}-glow">
@@ -1260,9 +1400,10 @@ function renderCampaignHub(filter = 'all') {
               </div>
               <div class="camp-card-title-text">
                 <h3>${camp.name}</h3>
-                <div style="display:flex; align-items:center; gap:6px; margin-top:2px;">
+                <div style="display:flex; align-items:center; gap:6px; margin-top:2px; flex-wrap:wrap;">
                   <span class="badge-status ${isRunning ? 'open' : 'closed'}">${isRunning ? '● Berjalan Aktif' : '⏸️ Dijeda'}</span>
-                  <span class="badge-tag ${camp.color}" style="font-size:0.7rem; padding:1px 6px;">${camp.classification.toUpperCase()}</span>
+                  <span class="badge-tag ${typeBadge}" style="font-size:0.7rem; padding:1px 6px;">${typeLabel}</span>
+                  <span class="badge-tag ${camp.color}" style="font-size:0.7rem; padding:1px 6px;">${categoryName}</span>
                 </div>
               </div>
             </div>
@@ -1272,11 +1413,14 @@ function renderCampaignHub(filter = 'all') {
           <!-- Bar Batas Waktu & Sisa Hari -->
           <div class="camp-duration-strip">
             <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.76rem;">
-              <span style="color:#64748B; font-weight:600;">📅 ${camp.startDate} s/d ${camp.endDate}</span>
+              <span style="color:#64748B; font-weight:600;">📅 ${formatDateIndo(startStr)} s/d ${formatDateIndo(endStr)}</span>
               ${durationLabel}
             </div>
             <div class="camp-progress-track">
               <div class="camp-progress-fill ${camp.color}" style="width:${progressPercent}%;"></div>
+            </div>
+            <div style="font-size:0.72rem; color:#475569; margin-top:4px;">
+              ${scheduleDetailHtml}
             </div>
           </div>
 
@@ -1284,7 +1428,7 @@ function renderCampaignHub(filter = 'all') {
           <div class="camp-meta-list">
             <div class="camp-meta-item">
               <span class="meta-label">📱 Nomor Pengirim:</span>
-              <strong>${camp.senderNumber}</strong>
+              <strong>${camp.senderNumber || camp.sender_number}</strong>
             </div>
             <div class="camp-meta-item">
               <span class="meta-label">🎯 Target Penerima:</span>
@@ -1292,7 +1436,7 @@ function renderCampaignHub(filter = 'all') {
             </div>
             <div class="camp-meta-item">
               <span class="meta-label">📚 Materi / Add-on:</span>
-              <strong style="color:#059669;">${camp.kbTitle}</strong>
+              <strong style="color:#059669;">${camp.kbTitle || 'Bahan Materi Standard'}</strong>
             </div>
           </div>
 
@@ -1303,46 +1447,63 @@ function renderCampaignHub(filter = 'all') {
               <span style="font-size:0.74rem; font-weight:700; color:#1E293B;">Contoh Pesan WhatsApp Terjadwal:</span>
             </div>
             <div class="wa-bubble-mockup">
-              <p class="wa-bubble-text">${camp.defaultMsg}</p>
+              <p class="wa-bubble-text">${camp.message || camp.defaultMsg}</p>
               <div class="wa-bubble-meta">
-                <span>${camp.time}</span>
+                <span>${camp.time} WIB</span>
                 <span class="wa-checks">✓✓</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Tombol Aksi Super Ramah (Anak SD Pun Mengerti) -->
+        <!-- Tombol Aksi Super Ramah -->
         <div class="camp-card-actions">
           <button class="btn btn-outline btn-sm" onclick="jumpToCalendarForCampaign('${camp.id}')" title="Buka kotak kalender 1-31 untuk campaign ini">
-            <span>🗓️ Kalender (1–31)</span>
+            <span>🗓️ Kalender</span>
           </button>
           <button class="btn btn-primary btn-sm" onclick="testSendCampaignToWA('${camp.id}')" title="Tes kirim langsung ke nomor WhatsApp">
             <span>📲 Tes Kirim</span>
           </button>
-          <button class="btn btn-ghost btn-sm" onclick="togglePauseCampaign('${camp.id}')" title="${isRunning ? 'Jeda program ini' : 'Aktifkan kembali program ini'}">
+          <button class="btn btn-ghost btn-sm" onclick="togglePauseCampaign('${camp.id}')" title="${isRunning ? 'Jeda campaign ini' : 'Aktifkan kembali campaign ini'}">
             <span>${isRunning ? '⏸️ Jeda' : '▶️ Aktif'}</span>
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="deleteCampaign('${camp.id}')" title="Hapus campaign ini" style="color:#DC2626;">
+            <span>🗑️ Hapus</span>
           </button>
         </div>
       </div>
     `;
   });
 
-  // Selalu tambahkan Kartu "+ Buat Campaign Baru" yang ramah & ceria di akhir grid
+  // Tombol "+ Buat Campaign Baru" yang ramah & ceria di akhir grid
   html += `
     <div class="campaign-hub-card create-new-dashed" onclick="openCreateCampaignModal()">
       <div class="create-new-content">
         <div class="create-new-icon">✨ ➕</div>
         <h3>Buat Campaign Baru</h3>
-        <p>Mudah dan menyenangkan! Pilih template siap pakai (Sapa Subuh, Event Lari, atau Surat Dinas) hanya dengan 1 kali klik.</p>
+        <p>Pilih dari 5 jenis mekanisme pengiriman pesan: Satu Waktu, Berulang, Berseri, Pengingat Acara, atau Balas Otomatis.</p>
         <button type="button" class="btn btn-primary btn-sm mt-3" style="pointer-events:none;">
-          <span>✨ Mulai Buat Siaran &rarr;</span>
+          <span>✨ Mulai Buat Campaign &rarr;</span>
         </button>
       </div>
     </div>
   `;
 
   grid.innerHTML = html;
+}
+
+async function deleteCampaign(campId) {
+  if (!confirm('Apakah Anda yakin ingin menghapus campaign ini?')) return;
+  try {
+    await fetch(`/api/campaigns/${campId}`, { method: 'DELETE' });
+  } catch (err) {
+    console.warn('API delete warning:', err);
+  }
+  campaignHubList = campaignHubList.filter(c => c.id !== campId);
+  localStorage.setItem('wawar_campaigns', JSON.stringify(campaignHubList));
+  renderCampaignHub(currentCampaignHubFilter);
+  renderCalendar(currentCalMonth, currentCalYear);
+  showToast('Campaign berhasil dihapus.', 'info');
 }
 
 function filterCampaignHub(category) {
@@ -1353,17 +1514,17 @@ function jumpToCalendarForCampaign(campId) {
   switchDashTab('calendar');
   selectCalendarCampaign(campId);
   const targetCamp = campaignHubList.find(c => c.id === campId);
-  showToast(`Membuka kotak kalender tanggal 1–31 untuk: "${targetCamp?.name || 'Program'}" 🗓️✨`, 'info');
+  showToast(`Membuka kotak kalender untuk: "${targetCamp?.name || 'Campaign'}" 🗓️✨`, 'info');
 }
 
 function testSendCampaignToWA(campId) {
   const camp = campaignHubList.find(c => c.id === campId);
   if (!camp) return;
 
-  showToast(`Mengirim simulasi pesan WhatsApp "${camp.name}" via jalur ${camp.senderNumber}... 📲⚡`, 'info');
+  showToast(`Mengirim simulasi pesan WhatsApp "${camp.name}" via jalur ${camp.senderNumber || camp.sender_number}... 📲⚡`, 'info');
 
   setTimeout(() => {
-    showToast(`✅ SUKSES! Pesan WhatsApp [${camp.name}] berhasil dikirim ke +62 851-2104-2025! Cek HP Anda sekarang. 🎉`, 'success');
+    showToast(`✅ SUKSES! Pesan WhatsApp [${camp.name}] berhasil dikirim ke ${camp.recipient}! Cek WhatsApp Anda sekarang. 🎉`, 'success');
   }, 1000);
 }
 
@@ -1372,21 +1533,25 @@ function togglePauseCampaign(campId) {
   if (!camp) return;
 
   camp.status = camp.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+  localStorage.setItem('wawar_campaigns', JSON.stringify(campaignHubList));
   renderCampaignHub(currentCampaignHubFilter);
 
   if (camp.status === 'ACTIVE') {
-    showToast(`Program "${camp.name}" diaktifkan kembali! 🚀 Siaran akan berjalan sesuai jadwal.`, 'success');
+    showToast(`Campaign "${camp.name}" diaktifkan kembali! 🚀 Pesan akan berjalan sesuai jadwal.`, 'success');
   } else {
-    showToast(`Program "${camp.name}" dijeda sementara. ⏸️ Bot tidak akan mengirim siaran sampai diaktifkan lagi.`, 'warning');
+    showToast(`Campaign "${camp.name}" dijeda sementara. ⏸️ Bot tidak akan mengirim pesan sampai diaktifkan lagi.`, 'warning');
   }
 }
 
-/* ================= MODAL: BUAT CAMPAIGN BARU WIZARD ================= */
+/* ================= MODAL: BUAT CAMPAIGN BARU (WIZARD 4 LANGKAH) ================= */
 
 function openCreateCampaignModal() {
   const modal = document.getElementById('modalCreateCampaign');
   if (modal) {
     modal.classList.add('active');
+    selectCampaignType('one_time');
+    populateCampaignContentPresetOptions();
+    calculateSeriesEndDate();
     updateModalLiveWaPreview();
   }
 }
@@ -1396,95 +1561,288 @@ function closeCreateCampaignModal() {
   if (modal) modal.classList.remove('active');
 }
 
-function pickCampaignTemplate(templateType) {
-  // 1. Update visual cards styling
-  const choices = document.querySelectorAll('.template-card-choice');
-  choices.forEach(c => c.classList.remove('active'));
+/**
+ * Langkah 1: Pilih Jenis Siaran (5 Mekanisme Pengiriman)
+ */
+function selectCampaignType(type) {
+  const validTypes = ['one_time', 'recurring', 'series', 'event_reminder', 'auto_reply'];
+  if (!validTypes.includes(type)) type = 'one_time';
 
-  const badge = document.getElementById('badgeTmplSelected');
-  const nameInp = document.getElementById('campName');
-  const classSelect = document.getElementById('campClassification');
-  const startInp = document.getElementById('campStartDate');
-  const endInp = document.getElementById('campEndDate');
-  const timeInp = document.getElementById('campTime');
-  const senderSelect = document.getElementById('campSenderNumber');
-  const targetSelect = document.getElementById('campTargetGroup');
-  const presetSelect = document.getElementById('campContentPreset');
-  const textInp = document.getElementById('campDefaultText');
+  // 1. Update hidden input
+  const typeInp = document.getElementById('campType');
+  if (typeInp) typeInp.value = type;
 
-  if (templateType === 'subuh') {
-    document.getElementById('tmplChoiceSubuh')?.classList.add('active');
-    if (badge) {
-      badge.textContent = '✅ Sapa Subuh Terpilih';
-      badge.className = 'badge-tag amber';
+  // 2. Update visual active state of cards
+  validTypes.forEach(t => {
+    const card = document.getElementById(`cardType-${t}`);
+    if (card) {
+      if (t === type) card.classList.add('active');
+      else card.classList.remove('active');
     }
-    nameInp.value = "Sapa Subuh Anak & Keluarga";
-    classSelect.value = "keluarga";
-    startInp.value = "2026-10-01";
-    endInp.value = "2026-10-31";
-    timeInp.value = "04:30";
-    senderSelect.value = "wawar-subuh";
-    targetSelect.value = "keluarga";
-    if (presetSelect) presetSelect.value = "subuh";
-    textInp.value = "Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.";
-    setQuickCampTime('04:30', document.querySelector('.time-pill:nth-child(1)'));
-  } else if (templateType === 'funrun') {
-    document.getElementById('tmplChoiceFunrun')?.classList.add('active');
-    if (badge) {
-      badge.textContent = '✅ Event Fun Run Terpilih';
-      badge.className = 'badge-tag blue';
+
+    // 3. Toggle corresponding schedule panel in Langkah 2
+    const panel = document.getElementById(`schedPanel-${t}`);
+    if (panel) {
+      if (t === type) panel.classList.remove('hidden');
+      else panel.classList.add('hidden');
     }
-    nameInp.value = "Event Fun Run 26 Des Jabar";
-    classSelect.value = "event";
-    startInp.value = "2026-12-01";
-    endInp.value = "2026-12-26";
-    timeInp.value = "05:30";
-    senderSelect.value = "rayi-cs-official";
-    targetSelect.value = "event_runners";
-    if (presetSelect) presetSelect.value = "funrun";
-    textInp.value = "Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186";
-    setQuickCampTime('07:00', document.querySelector('.time-pill:nth-child(2)'));
-  } else if (templateType === 'dinas') {
-    document.getElementById('tmplChoiceDinas')?.classList.add('active');
-    if (badge) {
-      badge.textContent = '✅ Kedinasan TANDANG Terpilih';
-      badge.className = 'badge-tag green';
-    }
-    nameInp.value = "Sosialisasi SPPD & Kedinasan TANDANG";
-    classSelect.value = "dinas";
-    startInp.value = "2026-10-15";
-    endInp.value = "2026-11-15";
-    timeInp.value = "07:00";
-    senderSelect.value = "Wawar-primary";
-    targetSelect.value = "tandang";
-    if (presetSelect) presetSelect.value = "tandang_sppd";
-    textInp.value = "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.";
-    setQuickCampTime('07:00', document.querySelector('.time-pill:nth-child(2)'));
-  } else if (templateType === 'custom') {
-    document.getElementById('tmplChoiceCustom')?.classList.add('active');
-    if (badge) {
-      badge.textContent = '✅ Pengumuman Bebas Terpilih';
-      badge.className = 'badge-tag purple';
-    }
-    nameInp.value = "Siaran Pengumuman Massal";
-    classSelect.value = "siaran";
-    startInp.value = "2026-10-24";
-    endInp.value = "2026-11-24";
-    timeInp.value = "12:00";
-    senderSelect.value = "wawar-blast-x";
-    targetSelect.value = "manual";
-    if (presetSelect) presetSelect.value = "custom";
-    textInp.value = "Halo rekan-rekan! 📢 Ini adalah siaran pengumuman penting hari ini. Mohon perhatikan jadwal dan instruksi berikut dengan seksama.";
-    setQuickCampTime('12:00', document.querySelector('.time-pill:nth-child(3)'));
+  });
+
+  // 4. Update badge
+  const badge = document.getElementById('badgeTypeSelected');
+  if (badge) {
+    const labels = {
+      one_time: '🎯 Satu Waktu Terpilih',
+      recurring: '🔄 Berulang Rutin Terpilih',
+      series: '📚 Paket Berseri Terpilih',
+      event_reminder: '⏰ Pengingat Acara Terpilih',
+      auto_reply: '🤖 Balas Otomatis Terpilih'
+    };
+    badge.textContent = labels[type] || 'Campaign Terpilih';
+    badge.className = `badge-tag ${getTypeBadgeClass(type)}`;
   }
 
-  handleTargetGroupChange();
+  // 5. Special computation for series
+  if (type === 'series') {
+    calculateSeriesEndDate();
+  }
+
   updateModalLiveWaPreview();
 }
 
+/**
+ * Drawer & Selector Template Campaign Milik Pengguna
+ */
+function toggleUserTemplatesDropdown() {
+  const drawer = document.getElementById('userTemplatesDrawer');
+  if (!drawer) return;
+  drawer.classList.toggle('hidden');
+  if (!drawer.classList.contains('hidden')) {
+    renderUserTemplatesList();
+  }
+}
+
+function renderUserTemplatesList() {
+  const container = document.getElementById('userTemplatesListContainer');
+  if (!container) return;
+
+  if (!userCampaignTemplates || userCampaignTemplates.length === 0) {
+    container.innerHTML = `
+      <div class="empty-template-state" style="grid-column: 1 / -1;">
+        <span>📂</span>
+        <h4>Belum Ada Template Campaign Tersimpan</h4>
+        <p>Anda belum menyimpan template custom. Saat membuat campaign baru, centang <em>"Simpan sebagai Template Campaign Saya"</em> di Langkah 4 untuk menyimpannya di sini.</p>
+      </div>
+    `;
+    return;
+  }
+
+  let html = '';
+  userCampaignTemplates.forEach(tmpl => {
+    const typeLabel = getTypeLabel(tmpl.type);
+    const typeColor = getTypeBadgeClass(tmpl.type);
+    const displayMsg = tmpl.default_message && tmpl.default_message.length > 90
+      ? tmpl.default_message.substring(0, 90) + '...'
+      : (tmpl.default_message || 'Tidak ada naskah pesan.');
+
+    html += `
+      <div class="template-item-card">
+        <div>
+          <div class="template-item-header">
+            <h5>${tmpl.name}</h5>
+            <span class="badge-tag ${typeColor}">${typeLabel}</span>
+          </div>
+          <div class="template-item-body">
+            <div style="font-size:0.75rem; color:#475569; margin-bottom:4px;">
+              <span>Kategori: <strong>${(tmpl.category || 'siaran').toUpperCase()}</strong></span> • 
+              <span>Jam: <strong>${tmpl.default_time || '07:00'} WIB</strong></span>
+            </div>
+            <div style="font-style:italic; color:#64748B;">"${displayMsg}"</div>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:6px; border-top:1px solid #F1F5F9;">
+          <button type="button" class="btn btn-outline btn-xs" onclick="applyUserTemplate('${tmpl.id}')">
+            <span>⚡ Gunakan Template</span>
+          </button>
+          <button type="button" class="btn btn-ghost btn-xs text-danger" onclick="deleteUserTemplate('${tmpl.id}', event)" title="Hapus Template" style="color:#DC2626; font-weight:700;">
+            Hapus
+          </button>
+        </div>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html;
+}
+
+function applyUserTemplate(tmplId) {
+  const tmpl = userCampaignTemplates.find(t => t.id === tmplId);
+  if (!tmpl) return;
+
+  // 1. Pilih jenis pengiriman
+  selectCampaignType(tmpl.type || 'one_time');
+
+  // 2. Isi identitas & kategori
+  const nameInp = document.getElementById('campName');
+  const classInp = document.getElementById('campClassification');
+  if (nameInp) nameInp.value = tmpl.name;
+  if (classInp && tmpl.category) classInp.value = tmpl.category;
+
+  // 3. Isi naskah pesan
+  const textInp = document.getElementById('campDefaultText');
+  if (textInp && tmpl.default_message) textInp.value = tmpl.default_message;
+
+  // 4. Pilih Knowledge Base jika ada
+  const kbSelect = document.getElementById('campContentPreset');
+  if (kbSelect && tmpl.knowledge_base_id) {
+    kbSelect.value = tmpl.knowledge_base_id;
+  }
+
+  // 5. Sesuaikan jadwal sesuai jenis
+  const cfg = tmpl.config || {};
+  const defTime = tmpl.default_time || '07:00';
+
+  if (tmpl.type === 'one_time') {
+    const timeInp = document.getElementById('campOneTimeTime');
+    if (timeInp) timeInp.value = defTime;
+  } else if (tmpl.type === 'recurring') {
+    const timeInp = document.getElementById('campRecurringTime');
+    const patInp = document.getElementById('campRecurringPattern');
+    if (timeInp) timeInp.value = defTime;
+    if (patInp && cfg.recurring_pattern) patInp.value = cfg.recurring_pattern;
+    handleRecurringPatternChange();
+  } else if (tmpl.type === 'series') {
+    const timeInp = document.getElementById('campSeriesTime');
+    const countInp = document.getElementById('campSeriesCount');
+    if (timeInp) timeInp.value = defTime;
+    if (countInp && cfg.total_messages) countInp.value = cfg.total_messages;
+    calculateSeriesEndDate();
+  } else if (tmpl.type === 'event_reminder') {
+    const timeInp = document.getElementById('campEventTime');
+    const dateInp = document.getElementById('campEventDate');
+    if (timeInp) timeInp.value = defTime;
+    if (dateInp && cfg.event_date) dateInp.value = cfg.event_date;
+  } else if (tmpl.type === 'auto_reply') {
+    const kwInp = document.getElementById('campAutoReplyKeywords');
+    if (kwInp && cfg.keywords) kwInp.value = cfg.keywords;
+  }
+
+  // Tutup drawer template
+  const drawer = document.getElementById('userTemplatesDrawer');
+  if (drawer) drawer.classList.add('hidden');
+
+  updateModalLiveWaPreview();
+  showToast(`✅ Template "${tmpl.name}" diterapkan ke form! Anda tetap bebas mengedit seluruh field sesuai kebutuhan.`, 'success');
+}
+
+async function deleteUserTemplate(tmplId, event) {
+  if (event) event.stopPropagation();
+  try {
+    const res = await fetch(`/api/campaign-templates/${tmplId}`, { method: 'DELETE' });
+    if (res.ok) {
+      userCampaignTemplates = userCampaignTemplates.filter(t => t.id !== tmplId);
+      localStorage.setItem('wawar_campaign_templates', JSON.stringify(userCampaignTemplates));
+      renderUserTemplatesList();
+      showToast('Template berhasil dihapus.', 'info');
+    }
+  } catch (err) {
+    console.error('Error deleting template:', err);
+    userCampaignTemplates = userCampaignTemplates.filter(t => t.id !== tmplId);
+    localStorage.setItem('wawar_campaign_templates', JSON.stringify(userCampaignTemplates));
+    renderUserTemplatesList();
+  }
+}
+
+/**
+ * Langkah 2: Logika & Kalkulasi Jadwal
+ */
+
+// Menolak tanggal mulai yang sudah lewat (validasi ketat: minimal 24 Okt 2026)
+function validateDateNotPast(inputElement) {
+  if (!inputElement || !inputElement.value) return true;
+  const todayStr = '2026-10-24';
+  const val = inputElement.value;
+  const parent = inputElement.closest('.form-group') || inputElement.parentElement;
+  const hint = parent ? parent.querySelector('.date-validation-hint') : null;
+
+  if (val < todayStr) {
+    inputElement.classList.add('error');
+    if (hint) {
+      hint.className = 'date-validation-hint error';
+      hint.textContent = `⚠️ Tanggal ditolak! Tidak boleh tanggal masa lalu (minimal hari ini: ${formatDateIndo(todayStr)}).`;
+    }
+    showToast(`⚠️ Tanggal mulai tidak boleh sudah lewat (minimal hari ini: ${formatDateIndo(todayStr)})`, 'error');
+    inputElement.value = todayStr;
+    return false;
+  } else {
+    inputElement.classList.remove('error');
+    if (hint) {
+      hint.className = 'date-validation-hint valid';
+      hint.textContent = `Format: ${formatDateIndo(val)}`;
+    }
+    return true;
+  }
+}
+
+// Menghitung tanggal selesai series otomatis dari start_date + (count - 1) hari (tidak boleh input manual)
+function calculateSeriesEndDate() {
+  const startInput = document.getElementById('campSeriesStartDate');
+  const countInput = document.getElementById('campSeriesCount');
+  const valDisplay = document.getElementById('valSeriesCalculatedEndDate');
+  const hintDisplay = document.getElementById('hintSeriesStartDate');
+
+  if (!startInput || !countInput || !valDisplay) return '2026-10-31';
+
+  const startVal = startInput.value || '2026-10-25';
+  const count = Math.max(1, parseInt(countInput.value, 10) || 7);
+
+  if (hintDisplay) {
+    hintDisplay.textContent = `Mulai: ${formatDateIndo(startVal)}`;
+  }
+
+  const startDate = new Date(startVal + 'T00:00:00');
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + (count - 1));
+
+  const y = endDate.getFullYear();
+  const m = String(endDate.getMonth() + 1).padStart(2, '0');
+  const d = String(endDate.getDate()).padStart(2, '0');
+  const endVal = `${y}-${m}-${d}`;
+
+  valDisplay.textContent = formatDateIndo(endVal);
+  valDisplay.dataset.endDate = endVal;
+
+  const boxBadge = document.getElementById('boxSeriesAutoEndDate');
+  if (boxBadge) {
+    boxBadge.innerHTML = `<span>📅</span><span>Tanggal Selesai Otomatis: <strong>${formatDateIndo(endVal)}</strong> (dihitung otomatis dari ${count} pesan berseri)</span>`;
+  }
+  return endVal;
+}
+
+function handleRecurringPatternChange() {
+  const pat = document.getElementById('campRecurringPattern')?.value;
+  const boxWeekly = document.getElementById('boxWeeklyDays');
+  if (boxWeekly) {
+    if (pat === 'weekly') boxWeekly.classList.remove('hidden');
+    else boxWeekly.classList.add('hidden');
+  }
+}
+
 function setQuickCampTime(timeStr, btnElement) {
-  const timeInp = document.getElementById('campTime');
-  if (timeInp) timeInp.value = timeStr;
+  const type = document.getElementById('campType')?.value || 'one_time';
+  if (type === 'one_time') {
+    const inp = document.getElementById('campOneTimeTime');
+    if (inp) inp.value = timeStr;
+  } else if (type === 'recurring') {
+    const inp = document.getElementById('campRecurringTime');
+    if (inp) inp.value = timeStr;
+  } else if (type === 'series') {
+    const inp = document.getElementById('campSeriesTime');
+    if (inp) inp.value = timeStr;
+  } else if (type === 'event_reminder') {
+    const inp = document.getElementById('campEventTime');
+    if (inp) inp.value = timeStr;
+  }
 
   const allPills = document.querySelectorAll('.time-preset-pills .time-pill');
   allPills.forEach(p => p.classList.remove('active'));
@@ -1496,6 +1854,17 @@ function setQuickCampTime(timeStr, btnElement) {
   updateModalLiveWaPreview();
 }
 
+function syncTimePill(timeStr) {
+  const pills = document.querySelectorAll('.time-preset-pills .time-pill');
+  pills.forEach(p => {
+    if (p.textContent.includes(timeStr)) p.classList.add('active');
+    else p.classList.remove('active');
+  });
+}
+
+/**
+ * Langkah 3: Pengirim, Target, & Sektor
+ */
 function handleTargetGroupChange() {
   const group = document.getElementById('campTargetGroup')?.value;
   const manualBox = document.getElementById('boxCampManualPhone');
@@ -1505,46 +1874,7 @@ function handleTargetGroupChange() {
   }
 }
 
-function updateModalLiveWaPreview() {
-  const name = document.getElementById('campName')?.value || 'Program WAWAR';
-  const senderNumber = document.getElementById('campSenderNumber')?.value || 'wawar-subuh';
-  const time = document.getElementById('campTime')?.value || '04:30';
-  const text = document.getElementById('campDefaultText')?.value || 'Sampurasun! Selamat pagi...';
-
-  const avatar = document.getElementById('mockupPhoneAvatar');
-  const title = document.getElementById('mockupPhoneSenderTitle');
-  const bubbleText = document.getElementById('mockupBubbleText');
-  const bubbleTime = document.getElementById('mockupBubbleTime');
-
-  if (bubbleText) bubbleText.textContent = text;
-  if (bubbleTime) bubbleTime.textContent = time;
-
-  if (avatar && title) {
-    if (senderNumber.includes('subuh')) {
-      avatar.textContent = '🌅';
-      title.textContent = 'wawar-subuh (+62 851-2104-2025)';
-    } else if (senderNumber.includes('official') || senderNumber.includes('rayi')) {
-      avatar.textContent = '🤖';
-      title.textContent = 'rayi-cs-official (Helpdesk Bot)';
-    } else if (senderNumber.includes('primary') || senderNumber.includes('Wawar')) {
-      avatar.textContent = '🏛️';
-      title.textContent = 'Wawar-primary (+62 851-2104-2025)';
-    } else {
-      avatar.textContent = '📢';
-      title.textContent = 'WAWAR Broadcast Gateway';
-    }
-  }
-}
-
-function applyContentPreset() {
-  const preset = document.getElementById('campContentPreset')?.value;
-  if (preset === 'subuh') pickCampaignTemplate('subuh');
-  else if (preset === 'funrun') pickCampaignTemplate('funrun');
-  else if (preset === 'tandang_sppd') pickCampaignTemplate('dinas');
-  else if (preset === 'custom') pickCampaignTemplate('custom');
-}
-
-function autoSyncSenderAndColorByClassification() {
+function autoSyncSenderByClassification() {
   const cls = document.getElementById('campClassification')?.value;
   const senderSelect = document.getElementById('campSenderNumber');
   if (!senderSelect) return;
@@ -1554,119 +1884,393 @@ function autoSyncSenderAndColorByClassification() {
   else if (cls === 'siaran') senderSelect.value = 'wawar-blast-x';
 }
 
-function handleSaveNewCampaign(e) {
+/**
+ * Langkah 4: Tulis Pesan, Pratinjau WhatsApp & Simpan Template
+ */
+function toggleSaveTemplateNameBox() {
+  const checked = document.getElementById('checkSaveAsTemplate')?.checked;
+  const box = document.getElementById('boxTemplateNameInput');
+  const nameInput = document.getElementById('inputTemplateName');
+  if (box) {
+    if (checked) {
+      box.classList.remove('hidden');
+      if (nameInput && !nameInput.value) {
+        nameInput.value = document.getElementById('campName')?.value || 'Template Baru';
+      }
+    } else {
+      box.classList.add('hidden');
+    }
+  }
+}
+
+function updateModalLiveWaPreview() {
+  const type = document.getElementById('campType')?.value || 'one_time';
+  const senderNumber = document.getElementById('campSenderNumber')?.value || 'Wawar-primary';
+  const text = document.getElementById('campDefaultText')?.value || 'Sampurasun rekan-rekan!';
+
+  let timeDisplay = '09:00 WIB';
+  if (type === 'one_time') {
+    const t = document.getElementById('campOneTimeTime')?.value || '09:00';
+    timeDisplay = `${t} WIB`;
+  } else if (type === 'recurring') {
+    const t = document.getElementById('campRecurringTime')?.value || '07:00';
+    timeDisplay = `${t} WIB`;
+  } else if (type === 'series') {
+    const t = document.getElementById('campSeriesTime')?.value || '04:30';
+    timeDisplay = `${t} WIB`;
+  } else if (type === 'event_reminder') {
+    const t = document.getElementById('campEventTime')?.value || '05:30';
+    timeDisplay = `${t} WIB`;
+  } else if (type === 'auto_reply') {
+    timeDisplay = 'Realtime 24/7';
+  }
+
+  const avatar = document.getElementById('mockupPhoneAvatar');
+  const title = document.getElementById('mockupPhoneSenderTitle');
+  const bubbleText = document.getElementById('mockupBubbleText');
+  const bubbleTime = document.getElementById('mockupBubbleTime');
+
+  if (bubbleText) bubbleText.textContent = text;
+  if (bubbleTime) bubbleTime.textContent = timeDisplay;
+
+  if (avatar && title) {
+    if (senderNumber.includes('subuh')) {
+      avatar.textContent = '🌅';
+      title.textContent = 'wawar-subuh (+62 851-2104-2025)';
+    } else if (senderNumber.includes('official') || senderNumber.includes('rayi')) {
+      avatar.textContent = '🤖';
+      title.textContent = 'rayi-cs-official (Helpdesk CS)';
+    } else if (senderNumber.includes('blast')) {
+      avatar.textContent = '📢';
+      title.textContent = 'wawar-blast-x (Broadcast Gateway)';
+    } else {
+      avatar.textContent = '📱';
+      title.textContent = 'Wawar-primary (+62 851-2104-2025)';
+    }
+  }
+}
+
+/**
+ * Handle Save New Campaign (Menyimpan record type, config, dan opsi template)
+ */
+async function handleSaveNewCampaign(e) {
   e.preventDefault();
+
+  const type = document.getElementById('campType')?.value || 'one_time';
   const name = document.getElementById('campName').value.trim();
-  const classification = document.getElementById('campClassification').value;
-  const startDateVal = document.getElementById('campStartDate').value;
-  const endDateVal = document.getElementById('campEndDate').value;
-  const group = document.getElementById('campTargetGroup').value;
-  const time = document.getElementById('campTime').value || '04:30';
+  const category = document.getElementById('campClassification').value;
+  const targetGroup = document.getElementById('campTargetGroup').value;
   const senderNumber = document.getElementById('campSenderNumber').value;
   const defaultText = document.getElementById('campDefaultText').value.trim();
+  const kbPreset = document.getElementById('campContentPreset')?.value || '';
+  const saveAsTemplate = document.getElementById('checkSaveAsTemplate')?.checked || false;
+  const templateName = document.getElementById('inputTemplateName')?.value.trim() || name;
 
-  let recipientLabel = "Anak & Keluarga (+62 851-2104-2025)";
-  if (group === 'pimpinan') recipientLabel = "Grup Pimpinan & Eselon IKP";
-  else if (group === 'tandang') recipientLabel = "Grup ASN & Staf TANDANG";
-  else if (group === 'event_runners') recipientLabel = "Peserta Fun Run 26 Des";
-  else if (group === 'manual') {
+  // Recipient label
+  let recipientLabel = "Grup ASN & Staf TANDANG";
+  if (targetGroup === 'keluarga') recipientLabel = "👨‍👩‍👧 Anak & Keluarga (+62 851-2104-2025)";
+  else if (targetGroup === 'pimpinan') recipientLabel = "🏛️ Grup Pimpinan & Eselon IKP";
+  else if (targetGroup === 'tandang') recipientLabel = "📋 Grup ASN & Staf TANDANG";
+  else if (targetGroup === 'event_runners') recipientLabel = "🏃 Peserta Fun Run 26 Des";
+  else if (targetGroup === 'manual') {
     const manualNum = document.getElementById('campManualPhone')?.value.trim() || '6285121042025';
     recipientLabel = `Nomor Manual (+${manualNum})`;
   }
 
+  // Type-specific config & date validation
+  let config = {};
+  let defaultTime = '09:00';
+  let startDate = '2026-10-24';
+  let endDate = '2026-10-24';
+
+  if (type === CampaignType.ONE_TIME) {
+    const dateInp = document.getElementById('campOneTimeDate');
+    const timeInp = document.getElementById('campOneTimeTime');
+    if (!validateDateNotPast(dateInp)) return;
+    defaultTime = timeInp.value || '09:00';
+    startDate = dateInp.value;
+    endDate = dateInp.value;
+    config = {
+      date: dateInp.value,
+      time: defaultTime
+    };
+  } else if (type === CampaignType.RECURRING) {
+    const startInp = document.getElementById('campRecurringStartDate');
+    const endInp = document.getElementById('campRecurringEndDate');
+    const timeInp = document.getElementById('campRecurringTime');
+    const patternInp = document.getElementById('campRecurringPattern');
+    if (!validateDateNotPast(startInp)) return;
+
+    const selectedDays = Array.from(document.querySelectorAll('input[name="recDay"]:checked')).map(cb => cb.value);
+    defaultTime = timeInp.value || '07:00';
+    startDate = startInp.value;
+    endDate = endInp.value || '';
+    config = {
+      recurring_pattern: patternInp.value,
+      recurring_days: selectedDays,
+      recurring_time: defaultTime,
+      start_date: startDate,
+      end_date: endDate
+    };
+  } else if (type === CampaignType.SERIES) {
+    const startInp = document.getElementById('campSeriesStartDate');
+    const countInp = document.getElementById('campSeriesCount');
+    const timeInp = document.getElementById('campSeriesTime');
+    if (!validateDateNotPast(startInp)) return;
+
+    const count = parseInt(countInp.value, 10) || 7;
+    const computedEndDate = calculateSeriesEndDate();
+    defaultTime = timeInp.value || '04:30';
+    startDate = startInp.value;
+    endDate = computedEndDate;
+    config = {
+      start_date: startDate,
+      end_date: endDate,
+      total_messages: count,
+      series_time: defaultTime
+    };
+  } else if (type === CampaignType.EVENT_REMINDER) {
+    const eventDateInp = document.getElementById('campEventDate');
+    const timeInp = document.getElementById('campEventTime');
+    if (!validateDateNotPast(eventDateInp)) return;
+
+    const selectedOffsets = Array.from(document.querySelectorAll('input[name="eventOffset"]:checked')).map(cb => cb.value);
+    defaultTime = timeInp.value || '05:30';
+    startDate = '2026-10-24';
+    endDate = eventDateInp.value;
+    config = {
+      event_date: eventDateInp.value,
+      event_time: defaultTime,
+      offsets: selectedOffsets
+    };
+  } else if (type === CampaignType.AUTO_REPLY) {
+    const kwInp = document.getElementById('campAutoReplyKeywords');
+    const modeInp = document.getElementById('campAutoReplyMatchMode');
+    defaultTime = '24 Jam';
+    startDate = '2026-10-24';
+    endDate = '2027-10-24';
+    config = {
+      keywords: kwInp.value.trim(),
+      match_mode: modeInp.value
+    };
+  }
+
   const campId = 'camp_' + Date.now();
-  
-  // Tentukan warna & ikon
   let assignedColor = 'amber';
   let assignedIcon = '🌅';
-  let kbLabel = 'Paket 31 Hari Sapa Subuh';
+  let kbLabel = 'Bahan Materi Standard';
 
-  if (classification === 'dinas') {
+  if (category === 'dinas') {
     assignedColor = 'green';
     assignedIcon = '🏛️';
     kbLabel = 'SOP Kedinasan TANDANG & SPPD';
-  } else if (classification === 'event') {
+  } else if (category === 'event') {
     assignedColor = 'blue';
     assignedIcon = '🏃';
-    kbLabel = 'Rute 5K & Link Google Maps Shareloc';
-  } else if (classification === 'siaran') {
+    kbLabel = 'Petunjuk Teknis Event & Rute';
+  } else if (category === 'siaran') {
     assignedColor = 'purple';
     assignedIcon = '📢';
-    kbLabel = 'Materi Siaran Bebas';
+    kbLabel = 'Materi Siaran Publik';
+  } else if (category === 'keluarga') {
+    assignedColor = 'amber';
+    assignedIcon = '🌅';
+    kbLabel = 'Paket Sapa Fajar & Keluarga';
   }
 
-  const newCampaign = {
+  const campaignRecord = {
     id: campId,
+    user_id: 'usr_admin',
     name: name,
-    classification: classification === 'keluarga' ? 'subuh' : classification,
-    icon: assignedIcon,
-    startDate: startDateVal,
-    endDate: endDateVal,
+    type: type, // one_time, recurring, series, event_reminder, auto_reply
+    category: category,
+    classification: category,
+    sender_number: senderNumber,
     senderNumber: senderNumber,
     senderInstance: senderNumber,
+    target_group: targetGroup,
     recipient: recipientLabel,
+    knowledge_base_id: kbPreset,
+    kbTitle: kbPreset ? getKbTitleById(kbPreset) : kbLabel,
+    message: defaultText,
+    defaultMsg: defaultText,
     status: 'ACTIVE',
     color: assignedColor,
-    kbTitle: kbLabel,
-    defaultMsg: defaultText,
-    time: time
+    icon: assignedIcon,
+    time: defaultTime,
+    startDate: startDate,
+    endDate: endDate,
+    config: config
   };
 
-  // 1. Simpan ke daftar master Campaign Hub
-  campaignHubList.unshift(newCampaign);
-
-  // 2. Simpan juga ke calendarCampaigns
-  calendarCampaigns.push({
-    id: campId,
-    name: `${assignedIcon} ${name}`,
-    time: time,
-    recipient: recipientLabel,
-    color: assignedColor,
-    defaultMsg: defaultText
-  });
-
-  // 3. Tambahkan chip filter di atas kalender jika ada
-  const pillList = document.getElementById('activeCampaignList');
-  if (pillList) {
-    const btn = document.createElement('button');
-    btn.className = `campaign-chip ${assignedColor}`;
-    btn.textContent = `${assignedIcon} ${name}`;
-    btn.onclick = () => selectCalendarCampaign(campId);
-    pillList.appendChild(btn);
-  }
-
-  // 4. Petakan HANYA pada rentang tanggal mulai s/d tanggal selesai (Batas Waktu)
-  const start = new Date(startDateVal);
-  const end = new Date(endDateVal);
-  let daysSeeded = 0;
-
-  for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
-    const y = dt.getFullYear();
-    const m = String(dt.getMonth() + 1).padStart(2, '0');
-    const d = String(dt.getDate()).padStart(2, '0');
-    const dKey = `${y}-${m}-${d}`;
-
-    if (!calendarEntries[dKey]) calendarEntries[dKey] = [];
-    calendarEntries[dKey].push({
-      id: `${campId}-${dKey}`,
-      campId: campId,
-      campName: name,
-      time: time,
-      senderNumber: senderNumber,
-      recipient: recipientLabel,
-      message: defaultText,
-      status: 'SCHEDULED',
-      color: assignedColor
+  // 1. Simpan ke Database API
+  try {
+    await fetch('/api/campaigns', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(campaignRecord)
     });
-    daysSeeded++;
+  } catch (err) {
+    console.warn('Network offline / API write error, saving locally:', err);
   }
 
-  // 5. Re-render kedua tampilan
+  // 2. Simpan ke local state
+  campaignHubList.unshift(campaignRecord);
+  localStorage.setItem('wawar_campaigns', JSON.stringify(campaignHubList));
+
+  // 3. Simpan sebagai template jika dicentang
+  if (saveAsTemplate) {
+    const templateRecord = {
+      id: 'tmpl_' + Date.now(),
+      user_id: 'usr_admin',
+      name: templateName,
+      type: type,
+      category: category,
+      default_time: defaultTime,
+      default_message: defaultText,
+      knowledge_base_id: kbPreset,
+      config: config
+    };
+
+    try {
+      await fetch('/api/campaign-templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(templateRecord)
+      });
+    } catch (err) {
+      console.warn('Template API write error:', err);
+    }
+
+    userCampaignTemplates.unshift(templateRecord);
+    localStorage.setItem('wawar_campaign_templates', JSON.stringify(userCampaignTemplates));
+    renderUserTemplatesList();
+  }
+
+  // 4. Sinkronisasi ke Kalender
+  seedCampaignRecordToCalendar(campaignRecord);
+
+  // 5. Re-render UI
   renderCampaignHub(currentCampaignHubFilter);
   renderCalendar(currentCalMonth, currentCalYear);
 
   closeCreateCampaignModal();
-  showToast(`🎉 Campaign baru "${name}" berhasil dibuat & aktif! Terjadwal ${daysSeeded} hari siar di Kalender. 🚀`, 'success');
+  showToast(`🎉 Campaign "${name}" [${getTypeLabel(type)}] berhasil disimpan dan dijadwalkan! 🚀`, 'success');
+}
+
+/**
+ * Memetakan jadwal campaign ke kotak kalender
+ */
+function seedCampaignRecordToCalendar(camp) {
+  const type = camp.type;
+  const cfg = camp.config || {};
+
+  if (type === CampaignType.ONE_TIME) {
+    const dKey = cfg.date || camp.startDate;
+    if (dKey) {
+      if (!calendarEntries[dKey]) calendarEntries[dKey] = [];
+      if (!calendarEntries[dKey].some(e => e.id === `${camp.id}-${dKey}`)) {
+        calendarEntries[dKey].push({
+          id: `${camp.id}-${dKey}`,
+          campId: camp.id,
+          campName: camp.name,
+          time: camp.time || '09:00',
+          senderNumber: camp.sender_number || camp.senderNumber,
+          recipient: camp.recipient,
+          message: camp.message || camp.defaultMsg,
+          status: 'SCHEDULED',
+          color: camp.color
+        });
+      }
+    }
+  } else if (type === CampaignType.SERIES) {
+    const startStr = cfg.start_date || camp.startDate || '2026-10-01';
+    const endStr = cfg.end_date || camp.endDate || '2026-10-31';
+    const start = new Date(startStr);
+    const end = new Date(endStr);
+    for (let dt = new Date(start); dt <= end; dt.setDate(dt.getDate() + 1)) {
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const d = String(dt.getDate()).padStart(2, '0');
+      const dKey = `${y}-${m}-${d}`;
+
+      if (!calendarEntries[dKey]) calendarEntries[dKey] = [];
+      if (!calendarEntries[dKey].some(e => e.id === `${camp.id}-${dKey}`)) {
+        calendarEntries[dKey].push({
+          id: `${camp.id}-${dKey}`,
+          campId: camp.id,
+          campName: camp.name,
+          time: camp.time || '04:30',
+          senderNumber: camp.sender_number || camp.senderNumber,
+          recipient: camp.recipient,
+          message: camp.message || camp.defaultMsg,
+          status: 'SCHEDULED',
+          color: camp.color
+        });
+      }
+    }
+  } else if (type === CampaignType.EVENT_REMINDER) {
+    const eventDateStr = cfg.event_date || '2026-12-26';
+    const offsets = cfg.offsets || ['H-7', 'H-1', 'H'];
+    const eventDate = new Date(eventDateStr + 'T00:00:00');
+
+    offsets.forEach(offset => {
+      let offsetDays = 0;
+      if (offset === 'H-7') offsetDays = -7;
+      else if (offset === 'H-3') offsetDays = -3;
+      else if (offset === 'H-1') offsetDays = -1;
+      else if (offset === 'H') offsetDays = 0;
+
+      const targetDate = new Date(eventDate);
+      targetDate.setDate(targetDate.getDate() + offsetDays);
+      const y = targetDate.getFullYear();
+      const m = String(targetDate.getMonth() + 1).padStart(2, '0');
+      const d = String(targetDate.getDate()).padStart(2, '0');
+      const dKey = `${y}-${m}-${d}`;
+
+      if (!calendarEntries[dKey]) calendarEntries[dKey] = [];
+      if (!calendarEntries[dKey].some(e => e.id === `${camp.id}-${dKey}-${offset}`)) {
+        calendarEntries[dKey].push({
+          id: `${camp.id}-${dKey}-${offset}`,
+          campId: camp.id,
+          campName: `${camp.name} (${offset})`,
+          time: camp.time || '05:30',
+          senderNumber: camp.sender_number || camp.senderNumber,
+          recipient: camp.recipient,
+          message: camp.message || camp.defaultMsg,
+          status: 'SCHEDULED',
+          color: camp.color
+        });
+      }
+    });
+  } else if (type === CampaignType.RECURRING) {
+    const pattern = cfg.recurring_pattern || 'weekly';
+    const days = cfg.recurring_days || ['monday'];
+    const dayMap = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
+    const targetDays = days.map(d => dayMap[d.toLowerCase()]);
+
+    for (let day = 1; day <= 31; day++) {
+      const dt = new Date(2026, 9, day);
+      const dayOfWeek = dt.getDay();
+      if (pattern === 'daily' || targetDays.includes(dayOfWeek)) {
+        const dKey = `2026-10-${String(day).padStart(2, '0')}`;
+        if (!calendarEntries[dKey]) calendarEntries[dKey] = [];
+        if (!calendarEntries[dKey].some(e => e.id === `${camp.id}-${dKey}`)) {
+          calendarEntries[dKey].push({
+            id: `${camp.id}-${dKey}`,
+            campId: camp.id,
+            campName: camp.name,
+            time: camp.time || '07:00',
+            senderNumber: camp.sender_number || camp.senderNumber,
+            recipient: camp.recipient,
+            message: camp.message || camp.defaultMsg,
+            status: 'SCHEDULED',
+            color: camp.color
+          });
+        }
+      }
+    }
+  }
 }
 
 /* ================= MODAL: ISI / EDIT PESAN PADA TANGGAL TERTENTU ================= */

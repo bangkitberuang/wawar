@@ -1,0 +1,141 @@
+{
+  "campaigns": [
+    {
+      "id": "camp_subuh_legacy",
+      "user_id": "usr_admin",
+      "name": "Sapa Subuh Anak & Keluarga",
+      "type": "series",
+      "category": "keluarga",
+      "sender_number": "wawar-subuh (+62 851-2104-2025)",
+      "target_group": "keluarga",
+      "recipient": "👨‍👩‍👧 Anak & Keluarga (+62 851-2104-2025)",
+      "knowledge_base_id": "kb_subuh",
+      "message": "Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.",
+      "status": "ACTIVE",
+      "color": "amber",
+      "icon": "🌅",
+      "config": {
+        "start_date": "2026-10-01",
+        "end_date": "2026-10-31",
+        "total_messages": 31,
+        "series_time": "04:30"
+      },
+      "created_at": "2026-10-01T04:30:00.000Z",
+      "updated_at": "2026-10-24T16:00:00.000Z"
+    },
+    {
+      "id": "camp_funrun_legacy",
+      "user_id": "usr_admin",
+      "name": "Event Fun Run 26 Des Jabar",
+      "type": "event_reminder",
+      "category": "event",
+      "sender_number": "rayi-cs-official",
+      "target_group": "event_runners",
+      "recipient": "🏃 500 Peserta Fun Run 26 Des",
+      "knowledge_base_id": "kb_funrun",
+      "message": "Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186",
+      "status": "ACTIVE",
+      "color": "blue",
+      "icon": "🏃",
+      "config": {
+        "event_date": "2026-12-26",
+        "event_time": "05:30",
+        "offsets": [
+          "H-7",
+          "H-1",
+          "H"
+        ]
+      },
+      "created_at": "2026-10-15T09:00:00.000Z",
+      "updated_at": "2026-10-24T16:00:00.000Z"
+    },
+    {
+      "id": "camp_dinas_legacy",
+      "user_id": "usr_admin",
+      "name": "Sosialisasi SPPD & Kedinasan TANDANG",
+      "type": "recurring",
+      "category": "dinas",
+      "sender_number": "Wawar-primary (+62 851-2104-2025)",
+      "target_group": "tandang",
+      "recipient": "🏛️ Grup ASN & Staf TANDANG",
+      "knowledge_base_id": "kb_tandang",
+      "message": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+      "status": "ACTIVE",
+      "color": "green",
+      "icon": "🏛️",
+      "config": {
+        "recurring_pattern": "weekly",
+        "recurring_days": [
+          "monday"
+        ],
+        "recurring_time": "07:00",
+        "start_date": "2026-10-15",
+        "end_date": "2026-11-15"
+      },
+      "created_at": "2026-10-15T07:00:00.000Z",
+      "updated_at": "2026-10-24T16:00:00.000Z"
+    }
+  ],
+  "campaign_templates": [
+    {
+      "id": "tmpl_subuh_legacy",
+      "user_id": "usr_admin",
+      "name": "Paket Sapa Subuh (31 Hari)",
+      "type": "series",
+      "category": "keluarga",
+      "default_time": "04:30",
+      "default_message": "Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur. Bismillah hari baru penuh berkah.",
+      "knowledge_base_id": "kb_subuh",
+      "config": {
+        "total_messages": 31,
+        "series_time": "04:30"
+      },
+      "created_at": "2026-10-24T16:00:00.000Z",
+      "updated_at": "2026-10-24T16:00:00.000Z"
+    },
+    {
+      "id": "tmpl_funrun_legacy",
+      "user_id": "usr_admin",
+      "name": "Event Fun Run 26 Des",
+      "type": "event_reminder",
+      "category": "event",
+      "default_time": "05:30",
+      "default_message": "Halo Runners! 🏃 Titik Kumpul & Start Fun Run berada di Halaman Gedung Sate. Flag-off start jam 06:00 WIB tepat. Info rute 5K & shareloc Google Maps: https://maps.google.com/?q=-6.9025,107.6186",
+      "knowledge_base_id": "kb_funrun",
+      "config": {
+        "event_date": "2026-12-26",
+        "offsets": [
+          "H-7",
+          "H-1",
+          "H"
+        ]
+      },
+      "created_at": "2026-10-24T16:00:00.000Z",
+      "updated_at": "2026-10-24T16:00:00.000Z"
+    },
+    {
+      "id": "tmpl_dinas_legacy",
+      "user_id": "usr_admin",
+      "name": "Pengingat Kedinasan TANDANG",
+      "type": "recurring",
+      "category": "dinas",
+      "default_time": "07:00",
+      "default_message": "Sampurasun Rekan ASN! 🏛️ Pengingat kelengkapan berkas SPPD digital format F4 untuk perjalanan dinas minggu ini. Pastikan cap stempel lokasi tujuan telah diunggah di TANDANG.",
+      "knowledge_base_id": "kb_tandang",
+      "config": {
+        "recurring_pattern": "weekly",
+        "recurring_days": [
+          "monday"
+        ],
+        "recurring_time": "07:00"
+      },
+      "created_at": "2026-10-24T16:00:00.000Z",
+      "updated_at": "2026-10-24T16:00:00.000Z"
+    }
+  ],
+  "migrations": {
+    "migration_v2_applied": true,
+    "migration_date": "2026-10-24T16:58:00.000Z",
+    "details": "Converted old preset campaigns to campaign_type enum (series, event_reminder, recurring) and saved 3 former presets into campaign_templates table for user usr_admin."
+  }
+}

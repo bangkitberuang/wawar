@@ -550,7 +550,7 @@
           <div class="metrics-grid mb-4">
             <div class="metric-card">
               <div class="metric-top">
-                <span class="metric-label">Status Siaran</span>
+                <span class="metric-label">Status Campaign</span>
                 <span class="badge-status open">3 AKTIF</span>
               </div>
               <h3>Program Berjalan</h3>
@@ -578,9 +578,9 @@
 
           <!-- Filter Klasifikasi Campaign -->
           <div class="campaign-selector-bar">
-            <span class="label">Filter Program:</span>
+            <span class="label">Filter Campaign:</span>
             <div class="campaign-pill-list" id="hubCampaignFilterList">
-              <button class="campaign-chip active" id="btnHubFilterAll" onclick="filterCampaignHub('all')">Semua Program (3)</button>
+              <button class="campaign-chip active" id="btnHubFilterAll" onclick="filterCampaignHub('all')">Semua Campaign</button>
               <button class="campaign-chip amber" id="btnHubFilterSubuh" onclick="filterCampaignHub('subuh')">🌅 Sapa Subuh / Keluarga</button>
               <button class="campaign-chip blue" id="btnHubFilterEvent" onclick="filterCampaignHub('event')">🏃 Event Publik / Fun Run</button>
               <button class="campaign-chip green" id="btnHubFilterDinas" onclick="filterCampaignHub('dinas')">🏛️ Kedinasan IKP / SPPD</button>
@@ -623,7 +623,7 @@
           <div class="campaign-selector-bar">
             <span class="label">Tampilkan di Kotak Tanggal:</span>
             <div class="campaign-pill-list" id="activeCampaignList">
-              <button class="campaign-chip active" onclick="selectCalendarCampaign('all')">Semua Program (4)</button>
+              <button class="campaign-chip active" onclick="selectCalendarCampaign('all')">Semua Campaign</button>
               <button class="campaign-chip amber" onclick="selectCalendarCampaign('subuh')">🌅 Sapa Subuh Anak &amp; Keluarga</button>
               <button class="campaign-chip green" onclick="selectCalendarCampaign('dinas')">🏛️ Agenda Kedinasan IKP</button>
               <button class="campaign-chip blue" onclick="selectCalendarCampaign('event')">🏃 Event Fun Run 26 Des</button>
@@ -693,8 +693,7 @@
           </div>
         </section>
 
-        <!-- MODAL: BUAT CAMPAIGN BARU (STEP BY STEP) -->
-        <!-- MODAL: BUAT CAMPAIGN BARU (STEP BY STEP SUPER MUDAH & MENYENANGKAN) -->
+        <!-- MODAL: BUAT CAMPAIGN BARU (WIZARD 4 LANGKAH BERDASARKAN JENIS PENGIRIMAN) -->
         <div id="modalCreateCampaign" class="modal-overlay">
           <div class="modal-box glass-card max-w-2xl">
             <button class="modal-close" onclick="closeCreateCampaignModal()">&times;</button>
@@ -705,15 +704,15 @@
                   ✨
                 </div>
                 <div>
-                  <h3 style="margin:0 0 2px 0;">Buat Campaign / Siaran Baru</h3>
-                  <p class="text-sm text-muted" style="margin:0;">Sangat mudah! Pilih 1 jenis acara di bawah, tentukan jam kirim, dan lihat langsung hasilnya.</p>
+                  <h3 style="margin:0 0 2px 0;">Buat Campaign Baru</h3>
+                  <p class="text-sm text-muted" style="margin:0;">Pilih jenis pengiriman (mekanisme siaran), atur jadwal &amp; nomor, lalu lihat pratinjau di WhatsApp.</p>
                 </div>
               </div>
             </div>
 
-            <!-- Petunjuk Langkah Visual (Anak SD Pun Mengerti) -->
+            <!-- Petunjuk Langkah Visual -->
             <div class="wizard-steps-header">
-              <div class="wizard-step-pill active" id="wStep1"><span>1️⃣</span> Pilih Acara</div>
+              <div class="wizard-step-pill active" id="wStep1"><span>1️⃣</span> Pilih Jenis</div>
               <span style="color:#CBD5E1;">&rarr;</span>
               <div class="wizard-step-pill" id="wStep2"><span>2️⃣</span> Jadwal &amp; Jam</div>
               <span style="color:#CBD5E1;">&rarr;</span>
@@ -723,181 +722,348 @@
             </div>
 
             <form onsubmit="handleSaveNewCampaign(event)">
-              <!-- LANGKAH 1: PILIH TEMPLATE JADI ("1 KLIK LANGSUNG SIAP") -->
+              <!-- LANGKAH 1: PILIH JENIS SIARAN (MEKANISME PENGIRIMAN - 5 PILIHAN ENUM) -->
+              <input type="hidden" id="campType" value="one_time">
+
               <div class="mb-3">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-                  <label style="font-weight:800; font-size:0.92rem; margin:0; color:#0F172A;">Langkah 1: Mau Bikin Siaran Apa? (Klik 1 Kotak):</label>
-                  <span class="badge-tag green" id="badgeTmplSelected">✅ Sapa Subuh Terpilih</span>
+                  <label style="font-weight:800; font-size:0.92rem; margin:0; color:#0F172A;">Langkah 1: Pilih Jenis Pengiriman (Mekanisme Siaran):</label>
+                  <span class="badge-tag green" id="badgeTypeSelected">🎯 Satu Waktu Terpilih</span>
                 </div>
                 
-                <div class="template-picker-grid">
-                  <div class="template-card-choice active" id="tmplChoiceSubuh" onclick="pickCampaignTemplate('subuh')">
-                    <span class="tmpl-icon">🌅</span>
-                    <div>
-                      <h4>Sapa Subuh Anak <span class="badge-tag amber" style="font-size:0.68rem; padding:1px 6px;">Keluarga</span></h4>
-                      <p>Kirim doa fajar jam 04:30 WIB otomatis tiap hari.</p>
-                    </div>
+                <div class="campaign-type-grid">
+                  <!-- 1. One Time -->
+                  <div class="campaign-type-card active" id="cardType-one_time" onclick="selectCampaignType('one_time')">
+                    <span class="type-icon">🎯</span>
+                    <h4>Satu Waktu <span class="type-check-indicator">✓</span></h4>
+                    <p>Satu pesan pada satu waktu tertentu.</p>
                   </div>
 
-                  <div class="template-card-choice" id="tmplChoiceFunrun" onclick="pickCampaignTemplate('funrun')">
-                    <span class="tmpl-icon">🏃</span>
-                    <div>
-                      <h4>Event Fun Run 26 Des <span class="badge-tag blue" style="font-size:0.68rem; padding:1px 6px;">Publik</span></h4>
-                      <p>Rute lari 5K, shareloc Gedung Sate &amp; bot tanya jawab.</p>
-                    </div>
+                  <!-- 2. Recurring -->
+                  <div class="campaign-type-card" id="cardType-recurring" onclick="selectCampaignType('recurring')">
+                    <span class="type-icon">🔄</span>
+                    <h4>Berulang Rutin <span class="type-check-indicator">✓</span></h4>
+                    <p>Berulang (harian/mingguan/bulanan) pada jam tertentu.</p>
                   </div>
 
-                  <div class="template-card-choice" id="tmplChoiceDinas" onclick="pickCampaignTemplate('dinas')">
-                    <span class="tmpl-icon">🏛️</span>
-                    <div>
-                      <h4>Kedinasan TANDANG <span class="badge-tag green" style="font-size:0.68rem; padding:1px 6px;">Resmi ASN</span></h4>
-                      <p>Surat tugas, SPPD F4 &amp; apel pagi IKP Jabar.</p>
-                    </div>
+                  <!-- 3. Series -->
+                  <div class="campaign-type-card" id="cardType-series" onclick="selectCampaignType('series')">
+                    <span class="type-icon">📚</span>
+                    <h4>Paket Berseri <span class="type-check-indicator">✓</span></h4>
+                    <p>Paket berseri, N pesan berbeda berurutan per hari.</p>
                   </div>
 
-                  <div class="template-card-choice" id="tmplChoiceCustom" onclick="pickCampaignTemplate('custom')">
-                    <span class="tmpl-icon">📢</span>
-                    <div>
-                      <h4>Pengumuman Bebas <span class="badge-tag purple" style="font-size:0.68rem; padding:1px 6px;">Kustom</span></h4>
-                      <p>Ketik pesan Anda sendiri untuk siaran terjadwal.</p>
-                    </div>
+                  <!-- 4. Event Reminder -->
+                  <div class="campaign-type-card" id="cardType-event_reminder" onclick="selectCampaignType('event_reminder')">
+                    <span class="type-icon">⏰</span>
+                    <h4>Pengingat Acara <span class="type-check-indicator">✓</span></h4>
+                    <p>Pesan relatif terhadap tanggal acara (H-7, H-1, hari H).</p>
+                  </div>
+
+                  <!-- 5. Auto Reply -->
+                  <div class="campaign-type-card" id="cardType-auto_reply" onclick="selectCampaignType('auto_reply')">
+                    <span class="type-icon">🤖</span>
+                    <h4>Balas Otomatis <span class="type-check-indicator">✓</span></h4>
+                    <p>Bot membalas berdasarkan kata kunci.</p>
+                  </div>
+                </div>
+
+                <!-- Tombol Sekunder: Mulai dari Template Saya -->
+                <div style="margin-top:6px;">
+                  <button type="button" class="btn btn-outline btn-sm" id="btnToggleUserTemplates" onclick="toggleUserTemplatesDropdown()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    <span>📂 Mulai dari Template Campaign Saya</span>
+                  </button>
+                </div>
+
+                <!-- Drawer Daftar Template Campaign Milik Pengguna -->
+                <div class="user-templates-drawer hidden" id="userTemplatesDrawer">
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #E2E8F0; padding-bottom:8px; margin-bottom:10px;">
+                    <strong style="font-size:0.85rem; color:#0F172A;">Daftar Template Campaign Tersimpan:</strong>
+                    <button type="button" class="btn btn-ghost btn-xs" onclick="toggleUserTemplatesDropdown()">&times; Tutup</button>
+                  </div>
+                  <div id="userTemplatesListContainer" class="templates-list-grid">
+                    <!-- Injected dynamically by renderUserTemplatesList() -->
                   </div>
                 </div>
               </div>
 
-              <!-- LANGKAH 2: JADWAL & BATAS WAKTU -->
-              <div class="card-grid-2 mb-3">
-                <div class="form-group" style="margin-bottom:0;">
-                  <label style="font-weight:700;">Nama Program / Siaran</label>
-                  <input type="text" id="campName" placeholder="Contoh: Sapa Subuh Anak / Fun Run 26 Des" value="Sapa Subuh Anak &amp; Keluarga" oninput="updateModalLiveWaPreview()" required>
+              <!-- LANGKAH 2: JADWAL & JAM (MENYESUAIKAN JENIS SIARAN) -->
+              <div class="mb-3" id="step2ScheduleSection">
+                <label style="font-weight:800; font-size:0.92rem; margin-bottom:8px; display:block; color:#0F172A;">Langkah 2: Atur Jadwal &amp; Jam Siar:</label>
+                
+                <!-- Panel 1: one_time -->
+                <div class="schedule-panel" id="schedPanel-one_time">
+                  <div class="schedule-panel-header">
+                    <span>🎯</span> <strong>Jadwal Pengiriman Tunggal (Satu Waktu)</strong>
+                  </div>
+                  <div class="card-grid-2">
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label style="font-weight:700;">Tanggal Kirim:</label>
+                      <input type="date" id="campOneTimeDate" min="2026-10-24" value="2026-10-25" onchange="validateDateNotPast(this)">
+                      <small class="date-validation-hint valid" id="hintOneTimeDate">Format: 25 Okt 2026</small>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label style="font-weight:700;">Jam Kirim (WIB):</label>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="time" id="campOneTimeTime" value="09:00" style="width:130px; font-weight:700; text-align:center;" oninput="syncTimePill('09:00'); updateModalLiveWaPreview();">
+                        <span class="time-zone-badge">24 Jam • WIB</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="time-preset-pills mt-2">
+                    <button type="button" class="time-pill" onclick="setQuickCampTime('04:30', this)">04:30 WIB (Subuh)</button>
+                    <button type="button" class="time-pill" onclick="setQuickCampTime('07:00', this)">07:00 WIB (Pagi)</button>
+                    <button type="button" class="time-pill active" onclick="setQuickCampTime('09:00', this)">09:00 WIB (Kantor)</button>
+                    <button type="button" class="time-pill" onclick="setQuickCampTime('12:00', this)">12:00 WIB (Siang)</button>
+                    <button type="button" class="time-pill" onclick="setQuickCampTime('18:00', this)">18:00 WIB (Sore)</button>
+                  </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom:0;">
-                  <label style="font-weight:700;">Kategori Program</label>
-                  <select id="campClassification" class="form-select" onchange="autoSyncSenderAndColorByClassification(); updateModalLiveWaPreview();">
-                    <option value="keluarga" selected>🌅 Keluarga &amp; Nurturing (Sapa Subuh)</option>
-                    <option value="event">🏃 Event &amp; Publik (Fun Run 26 Des)</option>
-                    <option value="dinas">🏛️ Kedinasan &amp; Pemerintahan (TANDANG)</option>
-                    <option value="siaran">📢 Siaran Pengumuman Massal</option>
+                <!-- Panel 2: recurring -->
+                <div class="schedule-panel hidden" id="schedPanel-recurring">
+                  <div class="schedule-panel-header">
+                    <span>🔄</span> <strong>Jadwal Berulang Rutin</strong>
+                  </div>
+                  <div class="form-group mb-2">
+                    <label style="font-weight:700;">Pola Pengulangan:</label>
+                    <select id="campRecurringPattern" class="form-select" onchange="handleRecurringPatternChange()">
+                      <option value="daily">Harian (Setiap Hari)</option>
+                      <option value="weekly" selected>Mingguan (Hari Tertentu Setiap Pekan)</option>
+                      <option value="monthly">Bulanan (Tanggal Tertentu Setiap Bulan)</option>
+                    </select>
+                  </div>
+
+                  <!-- Hari untuk mingguan -->
+                  <div class="form-group mb-2" id="boxWeeklyDays">
+                    <label style="font-weight:700;">Pilih Hari Siaran Mingguan:</label>
+                    <div class="weekly-days-list">
+                      <label class="day-pill-label"><input type="checkbox" name="recDay" value="monday" checked> <span>Senin</span></label>
+                      <label class="day-pill-label"><input type="checkbox" name="recDay" value="tuesday"> <span>Selasa</span></label>
+                      <label class="day-pill-label"><input type="checkbox" name="recDay" value="wednesday"> <span>Rabu</span></label>
+                      <label class="day-pill-label"><input type="checkbox" name="recDay" value="thursday"> <span>Kamis</span></label>
+                      <label class="day-pill-label"><input type="checkbox" name="recDay" value="friday"> <span>Jumat</span></label>
+                      <label class="day-pill-label"><input type="checkbox" name="recDay" value="saturday"> <span>Sabtu</span></label>
+                      <label class="day-pill-label"><input type="checkbox" name="recDay" value="sunday"> <span>Minggu</span></label>
+                    </div>
+                  </div>
+
+                  <div class="card-grid-2 mb-2">
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label style="font-weight:700;">Tanggal Mulai:</label>
+                      <input type="date" id="campRecurringStartDate" min="2026-10-24" value="2026-10-25" onchange="validateDateNotPast(this)">
+                      <small class="date-validation-hint valid">Format: 25 Okt 2026</small>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label style="font-weight:700;">Tanggal Selesai (Opsional):</label>
+                      <input type="date" id="campRecurringEndDate" min="2026-10-24">
+                      <small class="hint-text">Kosongkan jika berjalan seterusnya.</small>
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-weight:700;">Jam Kirim Rutin (WIB):</label>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <input type="time" id="campRecurringTime" value="07:00" style="width:130px; font-weight:700; text-align:center;" oninput="updateModalLiveWaPreview()">
+                      <span class="time-zone-badge">24 Jam • WIB</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Panel 3: series -->
+                <div class="schedule-panel hidden" id="schedPanel-series">
+                  <div class="schedule-panel-header">
+                    <span>📚</span> <strong>Paket Berseri (N Pesan Berurutan)</strong>
+                  </div>
+                  <div class="card-grid-2 mb-2">
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label style="font-weight:700;">Tanggal Mulai Hari Pertama:</label>
+                      <input type="date" id="campSeriesStartDate" min="2026-10-24" value="2026-10-25" onchange="validateDateNotPast(this); calculateSeriesEndDate();">
+                      <small class="date-validation-hint valid" id="hintSeriesStartDate">Mulai: 25 Okt 2026</small>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label style="font-weight:700;">Jumlah Pesan Berseri (Hari):</label>
+                      <input type="number" id="campSeriesCount" min="2" max="365" value="7" style="font-weight:700;" oninput="calculateSeriesEndDate()">
+                      <small class="hint-text">Berapa hari rangkaian berseri akan berjalan.</small>
+                    </div>
+                  </div>
+
+                  <!-- Tanggal selesai otomatis (jangan input manual) -->
+                  <div class="auto-computed-badge" id="boxSeriesAutoEndDate">
+                    <span>📅</span>
+                    <span>Tanggal Selesai Otomatis: <strong id="valSeriesCalculatedEndDate">31 Okt 2026</strong> (dihitung otomatis dari 7 pesan berseri)</span>
+                  </div>
+
+                  <div class="form-group mt-2" style="margin-bottom:0;">
+                    <label style="font-weight:700;">Jam Kirim Tiap Hari (WIB):</label>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                      <input type="time" id="campSeriesTime" value="04:30" style="width:130px; font-weight:700; text-align:center;" oninput="updateModalLiveWaPreview()">
+                      <span class="time-zone-badge">24 Jam • WIB</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Panel 4: event_reminder -->
+                <div class="schedule-panel hidden" id="schedPanel-event_reminder">
+                  <div class="schedule-panel-header">
+                    <span>⏰</span> <strong>Pengingat Acara (Offset Tanggal Acara)</strong>
+                  </div>
+                  <div class="card-grid-2 mb-2">
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label style="font-weight:700;">Tanggal Pelaksanaan Acara (Hari H):</label>
+                      <input type="date" id="campEventDate" min="2026-10-24" value="2026-12-26" onchange="validateDateNotPast(this)">
+                      <small class="date-validation-hint valid">Acara: 26 Des 2026</small>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                      <label style="font-weight:700;">Jam Pengiriman Pengingat (WIB):</label>
+                      <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="time" id="campEventTime" value="05:30" style="width:130px; font-weight:700; text-align:center;" oninput="updateModalLiveWaPreview()">
+                        <span class="time-zone-badge">24 Jam • WIB</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-weight:700;">Kirim Pengingat Pada Offset Hari:</label>
+                    <div class="offset-pills-list">
+                      <label class="offset-pill-label"><input type="checkbox" name="eventOffset" value="H-7" checked> <span>H-7 (1 Pekan Sebelum)</span></label>
+                      <label class="offset-pill-label"><input type="checkbox" name="eventOffset" value="H-3"> <span>H-3 (3 Hari Sebelum)</span></label>
+                      <label class="offset-pill-label"><input type="checkbox" name="eventOffset" value="H-1" checked> <span>H-1 (H-1 Gladi Bersih)</span></label>
+                      <label class="offset-pill-label"><input type="checkbox" name="eventOffset" value="H" checked> <span>Hari H (Saat Acara Berlangsung)</span></label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Panel 5: auto_reply -->
+                <div class="schedule-panel hidden" id="schedPanel-auto_reply">
+                  <div class="schedule-panel-header">
+                    <span>🤖</span> <strong>Balas Otomatis (Trigger Kata Kunci 24/7)</strong>
+                  </div>
+                  <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:var(--radius-sm); padding:8px 12px; margin-bottom:12px; font-size:0.78rem; color:#166534;">
+                    <span>⚡ <strong>Siaga Non-Stop:</strong> Jenis Balas Otomatis tidak memerlukan jadwal tanggal/jam, bot akan membalas seketika saat pesan masuk cocok dengan kata kunci.</span>
+                  </div>
+                  <div class="form-group mb-2">
+                    <label style="font-weight:700;">Kata Kunci Pemicu (Keywords Trigger):</label>
+                    <input type="text" id="campAutoReplyKeywords" placeholder="Contoh: rute, shareloc, sppd, daftar, jadwal, bantuan" value="rute, jadwal, info">
+                    <small class="hint-text">Pisahkan dengan koma jika lebih dari satu kata kunci.</small>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-weight:700;">Metode Pencocokan:</label>
+                    <select id="campAutoReplyMatchMode" class="form-select">
+                      <option value="contains" selected>Mengandung Kata Kunci (Partial Match)</option>
+                      <option value="exact">Persis Sama dengan Kata Kunci (Exact Match)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <!-- LANGKAH 3: NOMOR & TARGET -->
+              <div class="mb-3">
+                <label style="font-weight:800; font-size:0.92rem; margin-bottom:8px; display:block; color:#0F172A;">Langkah 3: Tentukan Nama, Target &amp; Nomor Pengirim:</label>
+                
+                <div class="card-grid-2 mb-2">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-weight:700;">Nama Campaign:</label>
+                    <input type="text" id="campName" placeholder="Contoh: Pengumuman Rapat Dinas IKP" value="Campaign Siaran Baru" oninput="updateModalLiveWaPreview()" required>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-weight:700;">Kategori Program:</label>
+                    <select id="campClassification" class="form-select" onchange="autoSyncSenderByClassification(); updateModalLiveWaPreview();">
+                      <option value="siaran" selected>📢 Siaran Umum &amp; Pengumuman</option>
+                      <option value="keluarga">🌅 Keluarga &amp; Sapaan Personal</option>
+                      <option value="event">🏃 Event &amp; Publik</option>
+                      <option value="dinas">🏛️ Kedinasan &amp; Pemerintahan (TANDANG)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="card-grid-2 mb-2">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-weight:700;">🎯 Kirim ke Siapa? (Target Penerima):</label>
+                    <select id="campTargetGroup" class="form-select wrap-text" onchange="handleTargetGroupChange(); updateModalLiveWaPreview();" title="Pilih target penerima broadcast">
+                      <option value="keluarga" title="Grup Keluarga &amp; Kerabat Dekat (+62 851-2104-2025)">👨‍👩‍👧 Grup Keluarga &amp; Kerabat (+62 851-2104-2025)</option>
+                      <option value="pimpinan" title="Grup Pimpinan &amp; Pejabat Struktural IKP">🏛️ Grup Pimpinan &amp; Pejabat Struktural IKP</option>
+                      <option value="tandang" selected title="Grup ASN &amp; Staf Pengguna Aplikasi TANDANG">📋 Grup ASN &amp; Staf Pengguna TANDANG</option>
+                      <option value="event_runners" title="Peserta Terdaftar Event Fun Run Diskominfo">🏃 Peserta Terdaftar Event Fun Run Diskominfo</option>
+                      <option value="manual" title="Ketik nomor WhatsApp secara bebas manual">📱 Ketik Nomor WhatsApp Bebas Manual...</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label style="font-weight:700;">📱 Nomor Pengirim (Trio Nomor WAWAR):</label>
+                    <select id="campSenderNumber" class="form-select wrap-text" onchange="updateModalLiveWaPreview()" title="Pilih jalur nomor WhatsApp pengirim">
+                      <option value="Wawar-primary" selected title="Wawar-primary (+62 851-2104-2025) — Jalur Notifikasi Resmi Kedinasan">📱 Wawar-primary (+62 851-2104-2025) — Notifikasi Resmi Dinas</option>
+                      <option value="wawar-subuh" title="wawar-subuh (+62 851-2104-2025) — Jalur Khusus Pesan Fajar &amp; Keluarga">🌅 wawar-subuh (+62 851-2104-2025) — Khusus Fajar &amp; Keluarga</option>
+                      <option value="rayi-cs-official" title="rayi-cs-official — Khusus Chatbot Cerdas RAYI &amp; Helpdesk Event">🤖 rayi-cs-official — Chatbot Cerdas RAYI &amp; Helpdesk Event</option>
+                      <option value="wawar-blast-x" title="wawar-blast-x — Khusus Siaran Massal &amp; Pengumuman Bebas">📢 wawar-blast-x — Khusus Siaran Massal</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Input nomor manual jika dipilih -->
+                <div class="form-group hidden mb-2" id="boxCampManualPhone">
+                  <label style="font-weight:700;">Nomor WhatsApp Tujuan (Format Internasional: 628xxx):</label>
+                  <input type="text" id="campManualPhone" placeholder="Contoh: 6285121042025" oninput="updateModalLiveWaPreview()">
+                </div>
+
+                <!-- Bahan Materi / Add-on Knowledge Base -->
+                <div class="form-group mb-0">
+                  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                    <label style="font-weight:700; margin:0;">📚 Bahan Materi / Knowledge Base (Add-on Bot):</label>
+                    <button type="button" class="btn btn-outline btn-xs" onclick="openCreateKnowledgeBaseModal()">+ Buat Materi Baru (Word/PDF)</button>
+                  </div>
+                  <select id="campContentPreset" class="form-select wrap-text">
+                    <!-- Populated dynamically from Knowledge Base store -->
                   </select>
                 </div>
-              </div>
-
-              <!-- Batas Waktu Campaign (Start & End Date) -->
-              <div class="card-grid-2 mb-2">
-                <div class="form-group" style="margin-bottom:0;">
-                  <label style="font-weight:700;">📅 Tanggal Mulai Siar</label>
-                  <input type="date" id="campStartDate" value="2026-10-01" required>
-                </div>
-                <div class="form-group" style="margin-bottom:0;">
-                  <label style="font-weight:700;">🛑 Batas Waktu Selesai (Auto Expire)</label>
-                  <input type="date" id="campEndDate" value="2026-10-31" required>
-                </div>
-              </div>
-              <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:var(--radius-sm); padding:6px 12px; margin-bottom:14px; font-size:0.78rem; color:#166534; display:flex; align-items:center; gap:6px;">
-                <span>💡</span>
-                <span><strong>Aman &amp; Terkendali:</strong> Bot otomatis berhenti kirim jika sudah lewat tanggal selesai agar kuota Anda tidak boros!</span>
-              </div>
-
-              <!-- Jam Kirim Rutin with Quick Time Presets -->
-              <div class="form-group mb-3">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                  <label style="font-weight:700; margin:0;">⏰ Jam Kirim Pesan:</label>
-                  <input type="time" id="campTime" value="04:30" style="width:130px; font-weight:700; text-align:center;" oninput="updateModalLiveWaPreview()" required>
-                </div>
-                <!-- Quick Time Preset Pills ("Tinggal Pencet") -->
-                <div class="time-preset-pills">
-                  <button type="button" class="time-pill active" onclick="setQuickCampTime('04:30', this)">🌅 04:30 Subuh</button>
-                  <button type="button" class="time-pill" onclick="setQuickCampTime('07:00', this)">☀️ 07:00 Pagi</button>
-                  <button type="button" class="time-pill" onclick="setQuickCampTime('12:00', this)">🌤️ 12:00 Siang</button>
-                  <button type="button" class="time-pill" onclick="setQuickCampTime('18:00', this)">🌆 18:00 Sore</button>
-                  <button type="button" class="time-pill" onclick="setQuickCampTime('20:00', this)">🌙 20:00 Malam</button>
-                </div>
-              </div>
-
-              <!-- LANGKAH 3: TARGET PENERIMA & NOMOR PENGIRIM -->
-              <div class="card-grid-2 mb-3">
-                <div class="form-group" style="margin-bottom:0;">
-                  <label style="font-weight:700;">🎯 Kirim ke Siapa? (Target)</label>
-                  <select id="campTargetGroup" class="form-select" onchange="handleTargetGroupChange(); updateModalLiveWaPreview();">
-                    <option value="keluarga" selected>👨‍👩‍👧 Grup Keluarga &amp; Anak (+62 851-2104-2025)</option>
-                    <option value="pimpinan">🏛️ Grup Pimpinan &amp; Eselon IKP</option>
-                    <option value="tandang">📋 Grup ASN &amp; Staf TANDANG</option>
-                    <option value="event_runners">🏃 Peserta Fun Run 26 Desember</option>
-                    <option value="manual">📱 Ketik Nomor HP Bebas Manual...</option>
-                  </select>
-                </div>
-
-                <div class="form-group" style="margin-bottom:0;">
-                  <label style="font-weight:700;">📱 Pakai Nomor Pengirim Mana?</label>
-                  <select id="campSenderNumber" class="form-select" onchange="updateModalLiveWaPreview()">
-                    <option value="wawar-subuh" selected>🌅 wawar-subuh • Khusus Sapa Subuh Anak &amp; Keluarga</option>
-                    <option value="Wawar-primary">📱 Wawar-primary (+62 851-2104-2025) • Notifikasi Utama Dinas</option>
-                    <option value="rayi-cs-official">🤖 rayi-cs-official • Khusus Chatbot RAYI &amp; CS Event</option>
-                    <option value="wawar-blast-x">📢 wawar-blast-x (Nomor X) • Khusus Blast Massal</option>
-                    <option value="pool-rotator">🔄 Multi-Number Pooling (Bagi Rata Beban)</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- Input nomor manual jika dipilih -->
-              <div class="form-group hidden mb-3" id="boxCampManualPhone">
-                <label style="font-weight:700;">Nomor WhatsApp Tujuan (Format: 628xxx)</label>
-                <input type="text" id="campManualPhone" placeholder="Contoh: 6285121042025" oninput="updateModalLiveWaPreview()">
-              </div>
-
-              <!-- Bahan Materi / Add-on Knowledge Base -->
-              <div class="form-group mb-3">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                  <label style="font-weight:700; margin:0;">📚 Bahan Materi / Add-on Knowledge Base:</label>
-                  <button type="button" class="btn btn-outline btn-xs" onclick="openCreateKnowledgeBaseModal()">+ Buat Materi Baru (Word/PDF)</button>
-                </div>
-                <select id="campContentPreset" class="form-select" onchange="applyContentPreset()">
-                  <option value="subuh" selected>🌅 Paket 31 Hari Sapa Subuh (31 Doa Fajar Berbeda Tiap Hari)</option>
-                  <option value="funrun">🏃 Paket Event Fun Run 26 Des (Rute 5K, Shareloc Gedung Sate)</option>
-                  <option value="tandang_sppd">🏛️ Paket Kedinasan TANDANG (Surat Tugas, SPPD F4)</option>
-                  <option value="apel_senin">📋 Paket Pengingat Apel Pagi ASN</option>
-                  <option value="custom">✍️ Kustom (Tulis Materi Sendiri)</option>
-                </select>
               </div>
 
               <!-- Saluran Komunikasi (Default: WhatsApp) -->
               <input type="hidden" id="campChannel" value="whatsapp">
 
               <!-- LANGKAH 4: ISI PESAN & PRATINJAU WHATSAPP REALTIME -->
-              <div class="form-group mb-2">
-                <label style="font-weight:700;">💬 Draf Pesan Pembuka (Bisa Diubah Kapan Saja di Kalender 1–31):</label>
-                <textarea id="campDefaultText" rows="3" placeholder="Ketik pesan..." oninput="updateModalLiveWaPreview()" required>Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur.</textarea>
-              </div>
-
-              <!-- Live WhatsApp Phone Mockup ("Intip Tampilan di WA") -->
               <div class="mb-3">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-                  <label style="font-weight:800; font-size:0.82rem; color:#0F172A; margin:0;">👀 Pratinjau Tampilan di Layar WhatsApp Penerima:</label>
-                  <span style="font-size:0.74rem; color:#059669; font-weight:700;">🟢 Live Realtime</span>
+                <label style="font-weight:800; font-size:0.92rem; margin-bottom:8px; display:block; color:#0F172A;">Langkah 4: Tulis Pesan &amp; Pratinjau Tampilan di WhatsApp:</label>
+                
+                <div class="form-group mb-2">
+                  <textarea id="campDefaultText" rows="3" placeholder="Ketik pesan yang akan dikirim bot..." oninput="updateModalLiveWaPreview()" required>Sampurasun rekan-rekan! 🙏 Mohon perhatikan pengumuman siaran berikut.</textarea>
                 </div>
 
+                <!-- Live WhatsApp Phone Mockup -->
                 <div class="live-phone-preview">
                   <div class="phone-top-bar">
                     <span style="font-size:0.9rem; cursor:pointer;">&larr;</span>
-                    <div class="phone-avatar" id="mockupPhoneAvatar">🌅</div>
+                    <div class="phone-avatar" id="mockupPhoneAvatar">📱</div>
                     <div class="phone-user-info">
-                      <strong id="mockupPhoneSenderTitle">wawar-subuh (+62 851-2104-2025)</strong>
+                      <strong id="mockupPhoneSenderTitle">Wawar-primary (+62 851-2104-2025)</strong>
                       <small id="mockupPhoneStatus">online • terverifikasi resmi</small>
                     </div>
                   </div>
 
-                  <div class="wa-chat-preview-wrap" style="margin:0; border:none; border-radius:0; min-height:110px;">
-                    <div style="text-align:center; margin-bottom:10px;">
-                      <span style="background:rgba(255,255,255,0.85); color:#475569; font-size:0.68rem; padding:3px 10px; border-radius:6px; font-weight:700; box-shadow:0 1px 2px rgba(0,0,0,0.06);">HARI INI</span>
+                  <div class="wa-chat-preview-wrap" style="margin:0; border:none; border-radius:0; min-height:100px;">
+                    <div style="text-align:center; margin-bottom:8px;">
+                      <span style="background:rgba(255,255,255,0.85); color:#475569; font-size:0.68rem; padding:2px 8px; border-radius:6px; font-weight:700;">HARI INI</span>
                     </div>
                     <div class="wa-bubble-mockup">
-                      <p class="wa-bubble-text" id="mockupBubbleText">Sampurasun! Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan sholat dan penuh rasa syukur.</p>
+                      <p class="wa-bubble-text" id="mockupBubbleText">Sampurasun rekan-rekan! 🙏 Mohon perhatikan pengumuman siaran berikut.</p>
                       <div class="wa-bubble-meta">
-                        <span id="mockupBubbleTime">04:30</span>
+                        <span id="mockupBubbleTime">09:00 WIB</span>
                         <span class="wa-checks">✓✓</span>
                       </div>
                     </div>
+                  </div>
+                </div>
+
+                <!-- Opsi: Simpan Sebagai Template Saya -->
+                <div class="mt-3" style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:var(--radius-sm); padding:10px 14px;">
+                  <label style="display:flex; align-items:center; gap:8px; margin:0; cursor:pointer; font-weight:700; color:#0F172A;">
+                    <input type="checkbox" id="checkSaveAsTemplate" onchange="toggleSaveTemplateNameBox()">
+                    <span>⭐ Simpan sebagai Template Campaign Saya (Bisa Dipakai Lagi Nanti)</span>
+                  </label>
+                  <div class="form-group hidden mt-2 mb-0" id="boxTemplateNameInput">
+                    <label style="font-size:0.8rem; font-weight:700; color:#475569;">Beri Nama Template:</label>
+                    <input type="text" id="inputTemplateName" placeholder="Contoh: Format Undangan Rapat Dinas" style="font-size:0.85rem;">
                   </div>
                 </div>
               </div>
@@ -905,7 +1071,7 @@
               <div class="form-actions mt-3">
                 <button type="button" class="btn btn-ghost" onclick="closeCreateCampaignModal()">Batal</button>
                 <button type="submit" class="btn btn-primary" style="flex:1; justify-content:center; font-weight:800; font-size:0.95rem; padding:12px;">
-                  <span>🚀 Simpan &amp; Jadwalkan Siaran Otomatis &rarr;</span>
+                  <span>🚀 Simpan &amp; Jadwalkan Campaign &rarr;</span>
                 </button>
               </div>
             </form>
