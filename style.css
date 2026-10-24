@@ -1377,3 +1377,56 @@ a {
   .banner-content { padding: 28px; }
   .nav-menu { display: none; }
 }
+
+/* ================= Campaign & Excel Dropzone Styling ================= */
+.dropzone-content {
+  border: 2px dashed rgba(0, 168, 107, 0.35);
+  border-radius: var(--radius-md);
+  padding: 36px 20px;
+  background: rgba(0, 168, 107, 0.03);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.dropzone-content:hover, #excelDropZone.drag-over .dropzone-content {
+  border-color: var(--primary);
+  background: rgba(0, 168, 107, 0.08);
+  transform: scale(1.01);
+}
+
+.dropzone-icon {
+  font-size: 2.8rem;
+  margin-bottom: 8px;
+}
+
+.dropzone-content h4 {
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+  color: #FFFFFF;
+}
+
+.schedule-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.schedule-filters .btn.active {
+  background: rgba(0, 168, 107, 0.2);
+  border-color: var(--primary);
+  color: #34D399;
+}
+
+.badge-tag.amber {
+  background: rgba(230, 149, 0, 0.15);
+  color: #FBBF24;
+}
+
+.mb-4 {
+  margin-bottom: 24px;
+}
+
+.d-block {
+  display: block;
+}
+

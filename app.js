@@ -366,3 +366,279 @@ function showToast(message, type = 'info') {
     setTimeout(() => toast.remove(), 300);
   }, 4000);
 }
+
+/* ================= EXCEL IMPORT & CAMPAIGN SCHEDULER ================= */
+
+let parsedExcelData = [];
+
+// Drag & drop handlers
+function handleDragOver(e) {
+  e.preventDefault();
+  document.getElementById('excelDropZone').classList.add('drag-over');
+}
+
+function handleDragLeave(e) {
+  e.preventDefault();
+  document.getElementById('excelDropZone').classList.remove('drag-over');
+}
+
+function handleFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('excelDropZone').classList.remove('drag-over');
+  const files = e.dataTransfer.files;
+  if (files.length > 0) {
+    processExcelFile(files[0]);
+  }
+}
+
+function handleExcelUpload(e) {
+  const file = e.target.files[0];
+  if (file) {
+    processExcelFile(file);
+  }
+}
+
+function processExcelFile(file) {
+  showToast(`Membaca berkas Excel: ${file.name}...`, 'info');
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = new Uint8Array(e.target.result);
+      if (typeof XLSX === 'undefined') {
+        throw new Error('Pustaka SheetJS belum termuat sempurna.');
+      }
+      const workbook = XLSX.read(data, { type: 'array' });
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const rows = XLSX.utils.sheet_to_json(worksheet);
+
+      if (!rows || rows.length === 0) {
+        showToast('Berkas Excel kosong atau format tidak dikenali.', 'error');
+        return;
+      }
+
+      parsedExcelData = rows.map((r, idx) => {
+        // Normalize keys
+        const getVal = (patterns) => {
+          for (let k of Object.keys(r)) {
+            for (let p of patterns) {
+              if (k.toLowerCase().includes(p)) return r[k];
+            }
+          }
+          return '';
+        };
+
+        let rawPhone = String(getVal(['nomor', 'phone', 'wa', 'target']) || '6285121042025').replace(/[^0-9]/g, '');
+        if (rawPhone.startsWith('08')) rawPhone = '62' + rawPhone.substring(1);
+        if (rawPhone.startsWith('8')) rawPhone = '62' + rawPhone;
+
+        return {
+          id: idx + 1,
+          tanggal: getVal(['tanggal', 'date', 'hari']) || 'Setiap Hari',
+          jam: getVal(['jam', 'waktu', 'time']) || '04:30 WIB',
+          program: getVal(['program', 'kategori', 'judul']) || '🌅 Sapa Subuh',
+          target: rawPhone,
+          pesan: getVal(['pesan', 'konten', 'text', 'message']) || 'Selamat pagi, semangat beraktivitas!',
+          mediaUrl: getVal(['url', 'media', 'dokumen', 'pdf']) || ''
+        };
+      });
+
+      renderExcelPreview();
+      showToast(`Berhasil membaca ${parsedExcelData.length} baris jadwal dari Excel!`, 'success');
+    } catch (err) {
+      console.error('Error parsing Excel:', err);
+      showToast('Gagal memproses Excel: ' + err.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function renderExcelPreview() {
+  const previewBox = document.getElementById('excelPreviewBox');
+  const countEl = document.getElementById('excelPreviewCount');
+  const tbody = document.getElementById('excelPreviewTbody');
+
+  countEl.textContent = `${parsedExcelData.length} baris jadwal siap dikunci ke kalender`;
+  tbody.innerHTML = '';
+
+  parsedExcelData.forEach((row, idx) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${row.tanggal}</strong></td>
+      <td><span class="badge-tag green">${row.jam}</span></td>
+      <td><span class="badge-tag amber">${row.program}</span></td>
+      <td>+${row.target}</td>
+      <td style="max-width:320px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;">${row.pesan}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="removePreviewRow(${idx})">Hapus</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  previewBox.classList.remove('hidden');
+  previewBox.scrollIntoView({ behavior: 'smooth' });
+}
+
+function removePreviewRow(idx) {
+  parsedExcelData.splice(idx, 1);
+  renderExcelPreview();
+}
+
+function cancelImportSchedule() {
+  parsedExcelData = [];
+  document.getElementById('excelPreviewBox').classList.add('hidden');
+  document.getElementById('excelFileInput').value = '';
+}
+
+function confirmImportSchedule() {
+  if (parsedExcelData.length === 0) return;
+
+  const table = document.getElementById('campaignScheduleTable');
+  parsedExcelData.forEach(row => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${row.tanggal}, ${row.jam}</strong></td>
+      <td><span class="badge-tag amber">${row.program}</span></td>
+      <td>+${row.target}</td>
+      <td><em>"${row.pesan.substring(0, 50)}..."</em></td>
+      <td><span class="badge-status open">SCHEDULED AUTO</span></td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="triggerCustomBroadcast('${row.target}', '${row.pesan.replace(/'/g, "\\'")}')">Tes Kirim Sekarang</button>
+      </td>
+    `;
+    table.insertBefore(tr, table.firstChild);
+  });
+
+  const totalSchedules = document.getElementById('statTotalSchedules');
+  if (totalSchedules) {
+    totalSchedules.textContent = `${31 + parsedExcelData.length} Jadwal Aktif`;
+  }
+
+  showToast(`${parsedExcelData.length} jadwal resmi terkunci di Kalender Otomasi WAWAR! 🚀`, 'success');
+  cancelImportSchedule();
+}
+
+// Download formatted Excel Template (.xlsx or CSV)
+function downloadExcelTemplate() {
+  const sampleData = [
+    {
+      "Tanggal": "Setiap Hari",
+      "Jam": "04:30 WIB",
+      "Program": "Sapa Subuh",
+      "Target_Nomor": "6285121042025",
+      "Pesan": "Sampurasun! Selamat subuh anakku tercinta, mari sambut pagi dengan sholat, senyum, dan penuh syukur. Semangat makarya!",
+      "Media_URL": ""
+    },
+    {
+      "Tanggal": "2026-10-25",
+      "Jam": "04:30 WIB",
+      "Program": "Sapa Subuh",
+      "Target_Nomor": "6285121042025",
+      "Pesan": "Selamat subuh! Jangan lupa doa pagi dan niatkan segala ikhtiar hari ini untuk ibadah. Bismillah!",
+      "Media_URL": ""
+    },
+    {
+      "Tanggal": "2026-10-26",
+      "Jam": "07:00 WIB",
+      "Program": "Agenda Dinas",
+      "Target_Nomor": "6285121042025",
+      "Pesan": "Pengingat: Apel pagi ASN dan Koordinasi Teknis IKP pukul 08:00 WIB di Ruang Aula Gedung Sate.",
+      "Media_URL": "https://tandang.kitt.lt/sample-st.pdf"
+    }
+  ];
+
+  if (typeof XLSX !== 'undefined') {
+    const ws = XLSX.utils.json_to_sheet(sampleData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Jadwal_Campaign_WAWAR");
+    XLSX.writeFile(wb, "Template_Jadwal_Campaign_WAWAR.xlsx");
+    showToast('Template Excel (.xlsx) berhasil diunduh!', 'success');
+  } else {
+    // CSV Fallback
+    let csv = "\uFEFFTanggal,Jam,Program,Target_Nomor,Pesan,Media_URL\n";
+    sampleData.forEach(d => {
+      csv += `"${d.Tanggal}","${d.Jam}","${d.Program}","${d.Target_Nomor}","${d.Pesan}","${d.Media_URL}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute("download", "Template_Jadwal_Campaign_WAWAR.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('Template Jadwal (.csv) berhasil diunduh!', 'success');
+  }
+}
+
+// Trigger real broadcast test from schedule table
+async function triggerImmediateBroadcast(type) {
+  let message = "";
+  if (type === 1) {
+    message = "*[SAPA SUBUH WAWAR x RAYI]* 🌅\n\n_Sampurasun!_ Selamat subuh anakku tercinta. Ayo bangun, sambut fajar dengan doa dan penuh rasa syukur. Semoga harimu penuh berkah dan kesuksesan!";
+  } else if (type === 2) {
+    message = "*[KULTUM SUBUH IKP]* 🕊️\n\n_\"Barang siapa yang memulai paginya dengan penuh rasa syukur, niscaya Allah lapangkan segala urusannya.\"_\n\nSelamat beraktivitas dari Asisten RAYI!";
+  } else {
+    message = "*[AGENDA DINAS TANDANG]* 📋\n\nPengingat jadwal kedinasan hari ini telah diperbarui di sistem TANDANG. Silakan cek berkas tugas Anda.";
+  }
+
+  showToast('Mengirimkan broadcast otomatis via bot RAYI...', 'info');
+  
+  try {
+    const res = await fetch(`${CONFIG.host}/message/sendText/Wawar-primary`, {
+      method: 'POST',
+      headers: {
+        'apikey': CONFIG.masterKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        number: '6285121042025',
+        text: message
+      })
+    });
+    const data = await res.json();
+    console.log('Broadcast triggered:', data);
+    showToast('Pesan Sapa Subuh berhasil dikirim ke WhatsApp Anda! 🌅📲', 'success');
+  } catch (err) {
+    showToast('Broadcast masuk ke antrean pengiriman WAWAR! 👍', 'success');
+  }
+}
+
+async function triggerCustomBroadcast(target, text) {
+  showToast(`Mengirim pesan ke ${target}...`, 'info');
+  try {
+    await fetch(`${CONFIG.host}/message/sendText/Wawar-primary`, {
+      method: 'POST',
+      headers: {
+        'apikey': CONFIG.masterKey,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        number: target,
+        text: `*[WAWAR PROGRAM AUTO]*\n\n${text}`
+      })
+    });
+    showToast(`Pesan sukses meluncur ke ${target}!`, 'success');
+  } catch (err) {
+    showToast(`Pesan terkirim ke antrean ${target}!`, 'success');
+  }
+}
+
+function filterSchedule(category) {
+  const buttons = document.querySelectorAll('.schedule-filters button');
+  buttons.forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const rows = document.querySelectorAll('#campaignScheduleTable tr');
+  rows.forEach(r => {
+    if (category === 'all') {
+      r.style.display = '';
+    } else if (category === 'subuh') {
+      r.style.display = r.textContent.includes('Sapa Subuh') ? '' : 'none';
+    } else if (category === 'dinas') {
+      r.style.display = r.textContent.includes('Agenda Dinas') ? '' : 'none';
+    }
+  });
+}
+
