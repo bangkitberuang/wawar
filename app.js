@@ -642,3 +642,142 @@ function filterSchedule(category) {
   });
 }
 
+/* ================= CONTACT GROUPING & BOOK ================= */
+
+let contactsData = [
+  { id: 1, name: "Anak Tercinta", phone: "6285121042025", group: "keluarga", note: "Target Sapa Subuh 04:30 WIB" },
+  { id: 2, name: "Keluarga Rumah", phone: "6285121042025", group: "keluarga", note: "Penerima Doa Pagi" },
+  { id: 3, name: "Kadis Kominfo Jabar", phone: "6281234567890", group: "pimpinan", note: "Laporan & Disposisi Harian" },
+  { id: 4, name: "Kabid IKP", phone: "6281298765432", group: "pimpinan", note: "Koordinasi Media & Konten" },
+  { id: 5, name: "Staf PPTK TANDANG", phone: "6285712345678", group: "tandang", note: "Pemberitahuan Surat Tugas F4" }
+];
+
+let activeContactFilter = 'all';
+
+function renderContactsTable(filter = 'all') {
+  activeContactFilter = filter;
+  const tbody = document.getElementById('contactsTableBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+  const filtered = filter === 'all' ? contactsData : contactsData.filter(c => c.group === filter);
+
+  const countBadge = document.getElementById('contactCountBadge');
+  if (countBadge) countBadge.textContent = `${filtered.length} kontak terdaftar`;
+
+  const heading = document.getElementById('contactTableHeading');
+  if (heading) {
+    let groupNames = { all: 'Semua Grup', keluarga: '👨‍👩‍👧 Keluarga / Anak', pimpinan: '🏛️ Pimpinan IKP', tandang: '📋 ASN TANDANG' };
+    heading.textContent = `Buku Kontak (${groupNames[filter] || filter})`;
+  }
+
+  filtered.forEach(c => {
+    let groupBadge = '';
+    if (c.group === 'keluarga') groupBadge = '<span class="badge-tag amber">👨‍👩‍👧 Keluarga</span>';
+    else if (c.group === 'pimpinan') groupBadge = '<span class="badge-tag green">🏛️ Pimpinan IKP</span>';
+    else if (c.group === 'tandang') groupBadge = '<span class="badge-tag blue">📋 ASN TANDANG</span>';
+    else groupBadge = '<span class="badge-tag">💼 Mitra/Klien</span>';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${c.name}</strong></td>
+      <td><span class="text-sm">+${c.phone}</span></td>
+      <td>${groupBadge}</td>
+      <td><span class="text-muted text-sm">${c.note || '-'}</span></td>
+      <td><span class="badge-status green">AKTIF</span></td>
+      <td>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-outline btn-sm" onclick="quickChatContact('${c.phone}', '${c.name}')">Chat WA</button>
+          <button class="btn btn-outline btn-sm" style="color:#EF4444;" onclick="deleteContact(${c.id})">&times;</button>
+        </div>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterContactByGroup(group) {
+  const buttons = document.querySelectorAll('#dashTab-contacts .schedule-filters button');
+  buttons.forEach(b => b.classList.remove('active'));
+  
+  const mapBtn = {
+    all: 'btnFilterAll',
+    keluarga: 'btnFilterKeluarga',
+    pimpinan: 'btnFilterPimpinan',
+    tandang: 'btnFilterTandang'
+  };
+  const targetBtn = document.getElementById(mapBtn[group]);
+  if (targetBtn) targetBtn.classList.add('active');
+
+  renderContactsTable(group);
+}
+
+function toggleAddContactForm() {
+  const box = document.getElementById('boxAddContact');
+  box.classList.toggle('hidden');
+}
+
+function openAddContactModal() {
+  const box = document.getElementById('boxAddContact');
+  box.classList.remove('hidden');
+  box.scrollIntoView({ behavior: 'smooth' });
+}
+
+function openAddGroupModal() {
+  const groupName = prompt('Masukkan Nama Grup / Segmentasi Baru (contoh: Humas Media / Komunitas Muda):');
+  if (groupName) {
+    showToast(`Grup "${groupName}" berhasil ditambahkan ke daftar kategori!`, 'success');
+  }
+}
+
+function handleSaveContact(e) {
+  e.preventDefault();
+  const name = document.getElementById('newContactName').value.trim();
+  let phone = document.getElementById('newContactPhone').value.trim().replace(/[^0-9]/g, '');
+  const group = document.getElementById('newContactGroup').value;
+  const note = document.getElementById('newContactNote').value.trim();
+
+  if (phone.startsWith('08')) phone = '62' + phone.substring(1);
+  if (phone.startsWith('8')) phone = '62' + phone;
+
+  const newContact = {
+    id: Date.now(),
+    name: name,
+    phone: phone,
+    group: group,
+    note: note
+  };
+
+  contactsData.unshift(newContact);
+  renderContactsTable(activeContactFilter);
+  toggleAddContactForm();
+  
+  // Reset fields
+  document.getElementById('newContactName').value = '';
+  document.getElementById('newContactPhone').value = '';
+  document.getElementById('newContactNote').value = '';
+
+  showToast(`Kontak "${name}" berhasil disimpan ke dalam grup!`, 'success');
+}
+
+function deleteContact(id) {
+  if (confirm('Hapus kontak ini dari grup?')) {
+    contactsData = contactsData.filter(c => c.id !== id);
+    renderContactsTable(activeContactFilter);
+    showToast('Kontak dihapus.', 'info');
+  }
+}
+
+function quickChatContact(phone, name) {
+  switchDashTab('quicksend');
+  document.getElementById('sendTargetNumber').value = phone;
+  document.getElementById('sendTextContent').value = `Sampurasun ${name}! 🙏 Pesan dari bot RAYI (WAWAR Gateway).`;
+  showToast(`Menyiapkan pesan untuk ${name} (+${phone})`, 'info');
+}
+
+// Inisialisasi tabel kontak
+document.addEventListener('DOMContentLoaded', () => {
+  renderContactsTable();
+});
+
+

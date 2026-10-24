@@ -382,6 +382,10 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             <span>Kalender &amp; Campaign</span>
           </button>
+          <button class="dash-link" onclick="switchDashTab('contacts')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Grup &amp; Buku Kontak</span>
+          </button>
           <button class="dash-link" onclick="switchDashTab('whatsapp')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
             <span>WhatsApp &amp; RAYI</span>
@@ -672,6 +676,127 @@
                       <button class="btn btn-outline btn-sm" onclick="triggerImmediateBroadcast(3)">Tes Kirim Sekarang</button>
                     </td>
                   </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- DASH TAB: GRUP & BUKU KONTAK -->
+        <section id="dashTab-contacts" class="dash-tab">
+          <div class="dash-header">
+            <div>
+              <h2>Grup &amp; Segmentasi Kontak Sasaran</h2>
+              <p>Kelola dan kelompokkan nomor penerima (Keluarga, Pimpinan, ASN TANDANG) untuk mempermudah pengiriman broadcast terarah.</p>
+            </div>
+            <div class="dash-header-actions">
+              <button class="btn btn-outline btn-sm" onclick="openAddGroupModal()">+ Buat Grup Baru</button>
+              <button class="btn btn-primary btn-sm" onclick="openAddContactModal()">+ Tambah Kontak</button>
+            </div>
+          </div>
+
+          <!-- Group Category Cards -->
+          <div class="metrics-grid">
+            <div class="metric-card cursor-pointer" onclick="filterContactByGroup('keluarga')">
+              <div class="metric-top">
+                <span class="metric-label">Grup Prioritas</span>
+                <span class="badge-tag amber">🌅 SUBUH</span>
+              </div>
+              <h3>👨‍👩‍👧 Keluarga &amp; Anak</h3>
+              <small class="metric-foot">3 Nomor • Jadwal Sapa Subuh Otomatis</small>
+            </div>
+
+            <div class="metric-card cursor-pointer" onclick="filterContactByGroup('pimpinan')">
+              <div class="metric-top">
+                <span class="metric-label">Kedinasan</span>
+                <span class="badge-tag green">🏛️ IKP</span>
+              </div>
+              <h3>Pimpinan &amp; Eselon</h3>
+              <small class="metric-foot">8 Nomor • Agenda &amp; Disposisi</small>
+            </div>
+
+            <div class="metric-card cursor-pointer" onclick="filterContactByGroup('tandang')">
+              <div class="metric-top">
+                <span class="metric-label">Operasional</span>
+                <span class="badge-tag blue">📋 TANDANG</span>
+              </div>
+              <h3>ASN &amp; Staf Dinas</h3>
+              <small class="metric-foot">45 Nomor • SPPD &amp; Surat Tugas</small>
+            </div>
+
+            <div class="metric-card cursor-pointer" onclick="filterContactByGroup('komersil')">
+              <div class="metric-top">
+                <span class="metric-label">Komersial</span>
+                <span class="badge-icon">💼</span>
+              </div>
+              <h3>Klien &amp; Mitra Luar</h3>
+              <small class="metric-foot">12 Klien • Multi-Tenant Gateway</small>
+            </div>
+          </div>
+
+          <!-- Fast Add Contact Inline Form (collapsible) -->
+          <div id="boxAddContact" class="panel-card hidden mb-4">
+            <div class="panel-header">
+              <h3>Tambah Kontak Baru ke Grup</h3>
+              <button class="btn btn-outline btn-sm" onclick="toggleAddContactForm()">Tutup</button>
+            </div>
+            <form onsubmit="handleSaveContact(event)" class="card-grid-2">
+              <div class="form-group">
+                <label>Nama Kontak Lengkap</label>
+                <input type="text" id="newContactName" placeholder="Contoh: Anak Tercinta / Rian Pratama" required>
+              </div>
+              <div class="form-group">
+                <label>Nomor WhatsApp</label>
+                <input type="text" id="newContactPhone" placeholder="Contoh: 0812xxxxxxxx atau 628xxxxxxx" required>
+              </div>
+              <div class="form-group">
+                <label>Pilih Grup Sasaran</label>
+                <select id="newContactGroup" class="form-select">
+                  <option value="keluarga">👨‍👩‍👧 Keluarga / Anak Tercinta</option>
+                  <option value="pimpinan">🏛️ Pimpinan &amp; Eselon IKP</option>
+                  <option value="tandang" selected>📋 ASN &amp; Staf TANDANG</option>
+                  <option value="komersil">💼 Klien Komersial</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Catatan / Peran</label>
+                <input type="text" id="newContactNote" placeholder="Contoh: Jadwal Sapa Subuh / PPK">
+              </div>
+              <div style="grid-column: 1 / -1;">
+                <button type="submit" class="btn btn-primary">Simpan Kontak ke Grup &rarr;</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Contacts Table -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3 id="contactTableHeading">Buku Kontak (Semua Grup)</h3>
+                <span class="text-muted text-sm" id="contactCountBadge">5 kontak terdaftar</span>
+              </div>
+              <div class="schedule-filters">
+                <button class="btn btn-outline btn-sm active" id="btnFilterAll" onclick="filterContactByGroup('all')">Semua (5)</button>
+                <button class="btn btn-outline btn-sm" id="btnFilterKeluarga" onclick="filterContactByGroup('keluarga')">👨‍👩‍👧 Keluarga</button>
+                <button class="btn btn-outline btn-sm" id="btnFilterPimpinan" onclick="filterContactByGroup('pimpinan')">🏛️ Pimpinan</button>
+                <button class="btn btn-outline btn-sm" id="btnFilterTandang" onclick="filterContactByGroup('tandang')">📋 ASN TANDANG</button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="dash-table">
+                <thead>
+                  <tr>
+                    <th>Nama Kontak</th>
+                    <th>Nomor WhatsApp</th>
+                    <th>Grup / Label</th>
+                    <th>Catatan Khusus</th>
+                    <th>Status</th>
+                    <th>Aksi Cepat</th>
+                  </tr>
+                </thead>
+                <tbody id="contactsTableBody">
+                  <!-- Injected via JavaScript -->
                 </tbody>
               </table>
             </div>
