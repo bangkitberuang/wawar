@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WAWAR — WhatsApp Gateway, Omnichannel & Bot RAYI</title>
+  <meta name="description" content="Layanan Gateway WhatsApp, Telegram, Email, dan OTP Terpadu dengan Asisten Virtual Pintar RAYI untuk TANDANG dan Ekosistem Aplikasi Modern.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-warm">
+
+  <!-- ================= TOP NAVIGATION ================= -->
+  <header class="navbar" id="mainNavbar">
+    <div class="nav-container">
+      <div class="nav-brand" onclick="switchView('landing')">
+        <img src="assets/logo-wawar.jpg" alt="WAWAR Logo" class="brand-logo">
+        <div class="brand-text">
+          <span class="brand-title">WAWAR</span>
+          <span class="brand-sub">Gateway & Notification Hub</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <a href="#fitur" class="nav-link" onclick="switchView('landing')">Fitur Utama</a>
+        <a href="#omnichannel" class="nav-link" onclick="switchView('landing')">Omnichannel</a>
+        <a href="#rayi" class="nav-link highlight" onclick="switchView('landing')">Kenalan dengan RAYI 🤖</a>
+        <a href="#arsitektur" class="nav-link" onclick="switchView('landing')">Arsitektur</a>
+        <a href="#api" class="nav-link" onclick="switchView('landing')">Integrasi API</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="status-badge live" id="navStatusBadge">
+          <span class="pulse-dot"></span>
+          <span id="gatewayStatusText">Gateway: Online</span>
+        </div>
+        <button class="btn btn-outline" id="btnNavAuth" onclick="toggleAuthModal()">Masuk Console</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= VIEW 1: LANDING PAGE ================= -->
+  <main id="viewLanding" class="view-section active">
+    
+    <!-- Hero Banner with Gedung Sate Vintage Aesthetic -->
+    <section class="hero-banner-wrapper">
+      <div class="banner-frame">
+        <img src="assets/banner-gedung-sate.jpg" alt="Lanskap Jawa Barat dan Gedung Sate" class="banner-img">
+        <div class="banner-overlay"></div>
+        <div class="banner-content">
+          <div class="badge-pill">
+            <span class="pill-dot"></span> Powered by Evolution API v2 • VPS Hostinger Cloud
+          </div>
+          <h1 class="hero-title">Warta Cepat, Tepat, &amp; Tangguh untuk Segala Aplikasi</h1>
+          <p class="hero-desc">
+            Satu gerbang pengiriman pesan resmi untuk <strong>WhatsApp</strong>, <strong>Telegram</strong>, dan <strong>Email &amp; OTP</strong>.
+            Dilengkapi asisten bot pintar <strong>RAYI</strong> yang ramah dan siap melayani 24/7 non-stop.
+          </p>
+          <div class="hero-buttons">
+            <button class="btn btn-primary" onclick="openConsole()">
+              <span>Buka Console WAWAR</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+            <button class="btn btn-secondary" onclick="scrollToSection('rayi')">
+              <span>Siapa itu RAYI?</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Realtime Gateway Health Bar -->
+    <section class="container status-strip">
+      <div class="status-card">
+        <div class="status-info">
+          <span class="label">Server Gateway</span>
+          <strong>srv2091882.hstgr.cloud (Port 8085)</strong>
+        </div>
+        <div class="status-info">
+          <span class="label">Primary Instance</span>
+          <strong id="instanceNameBadge">Wawar-primary (+62 851-2104-2025)</strong>
+        </div>
+        <div class="status-info">
+          <span class="label">Engine State</span>
+          <span class="badge-tag green">● Online 24/7 (Open)</span>
+        </div>
+        <div class="status-info">
+          <span class="label">Penyimpanan Sesi</span>
+          <strong>PostgreSQL + Redis (Anti-Logout)</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- Omnichannel Trio Showcase -->
+    <section class="container section" id="omnichannel">
+      <div class="section-header text-center">
+        <span class="section-tag">TRILOGI PENGIRIMAN</span>
+        <h2>Tiga Jalur Komunikasi Dalam Satu Pintu</h2>
+        <p>Aplikasi Anda cukup menembak 1 API terpadu, WAWAR yang mengatur perutean pengiriman pesan.</p>
+      </div>
+
+      <div class="trio-grid">
+        <!-- WhatsApp -->
+        <div class="channel-card wa">
+          <div class="card-icon wa-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.41a8.17 8.17 0 0 1 2.4 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.188 8.188 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.64c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.02-.39.11-.51.11-.11.25-.29.37-.43.13-.15.17-.25.25-.42.08-.17.04-.32-.02-.45s-.56-1.35-.77-1.85c-.2-.48-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31s-.87.85-.87 2.07c0 1.22.89 2.4 1.01 2.57.13.17 1.75 2.67 4.24 3.75.59.26 1.05.41 1.41.53.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z"/></svg>
+          </div>
+          <h3>WhatsApp Gateway</h3>
+          <p>Kirim notifikasi instan, pesan interaktif, dan <strong>file dokumen fisik PDF (F4/A4)</strong> Surat Tugas &amp; SPPD langsung ke chat pegawai.</p>
+          <ul class="feature-list">
+            <li>✓ Multi-Device Baileys 24/7</li>
+            <li>✓ Lampiran PDF, Gambar, Audio</li>
+            <li>✓ Multi-Instance (Bisa Switch Nomor)</li>
+            <li>✓ Anti-Banned Random Delay Queue</li>
+          </ul>
+          <div class="card-footer-badge green">Aktif &amp; Terhubung</div>
+        </div>
+
+        <!-- Telegram -->
+        <div class="channel-card tg">
+          <div class="card-icon tg-icon">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="32" height="32"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.77-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+          </div>
+          <h3>Telegram Bot</h3>
+          <p>Kanal cepat tanpa batas kuota resmi dari Telegram API. Sangat pas untuk alert sistem darurat, grup dinas, dan pengiriman dokumen besar.</p>
+          <ul class="feature-list">
+            <li>✓ 100% Bebas Risiko Banned</li>
+            <li>✓ Kirim File Hingga 50MB Instan</li>
+            <li>✓ Siap Broadcast ke Channel &amp; Grup</li>
+            <li>✓ Failover Otomatis jika WA Offline</li>
+          </ul>
+          <div class="card-footer-badge blue">Official Bot API</div>
+        </div>
+
+        <!-- Email & OTP -->
+        <div class="channel-card email">
+          <div class="card-icon mail-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
+          <h3>Email &amp; Mesin OTP</h3>
+          <p>Kirim email bertanda tangan domain resmi <code>@kitt.lt</code> dengan template artistik berlatar Gedung Sate dan verifikasi kode OTP 6-digit.</p>
+          <ul class="feature-list">
+            <li>✓ SMTP Domain Resmi Anda</li>
+            <li>✓ Generator OTP 6-Digit (TTL 5 Menit)</li>
+            <li>✓ Verifikasi Akun &amp; Reset Password</li>
+            <li>✓ Template HTML Elegan &amp; Responsif</li>
+          </ul>
+          <div class="card-footer-badge amber">Enterprise Security</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Meet RAYI: The AI Chatbot Persona -->
+    <section class="container section" id="rayi">
+      <div class="rayi-showcase-box">
+        <div class="rayi-content">
+          <div class="rayi-badge">PERSONA CHATBOT RESMI</div>
+          <h2>Kenalkan: <span class="highlight-text">RAYI</span></h2>
+          <p class="rayi-meaning">
+            <em>Rayi</em> (bahasa Sunda) berarti adik atau kerabat muda yang penuh rasa hormat, santun, sigap, dan cekatan melayani.
+          </p>
+          <p class="rayi-desc">
+            Di balik nomor WhatsApp WAWAR Anda, <strong>RAYI</strong> bertindak sebagai asisten virtual cerdas yang menyampaikan surat tugas kedinasan, menjawab pertanyaan pegawai secara ramah, dan memandu proses administrasi tanpa lelah.
+          </p>
+          <div class="rayi-traits">
+            <div class="trait-item">
+              <span class="trait-icon">⚡</span>
+              <div>
+                <strong>Responsif &amp; Siaga 24 Jam</strong>
+                <p>Membalas pesan dan mengantar dokumen dalam hitungan detik.</p>
+              </div>
+            </div>
+            <div class="trait-item">
+              <span class="trait-icon">📜</span>
+              <div>
+                <strong>Pengantar Dokumen Resmi</strong>
+                <p>Menyajikan Surat Tugas dan SPPD lengkap dengan rincian kegiatan.</p>
+              </div>
+            </div>
+            <div class="trait-item">
+              <span class="trait-icon">🤝</span>
+              <div>
+                <strong>Santun &amp; Berbudaya</strong>
+                <p>Menyapa dengan adab santun khas Jawa Barat (Sampurasun, Wilujeng).</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="rayi-chat-mockup">
+          <div class="mockup-header">
+            <div class="avatar-circle">R</div>
+            <div class="header-details">
+              <strong>RAYI • Asisten WAWAR</strong>
+              <span>Online • Terhubung ke Server</span>
+            </div>
+          </div>
+          <div class="mockup-body">
+            <div class="chat-bubble incoming">
+              <p>Sampurasun Kang/Teh! 🙏 Saya <strong>RAYI</strong>, asisten virtual resmi Anda.</p>
+              <span class="chat-time">14:32</span>
+            </div>
+            <div class="chat-bubble incoming document">
+              <div class="doc-icon">📄</div>
+              <div class="doc-info">
+                <strong>Surat_Tugas_090_ST_2026.pdf</strong>
+                <span>Format F4 • 2 Halaman • Terlampir</span>
+              </div>
+              <span class="chat-time">14:32</span>
+            </div>
+            <div class="chat-bubble incoming">
+              <p>Perjalanan dinas ke <strong>Kota Bandung</strong> dijadwalkan tanggal <strong>26-28 Oktober 2026</strong>. Wilujeng makarya!</p>
+              <span class="chat-time">14:33</span>
+            </div>
+            <div class="chat-bubble outgoing">
+              <p>Hatur nuhun RAYI, informasinya sangat jelas! 👍</p>
+              <span class="chat-time">14:34</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture & Client Apps Flow -->
+    <section class="container section" id="arsitektur">
+      <div class="section-header text-center">
+        <span class="section-tag">ARSITEKTUR &amp; CLIENT APPS</span>
+        <h2>Satu Gateway untuk Beragam Aplikasi</h2>
+        <p>TANDANG adalah klien pertama, disusul aplikasi internal lain dan layanan komersial masa depan.</p>
+      </div>
+
+      <div class="arch-diagram-card">
+        <div class="diagram-flow">
+          <div class="flow-col">
+            <span class="col-title">Client Applications</span>
+            <div class="client-node active-node">
+              <strong>App 1: TANDANG</strong>
+              <small>Tata Naskah &amp; SPPD Dinas</small>
+            </div>
+            <div class="client-node">
+              <strong>App 2: Portal Internal</strong>
+              <small>OTP Login &amp; Reset Sandi</small>
+            </div>
+            <div class="client-node komersil">
+              <strong>App 3: Klien Komersial</strong>
+              <small>Broadcast &amp; CS Multi-Tenant</small>
+            </div>
+          </div>
+
+          <div class="flow-arrow">
+            <span>REST API</span>
+            <svg width="40" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+
+          <div class="flow-col central">
+            <span class="col-title">WAWAR Hub (VPS Hostinger)</span>
+            <div class="hub-box">
+              <div class="hub-header">
+                <img src="assets/logo-wawar.jpg" alt="WAWAR" class="hub-logo">
+                <strong>WAWAR Gateway Engine</strong>
+              </div>
+              <div class="hub-components">
+                <span>🔐 Auth &amp; Rate Limiter</span>
+                <span>⚡ BullMQ Redis Queue</span>
+                <span>🤖 Bot RAYI Orchestrator</span>
+                <span>💾 PostgreSQL Session Data</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-arrow">
+            <span>Dispatched</span>
+            <svg width="40" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </div>
+
+          <div class="flow-col">
+            <span class="col-title">End Channels</span>
+            <div class="channel-pill green">📱 WhatsApp (Baileys)</div>
+            <div class="channel-pill blue">✈️ Telegram Bot API</div>
+            <div class="channel-pill amber">✉️ SMTP Email &amp; OTP</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick API Integration Example -->
+    <section class="container section" id="api">
+      <div class="section-header text-center">
+        <span class="section-tag">DOKUMENTASI CEPAT</span>
+        <h2>Mudah Diintegrasikan ke Bahasa Apapun</h2>
+        <p>Hanya 5 baris kode untuk mengirim notifikasi atau surat dinas dari aplikasi Anda.</p>
+      </div>
+
+      <div class="code-preview-box">
+        <div class="code-tabs">
+          <button class="code-tab active" onclick="switchCodeTab('curl')">cURL</button>
+          <button class="code-tab" onclick="switchCodeTab('nodejs')">Node.js / Next.js</button>
+          <button class="code-tab" onclick="switchCodeTab('python')">Python</button>
+        </div>
+        <pre class="code-content" id="codeSnippet"><code>curl -X POST http://srv2091882.hstgr.cloud:8085/message/sendText/Wawar-primary \
+  -H "apikey: WawarSecretMasterKey2026!" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "number": "6285121042025",
+    "text": "*[TANDANG]* Surat Tugas No 090/ST/2026 telah terbit. Cek dokumen di chat ini."
+  }'</code></pre>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= VIEW 2: AUTH MODAL / LOGIN ================= -->
+  <div id="authModal" class="modal-overlay">
+    <div class="modal-box glass-card">
+      <button class="modal-close" onclick="toggleAuthModal()">&times;</button>
+      <div class="auth-header text-center">
+        <img src="assets/logo-wawar.jpg" alt="WAWAR" class="auth-logo">
+        <h3>Masuk ke Console WAWAR</h3>
+        <p>Kelola gateway WhatsApp, asisten RAYI, Telegram, dan OTP Anda.</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabKeyAuth" onclick="switchAuthTab('key')">Master API Key</button>
+        <button class="auth-tab" id="tabOtpAuth" onclick="switchAuthTab('otp')">WhatsApp OTP (via RAYI)</button>
+      </div>
+
+      <!-- Form 1: Master Key Login -->
+      <form id="formKeyLogin" onsubmit="handleMasterLogin(event)">
+        <div class="form-group">
+          <label>Host Gateway</label>
+          <input type="text" id="authHost" value="http://srv2091882.hstgr.cloud:8085" readonly class="input-readonly">
+        </div>
+        <div class="form-group">
+          <label>Global Master Key</label>
+          <input type="password" id="authApiKey" placeholder="Masukkan WawarSecretMasterKey..." value="WawarSecretMasterKey2026!" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Buka Console &rarr;</button>
+      </form>
+
+      <!-- Form 2: OTP Login -->
+      <form id="formOtpLogin" class="hidden" onsubmit="handleOtpLogin(event)">
+        <div class="form-group">
+          <label>Nomor WhatsApp Admin</label>
+          <div class="input-inline">
+            <input type="text" id="otpPhone" value="6285121042025" placeholder="Contoh: 6285121042025">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="requestOtpFromRayi()">Minta OTP</button>
+          </div>
+          <small id="otpStatusHint" class="hint-text">Klik "Minta OTP" agar bot RAYI mengirim kode ke WhatsApp Anda.</small>
+        </div>
+        <div class="form-group">
+          <label>Kode Verifikasi 6-Digit</label>
+          <input type="text" id="otpCodeInput" maxlength="6" placeholder="000000" class="otp-input text-center">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Verifikasi &amp; Masuk &rarr;</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= VIEW 3: MAIN CONSOLE DASHBOARD ================= -->
+  <div id="viewDashboard" class="view-section">
+    <div class="dashboard-layout">
+      
+      <!-- Sidebar -->
+      <aside class="dash-sidebar">
+        <div class="dash-brand" onclick="switchView('landing')">
+          <img src="assets/logo-wawar.jpg" alt="WAWAR" class="dash-logo">
+          <div>
+            <strong>WAWAR Console</strong>
+            <small>v2.3.7 • Hostinger</small>
+          </div>
+        </div>
+
+        <nav class="dash-nav">
+          <button class="dash-link active" onclick="switchDashTab('overview')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Overview</span>
+          </button>
+          <button class="dash-link" onclick="switchDashTab('whatsapp')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span>WhatsApp &amp; RAYI</span>
+          </button>
+          <button class="dash-link" onclick="switchDashTab('quicksend')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <span>Kirim Pesan &amp; PDF</span>
+          </button>
+          <button class="dash-link" onclick="switchDashTab('telegram')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+            <span>Telegram Gateway</span>
+          </button>
+          <button class="dash-link" onclick="switchDashTab('emailotp')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <span>Email &amp; Modul OTP</span>
+          </button>
+          <button class="dash-link" onclick="switchDashTab('integrasi')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Klien: TANDANG &amp; API</span>
+          </button>
+        </nav>
+
+        <div class="dash-sidebar-footer">
+          <div class="active-instance-pill">
+            <span class="dot-green"></span>
+            <div>
+              <small>Nomor Aktif</small>
+              <strong>Wawar-primary</strong>
+            </div>
+          </div>
+          <button class="btn btn-outline btn-sm btn-block" onclick="switchView('landing')">Keluar Console</button>
+        </div>
+      </aside>
+
+      <!-- Main Dash Content -->
+      <main class="dash-content">
+        
+        <!-- DASH TAB 1: OVERVIEW -->
+        <section id="dashTab-overview" class="dash-tab active">
+          <div class="dash-header">
+            <div>
+              <h2>Dashboard Layanan WAWAR</h2>
+              <p>Ringkasan performa pengiriman pesan, status instansi, dan aktivitas realtime.</p>
+            </div>
+            <div class="dash-header-actions">
+              <button class="btn btn-outline btn-sm" onclick="fetchLiveInstanceStatus()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span>Sinkronkan Status</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Metric Cards -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Status WhatsApp</span>
+                <span class="badge-status open" id="metricWaStatus">OPEN</span>
+              </div>
+              <h3 id="metricOwnerJid">+62 851-2104-2025</h3>
+              <small class="metric-foot">Instance: <strong>Wawar-primary</strong></small>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Total Pesan Diproses</span>
+                <span class="badge-icon">💬</span>
+              </div>
+              <h3 id="metricTotalMessages">7,290+</h3>
+              <small class="metric-foot">Sinkronisasi database aktif</small>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Kontak Tersinkron</span>
+                <span class="badge-icon">👥</span>
+              </div>
+              <h3 id="metricTotalContacts">1,146</h3>
+              <small class="metric-foot">Tersimpan di PostgreSQL VPS</small>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-top">
+                <span class="metric-label">Klien Aktif</span>
+                <span class="badge-icon">🏛️</span>
+              </div>
+              <h3>1 Aplikasi</h3>
+              <small class="metric-foot">TANDANG (Tata Naskah &amp; SPPD)</small>
+            </div>
+          </div>
+
+          <!-- Activity & System Log -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>Log Aktivitas Pengiriman Terakhir</h3>
+              <span class="text-muted">Real-time webhook queue</span>
+            </div>
+            <div class="table-responsive">
+              <table class="dash-table">
+                <thead>
+                  <tr>
+                    <th>Waktu</th>
+                    <th>Saluran</th>
+                    <th>Tujuan</th>
+                    <th>Tipe Pesan</th>
+                    <th>Status</th>
+                    <th>Instance</th>
+                  </tr>
+                </thead>
+                <tbody id="activityLogTable">
+                  <tr>
+                    <td>Baru saja</td>
+                    <td><span class="badge-ch wa">WhatsApp</span></td>
+                    <td>+62 851-2104-2025</td>
+                    <td>Test Broadcast ([WAWAR NOTIFICATION])</td>
+                    <td><span class="badge-status green">DELIVERED</span></td>
+                    <td>Wawar-primary</td>
+                  </tr>
+                  <tr>
+                    <td>10 mnt lalu</td>
+                    <td><span class="badge-ch wa">WhatsApp</span></td>
+                    <td>System Self-Ping</td>
+                    <td>Handshake Baileys Multi-Device</td>
+                    <td><span class="badge-status green">SUCCESS</span></td>
+                    <td>Wawar-primary</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- DASH TAB 2: WHATSAPP & RAYI -->
+        <section id="dashTab-whatsapp" class="dash-tab">
+          <div class="dash-header">
+            <div>
+              <h2>Pengelolaan WhatsApp &amp; Asisten RAYI</h2>
+              <p>Atur nomor pengirim aktif, ganti nomor baru, atau kelola multi-instance.</p>
+            </div>
+          </div>
+
+          <div class="card-grid-2">
+            <!-- Active Number Card -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3>Nomor Pengirim Aktif Saat Ini</h3>
+                <span class="badge-status open">CONNECTED</span>
+              </div>
+              <div class="instance-details-box">
+                <div class="avatar-large">
+                  <img src="assets/logo-wawar.jpg" alt="Avatar">
+                </div>
+                <div class="details-content">
+                  <h4 id="detailInstanceName">Wawar-primary</h4>
+                  <p class="phone-number" id="detailPhoneNumber">+62 851-2104-2025</p>
+                  <div class="tech-specs">
+                    <span>Integration: Baileys</span> • <span>Client: evolution_v2</span> • <span>Engine: v2.3.7</span>
+                  </div>
+                </div>
+              </div>
+              <div class="instance-action-bar">
+                <button class="btn btn-outline btn-sm" onclick="testPingInstance()">Cek Status Koneksi</button>
+                <button class="btn btn-secondary btn-sm" onclick="alert('Untuk switch nomor, cukup daftarkan nomor baru pada tombol Tambah Nomor Baru di sebelah!')">Ganti Pengirim Utama</button>
+              </div>
+            </div>
+
+            <!-- Add/Switch Instance Card -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3>Tambah Nomor Khusus Baru (Masa Depan)</h3>
+              </div>
+              <p class="text-sm">Saat Anda membeli nomor SIM khusus untuk bot <strong>RAYI</strong>, Anda cukup klik tombol di bawah untuk membuat instance baru dan scan QR tanpa perlu menghapus nomor lama.</p>
+              
+              <div class="form-group mt-3">
+                <label>Nama Instance Baru</label>
+                <input type="text" id="newInstanceName" placeholder="Contoh: rayi-official" value="rayi-official">
+              </div>
+              <button class="btn btn-primary" onclick="createNewInstance()">Buat Instance &amp; Tampilkan QR &rarr;</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- DASH TAB 3: QUICK SEND & PDF -->
+        <section id="dashTab-quicksend" class="dash-tab">
+          <div class="dash-header">
+            <div>
+              <h2>Kirim Pesan WhatsApp &amp; Dokumen PDF</h2>
+              <p>Kirim langsung pesan teks terformat atau lampirkan berkas PDF Surat Tugas secara manual.</p>
+            </div>
+          </div>
+
+          <div class="panel-card max-w-xl">
+            <form onsubmit="handleQuickSend(event)">
+              <div class="form-group">
+                <label>Pilih Instance Pengirim</label>
+                <select id="sendSelectInstance" class="form-select">
+                  <option value="Wawar-primary" selected>Wawar-primary (+62 851-2104-2025)</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Nomor WhatsApp Tujuan</label>
+                <input type="text" id="sendTargetNumber" value="6285121042025" placeholder="628xxxxxxxxxx" required>
+                <small class="hint-text">Gunakan format internasional tanpa spasi dan tanda plus (contoh: 6285121042025).</small>
+              </div>
+
+              <div class="form-group">
+                <label>Isi Pesan Teks</label>
+                <textarea id="sendTextContent" rows="4" placeholder="Ketik pesan Anda di sini... Mendukung format *tebal*, _miring_, ~coret~.">*Pemberitahuan dari WAWAR:*
+Surat Perjalanan Dinas Anda telah siap diambil di subbagian kepegawaian. Hatur nuhun!</textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Lampiran Dokumen PDF (Opsional)</label>
+                <input type="text" id="sendDocUrl" placeholder="URL PDF Dokumen (misal: https://tandang.kitt.lt/sample.pdf)">
+                <small class="hint-text">Bisa gunakan link file Surat Tugas atau SPPD dari TANDANG.</small>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="btnSubmitSend">
+                  <span>Kirim Sekarang</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- DASH TAB 4: TELEGRAM GATEWAY -->
+        <section id="dashTab-telegram" class="dash-tab">
+          <div class="dash-header">
+            <div>
+              <h2>Konfigurasi Telegram Bot</h2>
+              <p>Gunakan Telegram Bot resmi untuk notifikasi cadangan, alert darurat, dan broadcast grup.</p>
+            </div>
+          </div>
+
+          <div class="panel-card max-w-xl">
+            <div class="form-group">
+              <label>Bot Token (@BotFather)</label>
+              <input type="password" id="tgBotToken" placeholder="Contoh: 123456789:ABCdefGhIJKlmNoPQRstuvwxYZ" value="798216345:AAHq_sample_token_kitt">
+            </div>
+            <div class="form-group">
+              <label>Username Bot Resmi</label>
+              <input type="text" id="tgBotUsername" placeholder="@WawarNotifyBot" value="@WawarOfficialBot">
+            </div>
+            <div class="form-group">
+              <label>Default Chat / Channel ID</label>
+              <input type="text" id="tgChatId" placeholder="Contoh: -100123456789 (Grup Dinas)" value="-10023456789">
+            </div>
+            <button class="btn btn-outline" onclick="alert('Token Telegram tersimpan. Sistem siap mengirim notifikasi ke Telegram!')">Simpan Pengaturan Telegram</button>
+          </div>
+        </section>
+
+        <!-- DASH TAB 5: EMAIL & OTP -->
+        <section id="dashTab-emailotp" class="dash-tab">
+          <div class="dash-header">
+            <div>
+              <h2>Layanan Email Resmi &amp; Generator OTP</h2>
+              <p>Konfigurasi pengiriman email ber-kop Gedung Sate dan pengujian verifikasi OTP 6-digit.</p>
+            </div>
+          </div>
+
+          <div class="card-grid-2">
+            <!-- SMTP Settings -->
+            <div class="panel-card">
+              <h3>Konfigurasi SMTP Domain (kitt.lt)</h3>
+              <div class="form-group mt-2">
+                <label>SMTP Host</label>
+                <input type="text" value="smtp.hostinger.com" readonly class="input-readonly">
+              </div>
+              <div class="form-group">
+                <label>Sender Email</label>
+                <input type="text" value="noreply@kitt.lt" class="input-readonly" readonly>
+              </div>
+              <div class="form-group">
+                <label>Template Email Resmi</label>
+                <p class="text-sm">Dilengkapi Header Banner Ilustrasi <strong>Gedung Sate Bandung</strong> untuk identitas kedaerahan yang megah.</p>
+              </div>
+            </div>
+
+            <!-- OTP Simulator -->
+            <div class="panel-card">
+              <h3>Simulasi Generator OTP</h3>
+              <p class="text-sm">Uji kirim kode OTP 6-digit ke nomor WhatsApp atau email dengan masa berlaku 5 menit.</p>
+              <div class="form-group mt-3">
+                <label>Tujuan Kirim OTP</label>
+                <input type="text" id="simOtpPhone" value="6285121042025">
+              </div>
+              <button class="btn btn-primary" onclick="simulateSendOtp()">Generate &amp; Kirim OTP ke WA &rarr;</button>
+              <div id="simOtpResult" class="otp-result-box hidden">
+                <span class="label">Kode Dihasilkan:</span>
+                <strong class="otp-display" id="generatedOtpCode">839201</strong>
+                <span class="expiry-timer">Berlaku selama 04:59</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DASH TAB 6: INTEGRASI & TANDANG -->
+        <section id="dashTab-integrasi" class="dash-tab">
+          <div class="dash-header">
+            <div>
+              <h2>Integrasi Klien: Aplikasi TANDANG</h2>
+              <p>Kunci API dan webhook untuk menghubungkan aplikasi Anda ke gateway WAWAR.</p>
+            </div>
+          </div>
+
+          <div class="panel-card max-w-xl">
+            <div class="form-group">
+              <label>API Endpoint Resmi (VPS)</label>
+              <input type="text" value="http://srv2091882.hstgr.cloud:8085" readonly class="input-readonly">
+            </div>
+
+            <div class="form-group">
+              <label>Bearer API Token (Untuk TANDANG)</label>
+              <div class="input-inline">
+                <input type="password" value="WawarSecretMasterKey2026!" id="clientApiKeyVal" readonly class="input-readonly">
+                <button class="btn btn-outline btn-sm" onclick="copyApiKey()">Salin</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Fungsi Siap Pakai di TANDANG (TypeScript):</label>
+              <pre class="code-content text-xs"><code>import { sendWawarNotification, sendWawarDocument } from '@/lib/wawar/client';
+
+// Kirim notifikasi Surat Tugas F4 ke pegawai:
+await sendWawarDocument({
+  phone: "6285121042025",
+  pdfUrl: "https://tandang.kitt.lt/api/pdf/st-090.pdf",
+  fileName: "Surat_Tugas_090.pdf",
+  caption: "Sampurasun! Surat Tugas No. 090 telah terbit."
+});</code></pre>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

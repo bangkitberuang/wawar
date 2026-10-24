@@ -1,0 +1,22 @@
+{
+  "name": "wawar",
+  "version": "1.0.0",
+  "description": "WAWAR — WhatsApp Gateway, Omnichannel & Bot RAYI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "whatsapp-gateway",
+    "wawar",
+    "rayi",
+    "evolution-api",
+    "omnichannel",
+    "telegram-bot",
+    "otp",
+    "tandang"
+  ],
+  "author": "bangkitberuang",
+  "license": "MIT"
+}
