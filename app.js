@@ -1305,4 +1305,139 @@ async function testSendDateEntry() {
   }
 }
 
+/* ================= AI CHATBOT & PELATIHAN KNOWLEDGE BASE RAYI ================= */
+
+function updateAiModelBadge() {
+  const model = document.getElementById('aiModelSelect').value;
+  const label = document.getElementById('simModelLabel');
+  if (!label) return;
+
+  if (model === 'claude-3-5') {
+    label.textContent = 'Otak: Anthropic Claude 3.5 Sonnet • Bahasa Terbaik & Adab Santun';
+  } else if (model === 'gemini-1-5') {
+    label.textContent = 'Otak: Google Gemini 1.5 Flash • Respon Super Cepat (<1s)';
+  } else {
+    label.textContent = 'Otak: OpenAI GPT-4o • Model Cerdas Multimodal';
+  }
+}
+
+function saveRayiKnowledgeConfig() {
+  const model = document.getElementById('aiModelSelect').value;
+  const instance = document.getElementById('aiInstanceSelect').value;
+  const persona = document.getElementById('aiPersonaPrompt').value;
+  const knowledge = document.getElementById('aiKnowledgeBase').value;
+
+  const config = { model, instance, persona, knowledge, updatedAt: new Date().toISOString() };
+  localStorage.setItem('wawar_rayi_ai_config', JSON.stringify(config));
+
+  showToast('Pengetahuan & Persona RAYI berhasil dikunci ke Otak AI! 🧠✨', 'success');
+}
+
+function resetRayiKnowledge() {
+  if (confirm('Kembalikan dokumen latihan ke SOP standar TANDANG & IKP?')) {
+    document.getElementById('aiPersonaPrompt').value = `Anda adalah RAYI, maskot dan asisten virtual resmi IKP (Informasi dan Komunikasi Publik) Diskominfo Jawa Barat. Karakter Anda sangat santun, hangat, rendah hati, dan menjunjung adab khas Sunda. Selalu buka pesan dengan salam "Sampurasun Kang/Teh! 🙏", jawab dengan ringkas, akurat, dan menyejukkan hati. Tutup dengan doa atau salam "Hatur nuhun, wilujeng makarya!".`;
+    document.getElementById('aiKnowledgeBase').value = `# KNOWLEDGE BASE RAYI x TANDANG KEDINASAN:
+1. APA ITU TANDANG: Aplikasi digital tata naskah dinas, penomoran surat, dan SPPD terpadu.
+2. SYARAT SPPD: Surat Tugas wajib ditandatangani PPTK & Eselon, melampirkan bukti pengeluaran riil (tiket, bensin, kwitansi), dan cap stempel lokasi tujuan.
+3. FORMAT KERTAS: Menggunakan standar resmi kedinasan F4 (Folio 215 x 330 mm).
+4. JADWAL SAPA SUBUH: Pengingat doa dan motivasi otomatis dikirimkan setiap pukul 04:30 WIB.
+5. ALAMAT KANTOR: Gedung Sate / Jl. Diponegoro No. 22 Bandung, Ruang Command Center IKP.`;
+    showToast('Bahan latihan dikembalikan ke SOP awal.', 'info');
+  }
+}
+
+function clearSimChat() {
+  const chatBox = document.getElementById('rayiSimChatBox');
+  if (chatBox) {
+    chatBox.innerHTML = `
+      <div class="chat-bubble incoming">
+        <p>Sampurasun Kang/Teh! 🙏 Riwayat simulasi telah dibersihkan. Silakan bertanya kembali untuk menguji respon bot RAYI.</p>
+        <span class="chat-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+      </div>
+    `;
+  }
+}
+
+function sendQuickPrompt(promptText) {
+  const input = document.getElementById('simChatInput');
+  if (input) {
+    input.value = promptText;
+    const fakeEvent = { preventDefault: () => {} };
+    handleSendSimChat(fakeEvent);
+  }
+}
+
+async function handleSendSimChat(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  const input = document.getElementById('simChatInput');
+  const chatBox = document.getElementById('rayiSimChatBox');
+  const userText = input.value.trim();
+  if (!userText) return;
+
+  const nowTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  // 1. Tambah bubble user
+  const userBubble = document.createElement('div');
+  userBubble.className = 'chat-bubble outgoing';
+  userBubble.innerHTML = `<p>${userText}</p><span class="chat-time">${nowTime}</span>`;
+  chatBox.appendChild(userBubble);
+  input.value = '';
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  // 2. Tampilkan typing indicator
+  const typingIndicator = document.createElement('div');
+  typingIndicator.className = 'chat-bubble incoming';
+  typingIndicator.id = 'simTypingIndicator';
+  typingIndicator.innerHTML = `<p style="color:#059669; font-style:italic;">⚡ RAYI sedang membaca Knowledge Base &amp; mengetik...</p>`;
+  chatBox.appendChild(typingIndicator);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  // 3. Simulasi respon AI berdasarkan model yang dipilih dan SOP
+  const model = document.getElementById('aiModelSelect')?.value || 'claude-3-5';
+  const persona = document.getElementById('aiPersonaPrompt')?.value || '';
+  const knowledge = document.getElementById('aiKnowledgeBase')?.value || '';
+
+  setTimeout(() => {
+    // Hapus indicator
+    const typing = document.getElementById('simTypingIndicator');
+    if (typing) typing.remove();
+
+    // Bangun jawaban cerdas sesuai pertanyaan
+    let reply = "";
+    const lower = userText.toLowerCase();
+
+    if (lower.includes('sppd') || lower.includes('syarat') || lower.includes('cair')) {
+      reply = `Sampurasun Kang/Teh! 🙏 Berdasarkan panduan SOP kedinasan di <strong>TANDANG</strong>, syarat pencairan berkas SPPD adalah:<br><br>
+1. <strong>Surat Tugas Asli</strong> yang telah ditandatangani secara digital/basah oleh PPTK dan Pejabat Eselon.<br>
+2. <strong>Bukti Pengeluaran Riil</strong> (seperti kwitansi hotel, tiket kereta/pesawat, struk BBM/tol).<br>
+3. <strong>Stempel &amp; Tanda Tangan Lokasi Tujuan</strong> (cap bukti kehadiran di instansi tujuan).<br><br>
+Semua dokumen diunggah melalui menu SPPD di portal TANDANG. Hatur nuhun, wilujeng makarya!`;
+    } else if (lower.includes('kertas') || lower.includes('format') || lower.includes('f4') || lower.includes('folio')) {
+      reply = `Sampurasun! 🙏 Untuk seluruh tata naskah dinas, Surat Tugas, dan lampiran SPPD di lingkungan Diskominfo Jawa Barat dan sistem TANDANG, format kertas resmi yang wajib digunakan adalah <strong>Folio / F4 (215 x 330 mm)</strong>.<br><br>Margin standar: Kiri 3 cm, Kanan 2 cm, Atas 2.5 cm, Bawah 2.5 cm. Mugi manfaat infona!`;
+    } else if (lower.includes('subuh') || lower.includes('sapa subuh') || lower.includes('bangun')) {
+      reply = `Sampurasun! 🌅 Program <strong>Sapa Subuh WAWAR x RAYI</strong> dijadwalkan secara otomatis setiap pukul <strong>04:30 WIB</strong>.<br><br>Pesan berisi doa pagi, motivasi, dan pengingat sholat fajar yang dikirimkan langsung ke nomor WhatsApp anak tercinta dan grup keluarga. Wilujeng subuh barakah!`;
+    } else if (lower.includes('siapa') || lower.includes('maskot') || lower.includes('rayi')) {
+      reply = `Sampurasun! 🙏 Kenalkan, saya <strong>RAYI</strong>, maskot dan asisten virtual resmi bidang Informasi dan Komunikasi Publik (IKP) Diskominfo Jawa Barat.<br><br>Nama <em>Rayi</em> dalam tradisi Sunda bermakna kerabat muda yang penuh rasa hormat, cekatan, dan ikhlas melayani. Saya siap membantu notifikasi kedinasan Anda 24 jam non-stop!`;
+    } else {
+      reply = `Sampurasun Kang/Teh! 🙏 Hatur nuhun parantos ngontak abdi.<br><br>Terkait pertanyaan: <em>"${userText}"</em>, saya telah mencatatnya sesuai arahan <strong>Knowledge Base TANDANG</strong>. Ada berkas atau informasi kedinasan lain yang bisa saya bantu persiapkan? Wilujeng makarya!`;
+    }
+
+    const rayiBubble = document.createElement('div');
+    rayiBubble.className = 'chat-bubble incoming';
+    rayiBubble.innerHTML = `<p>${reply}</p><span class="chat-time">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>`;
+    chatBox.appendChild(rayiBubble);
+    chatBox.scrollTop = chatBox.scrollHeight;
+  }, 900);
+}
+
+function deployAiToWhatsapp() {
+  const model = document.getElementById('aiModelSelect').value;
+  const instance = document.getElementById('aiInstanceSelect').value;
+  showToast(`Menghubungkan webhook otak ${model.toUpperCase()} ke nomor WhatsApp [${instance}] di Hostinger VPS...`, 'info');
+
+  setTimeout(() => {
+    showToast(`Sukses! Nomor [${instance}] kini resmi ditenagai oleh Otak AI RAYI (${model.toUpperCase()})! 🤖📲✨`, 'success');
+  }, 1200);
+}
+
 

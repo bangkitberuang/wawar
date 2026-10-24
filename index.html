@@ -388,7 +388,11 @@
           </button>
           <button class="dash-link" onclick="switchDashTab('whatsapp')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-            <span>WhatsApp &amp; RAYI</span>
+            <span>WhatsApp &amp; Nomor</span>
+          </button>
+          <button class="dash-link" onclick="switchDashTab('rayiai')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a8 8 0 0 0-8 8c0 3.37 2.08 6.25 5 7.42V20a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2.58c2.92-1.17 5-4.05 5-7.42a8 8 0 0 0-8-8z"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/><path d="M8 13a4 4 0 0 0 8 0"/></svg>
+            <span>Otak AI &amp; Pelatihan RAYI</span>
           </button>
           <button class="dash-link" onclick="switchDashTab('quicksend')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
@@ -412,8 +416,8 @@
           <div class="active-instance-pill">
             <span class="dot-green"></span>
             <div>
-              <small>Nomor Aktif</small>
-              <strong>Wawar-primary</strong>
+              <small>Trio Nomor Strategis</small>
+              <strong>1 Terhubung • 2 Siap Pair</strong>
             </div>
           </div>
           <button class="btn btn-outline btn-sm btn-block" onclick="switchView('landing')">Keluar Console</button>
@@ -954,6 +958,111 @@
               </div>
             </div>
             <button class="btn btn-primary" onclick="createNewInstance()">Buat Instance &amp; Tampilkan QR Scan &rarr;</button>
+          </div>
+        </section>
+
+        <!-- DASH TAB: OTAK AI & PELATIHAN CHATBOT RAYI -->
+        <section id="dashTab-rayiai" class="dash-tab">
+          <div class="dash-header">
+            <div>
+              <h2>Pelatihan Otak AI &amp; Knowledge Base RAYI</h2>
+              <p>Latih asisten bot dengan persona santun Jawa Barat, hubungkan ke Claude 3.5 / Gemini, dan uji coba simulasi percakapan interaktif.</p>
+            </div>
+            <div class="dash-header-actions">
+              <button class="btn btn-outline btn-sm" onclick="resetRayiKnowledge()">Reset ke Default SOP</button>
+              <button class="btn btn-primary btn-sm" onclick="saveRayiKnowledgeConfig()">Simpan &amp; Terapkan ke Bot</button>
+            </div>
+          </div>
+
+          <div class="card-grid-2">
+            <!-- Kolom 1: Konfigurasi Otak & Pengetahuan (Knowledge Base) -->
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3>1. Parameter Otak &amp; Pengetahuan Kedinasan</h3>
+                <span class="badge-tag green">🤖 AI AGENT READY</span>
+              </div>
+
+              <div class="card-grid-2 mt-2">
+                <div class="form-group">
+                  <label>Pilih Mesin AI (LLM Provider)</label>
+                  <select id="aiModelSelect" class="form-select" onchange="updateAiModelBadge()">
+                    <option value="claude-3-5" selected>Anthropic Claude 3.5 Sonnet (Bahasa Terbaik)</option>
+                    <option value="gemini-1-5">Google Gemini 1.5 Flash (Super Cepat)</option>
+                    <option value="openai-gpt4o">OpenAI GPT-4o (Multimodal)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Nomor Instance WhatsApp</label>
+                  <select id="aiInstanceSelect" class="form-select">
+                    <option value="rayi-cs-official" selected>rayi-cs-official (Nomor Khusus Bot)</option>
+                    <option value="Wawar-primary">Wawar-primary (+62 851-2104-2025)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>System Persona &amp; Adab Bahasa RAYI</label>
+                <textarea id="aiPersonaPrompt" rows="4" class="text-sm">Anda adalah RAYI, maskot dan asisten virtual resmi IKP (Informasi dan Komunikasi Publik) Diskominfo Jawa Barat. Karakter Anda sangat santun, hangat, rendah hati, dan menjunjung adab khas Sunda. Selalu buka pesan dengan salam "Sampurasun Kang/Teh! 🙏", jawab dengan ringkas, akurat, dan menyejukkan hati. Tutup dengan doa atau salam "Hatur nuhun, wilujeng makarya!".</textarea>
+                <small class="hint-text">Menentukan kepribadian, gaya bicara, dan adab sopan santun bot saat membalas warga/pegawai.</small>
+              </div>
+
+              <div class="form-group">
+                <label>Bahan Latihan Dokumen &amp; SOP (Knowledge Base)</label>
+                <textarea id="aiKnowledgeBase" rows="7" class="text-sm"># KNOWLEDGE BASE RAYI x TANDANG KEDINASAN:
+1. APA ITU TANDANG: Aplikasi digital tata naskah dinas, penomoran surat, dan SPPD terpadu.
+2. SYARAT SPPD: Surat Tugas wajib ditandatangani PPTK & Eselon, melampirkan bukti pengeluaran riil (tiket, bensin, kwitansi), dan cap stempel lokasi tujuan.
+3. FORMAT KERTAS: Menggunakan standar resmi kedinasan F4 (Folio 215 x 330 mm).
+4. JADWAL SAPA SUBUH: Pengingat doa dan motivasi otomatis dikirimkan setiap pukul 04:30 WIB.
+5. ALAMAT KANTOR: Gedung Sate / Jl. Diponegoro No. 22 Bandung, Ruang Command Center IKP.</textarea>
+                <small class="hint-text">Tuliskan aturan, SOP, atau FAQ yang wajib diketahui bot RAYI sebelum menjawab pertanyaan.</small>
+              </div>
+
+              <div class="form-actions">
+                <button type="button" class="btn btn-primary btn-block" onclick="saveRayiKnowledgeConfig()">
+                  <span>Kunci Pengetahuan ke Server WAWAR</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Kolom 2: Live Simulator Chatbot Interaktif -->
+            <div class="panel-card" style="display:flex; flex-direction:column; height:100%;">
+              <div class="panel-header">
+                <div>
+                  <h3>2. Simulator Percakapan RAYI</h3>
+                  <span class="text-sm text-muted" id="simModelLabel">Otak: Claude 3.5 Sonnet • Mode Santun Aktif</span>
+                </div>
+                <button class="btn btn-outline btn-xs" onclick="clearSimChat()">Bersihkan Chat</button>
+              </div>
+
+              <!-- Chat Messages Container -->
+              <div class="rayi-chat-box" id="rayiSimChatBox" style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:var(--radius-md); padding:16px; flex:1; min-height:280px; max-height:360px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; margin-bottom:12px;">
+                <div class="chat-bubble incoming">
+                  <p>Sampurasun Kang/Teh! 🙏 Saya <strong>RAYI</strong>, asisten virtual resmi Anda. Silakan uji coba bertanya apa saja seputar TANDANG atau agenda kedinasan hari ini.</p>
+                  <span class="chat-time">16:15</span>
+                </div>
+              </div>
+
+              <!-- Quick Prompt Pills -->
+              <div class="quick-prompts mb-2" style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Sampurasun RAYI, apa saja syarat pencairan SPPD di TANDANG?')">💡 Syarat SPPD?</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Format kertas resmi yang dipakai di TANDANG apa?')">💡 Format Kertas?</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Jam berapa jadwal sapa subuh otomatis dikirim?')">💡 Sapa Subuh?</button>
+                <button type="button" class="btn btn-outline btn-xs" onclick="sendQuickPrompt('Bisa bantu jelaskan siapa itu RAYI?')">💡 Siapa RAYI?</button>
+              </div>
+
+              <!-- Input Bar -->
+              <form onsubmit="handleSendSimChat(event)" style="display:flex; gap:8px;">
+                <input type="text" id="simChatInput" placeholder="Ketik pesan untuk mengetes bot RAYI..." style="flex:1;" required>
+                <button type="submit" class="btn btn-primary" id="btnSendSim">
+                  <span>Kirim</span>
+                </button>
+              </form>
+
+              <div class="mt-3" style="border-top:1px dashed #CBD5E1; padding-top:10px; display:flex; justify-content:space-between; align-items:center;">
+                <small class="text-muted">Siap dipakai di WhatsApp nyata?</small>
+                <button class="btn btn-secondary btn-sm" onclick="deployAiToWhatsapp()">Aktifkan ke Nomor WhatsApp &rarr;</button>
+              </div>
+            </div>
           </div>
         </section>
 
