@@ -2,7 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 3030;
+const PORT = process.env.PORT || 3002;
 const DB_FILE = path.join(__dirname, 'data', 'db.json');
 
 const MIME = {

@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  wawar-app:
+    build: .
+    container_name: wawar-app
+    restart: unless-stopped
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - EVOLUTION_HOST=http://187.52.118.104:8085
+      - EVOLUTION_KEY=WawarSecretMasterKey2026!
+      - DEFAULT_INSTANCE=Wawar-primary
+    volumes:
+      - ./data:/app/data
